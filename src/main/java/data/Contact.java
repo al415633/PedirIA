@@ -17,6 +17,7 @@ public class Contact {
     @Id
     String nif;
     @OneToOne
+    @JoinColumn(name = "postal_address_id")
     PostalAddress postalAddress;
 
     @Transient

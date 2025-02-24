@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 @Entity
 public class PostalAddress {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     String street;
     int building;

@@ -8,18 +8,17 @@ import java.util.List;
 public interface ComercioDao {
 
 
-    String getTipo(String nombre);
+    String getTipo(String email);
 
 
-    ComercioDetails getComercio(String nombre);
-
+    ComercioDetails getComercio(String email);
 
 
 
     List<ComercioDetails> getComercios();
 
 
-    ComercioDetails loadComercioByUsername(String username, String password);
+    ComercioDetails loadComercioByUsername(String email, String password);
 
 
     Collection<ComercioDetails> listAllComercios();

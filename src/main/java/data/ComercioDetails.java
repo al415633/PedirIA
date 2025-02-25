@@ -1,7 +1,21 @@
 package data;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@Entity
+@NamedQueries({
+        @NamedQuery(name="Comercio.findAll", query = "SELECT c FROM ComercioDetails c"),
+        @NamedQuery(name = "Comercio.findByEmail", query = "SELECT c FROM ComercioDetails c WHERE c.email = :email")
+})
+
 public class ComercioDetails {
 
+    @Id
     String email;
     String password;
     String nombre;

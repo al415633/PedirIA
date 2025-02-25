@@ -11,35 +11,49 @@
 </head>
 <body>
 <div id="app" class="container">
-    <h1>Gestión de Carne</h1>
-    <div>
-        <form class="row g-4">
-            <div class="col-auto">
-                <input v-model="tipo" type="text" class="form-control" placeholder="Tipo de Carne">
+    <h1 class="mt-4">Gestión de Carne</h1>
+
+    <!-- Formulario para agregar carne -->
+    <div class="card p-3 mb-4">
+        <h4>Agregar Nueva Carne</h4>
+        <form class="row g-3">
+            <div class="col-md-3">
+                <input v-model="nombre" type="text" class="form-control" placeholder="Nombre">
             </div>
-            <div class="col-auto">
-                <input v-model="origen" type="text" class="form-control" placeholder="Origen">
+            <div class="col-md-3">
+                <input v-model="categoria" type="text" class="form-control" placeholder="Categoría">
             </div>
-            <div class="col-auto">
-                <button v-on:click="createCarne(tipo, origen)" type="button" class="btn btn-primary">Agregar</button>
+            <div class="col-md-2">
+                <input v-model="unidad" type="text" class="form-control" placeholder="Unidad">
+            </div>
+            <div class="col-md-3">
+                <input v-model="tipoConserva" type="text" class="form-control" placeholder="Tipo de Conserva">
+            </div>
+            <div class="col-md-1">
+                <button v-on:click="createCarne()" type="button" class="btn btn-primary">Agregar</button>
             </div>
         </form>
     </div>
 
-    <table class="table">
+    <!-- Tabla de carnes -->
+    <table class="table table-striped">
         <thead>
         <tr>
             <th>#</th>
-            <th>Tipo</th>
-            <th>Origen</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Unidad</th>
+            <th>Tipo de Conserva</th>
             <th>Acciones</th>
         </tr>
         </thead>
         <tbody>
         <tr v-for="(carne, index) in carnes" :key="carne.id">
             <td>{{ index + 1 }}</td>
-            <td>{{ carne.tipo }}</td>
-            <td>{{ carne.origen }}</td>
+            <td>{{ carne.nombre }}</td>
+            <td>{{ carne.categoria }}</td>
+            <td>{{ carne.unidad }}</td>
+            <td>{{ carne.tipoConserva }}</td>
             <td>
                 <button v-on:click="retrieveCarne(index)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">Editar</button>
                 <button v-on:click="deleteCarne(index)" class="btn btn-danger">Eliminar</button>
@@ -48,6 +62,7 @@
         </tbody>
     </table>
 
+    <!-- Modal para editar carne -->
     <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -57,10 +72,14 @@
                 </div>
                 <div class="modal-body">
                     <form>
-                        <label>Tipo:</label>
-                        <input v-model="currentCarne.tipo" type="text" class="form-control">
-                        <label>Origen:</label>
-                        <input v-model="currentCarne.origen" type="text" class="form-control">
+                        <label>Nombre:</label>
+                        <input v-model="currentCarne.nombre" type="text" class="form-control">
+                        <label>Categoría:</label>
+                        <input v-model="currentCarne.categoria" type="text" class="form-control">
+                        <label>Unidad:</label>
+                        <input v-model="currentCarne.unidad" type="text" class="form-control">
+                        <label>Tipo de Conserva:</label>
+                        <input v-model="currentCarne.tipoConserva" type="text" class="form-control">
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -71,6 +90,7 @@
         </div>
     </div>
 </div>
+
 <script src="./js/carne.js"></script>
 </body>
 </html>

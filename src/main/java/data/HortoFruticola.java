@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class HortoFruticola {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_hortofruticola")
+    @Column(name = "id_hortofruticola", columnDefinition = "serial")
     private Long id;
 
     @Column(name = "nombre", nullable = false, length = 255)

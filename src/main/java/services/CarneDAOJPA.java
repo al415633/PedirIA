@@ -19,9 +19,6 @@ public class CarneDAOJPA {
 
     @Transactional
     public Carne create(Carne carne) {
-        if (em.find(Carne.class, carne.getId()) != null) {
-            return null;
-        }
         em.persist(carne);
         return carne;
     }

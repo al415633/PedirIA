@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class Pescado {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_pescado")
+    @Column(name = "id_pescado", columnDefinition = "serial")
     private Long id;
 
     @Column(name = "nombre", nullable = false, length = 250)

@@ -1,0 +1,12 @@
+{
+  "nombre": "Mundo",
+  "ocupacion": "existir",
+  "extra":[{
+    "vida":"#f00",
+    "muerte":"#0f0"
+  },{
+    "vida":"#f01",
+    "muerte":"#0f1"
+  }
+  ]
+}

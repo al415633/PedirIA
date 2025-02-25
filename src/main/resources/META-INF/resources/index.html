@@ -3,35 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Contact list</title>
-    <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-uWxY/CJNBR+1zjPWmfnSnVxwRheevXITnMqoEIeG1LJrdI0GlVs/9cVSyPYXdcSF" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-kQtW33rZJAHjgefvhyyzcGF3C5TFyBQBA13V1RKPf4uH+bwyzQxZ6CmMZHmNBEfJ"
-            crossorigin="anonymous"></script>
+    <title>Gestión de Carne</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!--    <script src="./js/app.js"></script>-->
 </head>
 <body>
 <div id="app" class="container">
-    <h1>My awesome contact list</h1>
+    <h1>Gestión de Carne</h1>
     <div>
         <form class="row g-4">
             <div class="col-auto">
-                <input id="name" v-model="name" type="text" class="form-control" placeholder="Name">
+                <input v-model="tipo" type="text" class="form-control" placeholder="Tipo de Carne">
             </div>
             <div class="col-auto">
-                <input id="surname" v-model="surname" type="text" class="form-control" placeholder="Surname">
+                <input v-model="origen" type="text" class="form-control" placeholder="Origen">
             </div>
             <div class="col-auto">
-                <input id="nif" v-model="nif" type="text" class="form-control" placeholder="NIF">
-            </div>
-            <div class="col-auto">
-                <button id="new" v-on:click="createContact(name, surname, nif)" type="button" class="btn btn-primary">New
-                </button>
+                <button v-on:click="createCarne(tipo, origen)" type="button" class="btn btn-primary">Agregar</button>
             </div>
         </form>
     </div>
@@ -39,65 +29,48 @@
     <table class="table">
         <thead>
         <tr>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">Surname</th>
-            <th scope="col">NIF</th>
-            <th></th>
+            <th>#</th>
+            <th>Tipo</th>
+            <th>Origen</th>
+            <th>Acciones</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(contact, index) in contacts" :id="contact.nif">
-            <th scope="row">{{index + 1}}</th>
-            <td>{{contact.name}}</td>
-            <td>{{contact.surname}}</td>
-            <td>{{contact.nif}}</td>
+        <tr v-for="(carne, index) in carnes" :key="carne.id">
+            <td>{{ index + 1 }}</td>
+            <td>{{ carne.tipo }}</td>
+            <td>{{ carne.origen }}</td>
             <td>
-                <button v-on:click="retrieveContact(index)" type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#exampleModal">Update
-                </button>
-            </td>
-            <td>
-                <button v-on:click="deleteContact(index)" type="button" class="btn btn-danger">Remove</button>
+                <button v-on:click="retrieveCarne(index)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">Editar</button>
+                <button v-on:click="deleteCarne(index)" class="btn btn-danger">Eliminar</button>
             </td>
         </tr>
         </tbody>
     </table>
 
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">Editar Carne</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form>
-                        <label>Name:</label>
-                        <div class="col-auto">
-                            <input v-model="currentContact.name" type="text" class="form-control" placeholder="Name">
-                        </div>
-                        <label>Surname:</label>
-                        <div class="col-auto">
-                            <input v-model="currentContact.surname" type="text" class="form-control"
-                                   placeholder="Surname">
-                        </div>
-                        <label>NIF:</label>
-                        <div class="col-auto">
-                            <input disabled v-model="currentContact.nif" type="text" class="form-control" placeholder="NIF">
-                        </div>
+                        <label>Tipo:</label>
+                        <input v-model="currentCarne.tipo" type="text" class="form-control">
+                        <label>Origen:</label>
+                        <input v-model="currentCarne.origen" type="text" class="form-control">
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" v-on:click="updateContact()" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" v-on:click="updateCarne()" class="btn btn-primary">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
-<script src="./js/app.js"></script>
+<script src="./js/carne.js"></script>
 </body>
 </html>

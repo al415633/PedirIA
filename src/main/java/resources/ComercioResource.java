@@ -31,10 +31,10 @@ ComercioResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/retrieve/{gmail}")
-    public Response getContact(@PathParam("gmail") final String gmail) {
-        if (dao.getComercio(gmail) == null) return Response.status(Response.Status.NOT_FOUND).build();
-        return Response.ok(dao.getComercio(gmail)).build();
+    @Path("/retrieve/{correo}")
+    public Response getContact(@PathParam("correo") final String correo) {
+        if (dao.getComercio(correo) == null) return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.ok(dao.getComercio(correo)).build();
     }
 
     @POST
@@ -42,7 +42,7 @@ ComercioResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/create")
     public Response createContact(ComercioDetails comercioDetails) throws URISyntaxException {
-        ComercioDetails response = dao.loadComercioByUsername(comercioDetails.getEmail(), comercioDetails.getPassword());
+        ComercioDetails response = dao.loadComercioByUsername(comercioDetails.getCorreo(), comercioDetails.getPassword());
         if (response == null) return Response.status(Response.Status.CONFLICT).build();
         URI uri = new URI("/contacts/" + comercioDetails.getNombre());
         return Response.created(uri).build();
@@ -62,9 +62,9 @@ ComercioResource {
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/delete/{gmail}")
-    public Response deleteContact(@PathParam("gmail") final String gmail) {
-       /* Contact result = dao.(gmail);
+    @Path("/delete/{correo}")
+    public Response deleteContact(@PathParam("correo") final String correo) {
+       /* Contact result = dao.(correo);
         if(result == Contact.NOT_FOUND) return Response.status(Response.Status.NOT_FOUND).build();
         return Response.noContent().build();
     */

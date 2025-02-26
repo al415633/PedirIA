@@ -22,15 +22,15 @@ public class ComercioDAOJPA implements ComercioDao {
     EntityManager em;
 
     @Override
-    public String getTipo(String email) {
-        ComercioDetails comercioDetails = em.find(ComercioDetails.class, email);  // Busca el contacto por email
+    public String getTipo(String correo) {
+        ComercioDetails comercioDetails = em.find(ComercioDetails.class, correo);  // Busca el contacto por correo
         // Si no se encuentra, devuelve Contact.NOT_FOUND
         return Objects.requireNonNullElse(comercioDetails.getTipo(), null);
     }
 
     @Override
-    public ComercioDetails getComercio(String email) {
-        ComercioDetails comercioDetails = em.find(ComercioDetails.class, email);  // Busca el contacto por email
+    public ComercioDetails getComercio(String correo) {
+        ComercioDetails comercioDetails = em.find(ComercioDetails.class, correo);  // Busca el contacto por correo
         // Si no se encuentra, devuelve Contact.NOT_FOUND
         return Objects.requireNonNullElse(comercioDetails, null);
     }
@@ -44,8 +44,8 @@ public class ComercioDAOJPA implements ComercioDao {
     }
 
     @Override
-    public ComercioDetails loadComercioByUsername(String email, String password) {
-        ComercioDetails comercioDetails = em.find(ComercioDetails.class, email);  // Busca el comercio por email
+    public ComercioDetails loadComercioByUsername(String correo, String password) {
+        ComercioDetails comercioDetails = em.find(ComercioDetails.class, correo);  // Busca el comercio por correo
 
         if (comercioDetails != null && comercioDetails.getPassword().equals(password)) {
             return comercioDetails;  // Retorna si la contraseña es correcta

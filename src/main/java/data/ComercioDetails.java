@@ -13,10 +13,11 @@ import jakarta.persistence.NamedQuery;
         @NamedQuery(name = "Comercio.findByEmail", query = "SELECT c FROM ComercioDetails c WHERE c.email = :email")
 })
 
+
 public class ComercioDetails {
 
     @Id
-    String email;
+    String correo;
     String password;
     String nombre;
 
@@ -32,7 +33,7 @@ public class ComercioDetails {
     @Override
     public String toString() {
         return "ComercioDetails{" +
-                "email='" + email + '\'' +
+                "correo='" + correo + '\'' +
                 ", password='" + password + '\'' +
                 ", nombre='" + nombre + '\'' +
                 ", tipo='" + tipo + '\'' +
@@ -43,13 +44,13 @@ public class ComercioDetails {
 
 
 
-    public String getEmail() {
-        return email;
+    public String getCorreo() {
+        return correo;
     }
 
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setCorreo(String email) {
+        this.correo = email;
     }
 
 

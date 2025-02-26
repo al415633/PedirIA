@@ -10,7 +10,7 @@ import jakarta.persistence.NamedQuery;
 @Entity
 @NamedQueries({
         @NamedQuery(name="Comercio.findAll", query = "SELECT c FROM ComercioDetails c"),
-        @NamedQuery(name = "Comercio.findByEmail", query = "SELECT c FROM ComercioDetails c WHERE c.email = :email")
+        @NamedQuery(name = "Comercio.findByCorreo", query = "SELECT c FROM ComercioDetails c WHERE c.correo = :correo")
 })
 
 

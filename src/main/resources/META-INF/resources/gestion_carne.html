@@ -69,16 +69,41 @@
             <td>{{ carne.tipoConserva }}</td>
             <td>
                 <button v-on:click="retrieveCarne(index)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">Editar</button>
-                <button v-on:click="deleteCarne(index)" class="btn btn-danger">Eliminar</button>
-                <button v-on:click="verStock(index)" class="btn btn-info">Ver Stock</button> <!-- Botón para ver stock -->
+<!--                <button v-on:click="deleteCarne(index)" class="btn btn-danger">Eliminar</button>-->
+                <!-- Botón para abrir el modal -->
+                <button type="button" class="btn btn-danger" @click="deleteCarne(index)">
+                    Eliminar Carne
+                </button>
+                <button v-on:click="verStock(carne.id)" class="btn btn-info">Ver Stock</button> <!-- Botón para ver stock -->
             </td>
         </tr>
         </tbody>
     </table>
 
+
+
+    <!-- Modal de Confirmación de Borrado -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar esta carne?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Sección de stock de la carne seleccionada -->
     <div v-if="mostrarStock" class="mt-4">
-        <h4>Stock de {{ currentCarne.nombre }}</h4>
+        <h4>Stock de {{ carneSeleccionada.nombre }}</h4>
         <table class="table table-bordered">
             <thead>
             <tr>
@@ -95,7 +120,7 @@
                 <td>{{ stock.fechaVencimiento }}</td>
                 <td>
                     <button v-on:click="seleccionarStock(stock)" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editStockModal">Modificar</button>
-                    <button v-on:click="eliminarStock(stock)" class="btn btn-danger">Eliminar</button>
+                    <button v-on:click="eliminarStock(index)" class="btn btn-danger">Eliminar</button>
                 </td>
             </tr>
             </tbody>
@@ -129,11 +154,11 @@
                 <div class="modal-body">
                     <form>
                         <label>Nombre:</label>
-                        <input v-model="currentCarne.nombre" type="text" class="form-control">
+                        <input v-model="carneSeleccionada.nombre" type="text" class="form-control">
                         <label>Unidad:</label>
-                        <input v-model="currentCarne.unidad" type="text" class="form-control">
+                        <input v-model="carneSeleccionada.unidad" type="text" class="form-control">
                         <label>Tipo de Conserva:</label>
-                        <select v-model="currentCarne.tipoConserva" class="form-control">
+                        <select v-model="carneSeleccionada.tipoConserva" class="form-control">
                             <option v-for="tipo in tiposConserva" :key="tipo" :value="tipo">{{ tipo }}</option>
                         </select>
                     </form>
@@ -145,6 +170,18 @@
             </div>
         </div>
     </div>
+
+    <!-- Toast para mensajes Feedback usuario -->
+    <div id="toastCarne" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 20px; right: 20px; z-index: 1050;">
+        <div class="toast-header">
+            <strong class="me-auto">Notificación</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toast-body">
+            ¡Carne algo con éxito!
+        </div>
+    </div>
+
     <!-- Modal para editar stock -->
     <div class="modal fade" id="editStockModal" tabindex="-1">
     <div class="modal-dialog">
@@ -170,6 +207,7 @@
         </div>
     </div>
 </div>
+
 </div>
 
 <script src="./js/carne.js"></script>

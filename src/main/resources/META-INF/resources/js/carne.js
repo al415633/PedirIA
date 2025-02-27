@@ -1,7 +1,7 @@
-const RETRIEVE_ALL = "/carnes";
+const RETRIEVE_ALL_CARNES = "/carnes";
 const POST = "/carnes/create";
 const DELETE = "/carnes/delete/";
-const RETRIEVE_ONE = "/carnes/retrieve/";
+const RETRIEVE_ONE_CARNE = "/carnes/retrieve/";
 const UPDATE = "/carnes/update";
 
 const STOCK_RETRIEVE_ONE = "/carnes/stock/retrieve/";
@@ -10,17 +10,20 @@ const STOCK_ADD = "/carnes/stock";
 const STOCK_UPDATE = "/carnes/stock/";
 const STOCK_DELETE = "/carnes/stock/";
 
-Vue.createApp({
+const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO", "VIVO"];
+
+
+    Vue.createApp({
     data() {
         return {
-            // Gestión productos
+
+            // Gestión de las carnes
             carnes: [],
             nombreCarne: "",
             categoriaCarne: "",
             unidadCarne: "",
             tipoConserva: "",
-            tiposConserva: ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO", "VIVO"], // Enum en frontend
-            currentCarne: { id: null, nombre: "", categoria: "", unidad: "", tipoConserva: "" },
+            carneSeleccionada: {},
 
             // Gestión stock carne
             stocks: [],
@@ -31,14 +34,30 @@ Vue.createApp({
             stockSeleccionado: {},
         };
     },
+        
+    // Permite hacer visible la enumeración constante    
+    computed: {
+        tiposConserva() {
+            return TIPOS_CONSERVA;
+        }
+    },
+
     methods: {
+
         // Obtiene el listado de carnes completo
-        async doGet() {
+        async getAllCarnes() {
             try {
-                const response = await axios.get(RETRIEVE_ALL);
+                const response = await axios.get(RETRIEVE_ALL_CARNES);
                 this.carnes = response.data;
+
+                // Ordenar las carnes después
+                this.carnes.sort((a, b) => {
+                    if (a.nombre < b.nombre) return -1;
+                    if (a.nombre > b.nombre) return 1;
+                    return 0;
+                });
+
                 console.log("Carnes cargadas:", response.data);
-                this.currentCarne = { id: null, nombre: "", categoria: "", unidad: "", tipoConserva: "" };
             } catch (error) {
                 console.error("Error al obtener los datos:", error);
             }
@@ -49,8 +68,8 @@ Vue.createApp({
             try {
                 const carneId = this.carnes[index].id;
                 console.log("Recuperando Carne con ID:", carneId);
-                const response = await axios.get(RETRIEVE_ONE + carneId);
-                this.currentCarne = response.data;
+                const response = await axios.get(RETRIEVE_ONE_CARNE + carneId);
+                this.carneSeleccionada = response.data;
             } catch (error) {
                 console.error("Error al recuperar la Carne:", error);
             }
@@ -65,17 +84,26 @@ Vue.createApp({
                     tipoConserva: this.tipoConserva
                 };
 
-                await axios.post(POST, newCarne);
+                const response = await axios.post(POST, newCarne);
                 console.log("Carne creada:", newCarne);
 
-                // Actualiza el listado de carnes
-                this.doGet();
+                // Agregar la nueva carne al listado localmente
+                console.log("Carne devuelta por API:", response.data);
+                this.carnes.push(response.data); // Suponiendo que la respuesta contiene el objeto creado
+
 
                 // Limpiar los campos después de crear
                 this.nombreCarne = "";
                 this.categoriaCarne = "";
                 this.unidadCarne = "";
                 this.tipoConserva = "";
+
+                // Mostrar el toast de éxito
+                const toastBody = document.getElementById('toast-body');
+                toastBody.textContent = 'Carne añadida con éxito!'; // Mensaje de éxito
+                const toastEl = document.getElementById('toastCarne');
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
 
             } catch (error) {
                 console.error("Error al crear Carne:", error);
@@ -85,34 +113,90 @@ Vue.createApp({
         // Se llama una vez se pulsa guardar en el modal de edición
         async updateCarne() {
             try {
-                if (!this.currentCarne.id) {
+                if (!this.carneSeleccionada.id) {
                     console.error("Error: ID de carne no definido.");
                     return;
                 }
-                console.log("Actualizando Carne:", this.currentCarne);
-                await axios.put(UPDATE, this.currentCarne);
+                console.log("Actualizando Carne:", this.carneSeleccionada);
+                await axios.put(UPDATE, this.carneSeleccionada);
 
-                // Actualizar el listado de carnes
-                this.doGet();
+                console.log("Actualizando correctamente");
+
+                // Actualizar el listado de carnes localmente
+                const index = this.carnes.findIndex(carne => carne.id === this.carneSeleccionada.id);
+                if (index !== -1) {
+                    this.carnes.splice(index, 1, { ...this.carneSeleccionada }); // Reemplaza el elemento modificado
+                }
+
+                // Ordenar las carnes después de la actualización
+                this.carnes.sort((a, b) => {
+                    if (a.nombre < b.nombre) return -1;
+                    if (a.nombre > b.nombre) return 1;
+                    return 0;
+                });
 
                 // Cerrar el modal manualmente
                 let modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
                 if (modal) {
                     modal.hide();
                 }
+
+                // Mostrar el toast de éxito
+                const toastBody = document.getElementById('toast-body');
+                toastBody.textContent = 'Carne actualizada con éxito!'; // Mensaje de éxito
+                const toastEl = document.getElementById('toastCarne');
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
             } catch (error) {
                 console.error("Error al actualizar Carne:", error);
             }
         },
 
-        async deleteCarne(index) {
+        deleteCarne(index) {
+            // Mostrar el modal de confirmación
+            const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+            modal.show();
+
+            // Asignar el índice a un atributo del modal para usarlo en la confirmación
+            const confirmButton = document.getElementById('confirmDeleteButton');
+            confirmButton.onclick = () => {
+                // Cerrar el modal aquí para evitar problemas
+                modal.hide();
+                this.confirmDelete(index);
+            };
+        },
+
+        async confirmDelete(index) {
+            // Verificar que el índice sea válido
+            if (index < 0 || index >= this.carnes.length) {
+                console.error("Índice de carne no válido:", index);
+                return;
+            }
+
             try {
-                const carneId = this.carnes[index].id;
+                const carneId = this.carnes[index].id; // Obtener el ID de la carne
                 console.log("Eliminando Carne con ID:", carneId);
                 await axios.delete(DELETE + carneId);
-                this.doGet();
+
+                console.log("Eliminada de la BBDD");
+                // Eliminar la carne del listado localmente
+                this.carnes.splice(index, 1);
+
+                // Mostrar el toast de éxito
+                const toastBody = document.getElementById('toast-body');
+                toastBody.textContent = 'Carne eliminada con éxito!'; // Mensaje de éxito
+                const toastEl = document.getElementById('toastCarne');
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+
             } catch (error) {
                 console.error("Error al eliminar Carne:", error);
+                // Mostrar el toast de error
+                const toastBody = document.getElementById('toast-body');
+                toastBody.textContent = 'Ocurrió un error al eliminar la carne. Por favor, intenta nuevamente.';
+                const toastEl = document.getElementById('toastCarne');
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
             }
         },
 
@@ -128,12 +212,11 @@ Vue.createApp({
             }
         },
 
-        async verStock(index) {
+        async verStock(carneID) {
             try {
-                const response = await axios.get(STOCK_RETRIEVE + this.carnes[index].id);
+                const response = await axios.get(STOCK_RETRIEVE + carneID);
                 console.log("Stock recibido:", response.data); // Agregar esta línea
                 this.stocks = response.data;
-                this.retrieveCarne(index)
                 this.mostrarStock = true;
             } catch (error) {
                 console.error("Error al obtener el stock:", error);
@@ -146,7 +229,7 @@ Vue.createApp({
                     cantidad: this.cantidadStock,
                     fechaIngreso: this.fechaIngresoStock,
                     fechaVencimiento: this.fechaVencimientoStock,
-                    carne: this.currentCarne,
+                    carne: this.carneSeleccionada,
                 };
 
                 console.log("Stock a añadir: ", nuevoStock)
@@ -171,7 +254,7 @@ Vue.createApp({
                     cantidad: this.stockSeleccionado.cantidad,
                     fechaIngreso: this.stockSeleccionado.fechaIngreso,
                     fechaVencimiento: this.stockSeleccionado.fechaVencimiento,
-                    idCarne: this.currentCarne.id,
+                    idCarne: this.carneSeleccionada.id,
                 };
                 await axios.put(STOCK_UPDATE + this.stockSeleccionado.id, updatedStock);
                 const index = this.stocks.findIndex(stock => stock.id === this.stockSeleccionado.id);
@@ -184,16 +267,16 @@ Vue.createApp({
             }
         },
 
-        async eliminarStock() {
-            if (!this.stockSeleccionado) {
-                console.error("Error: No hay stock seleccionado para eliminar.");
-                return;
-            }
+        async eliminarStock(index) {
+
+            let stockEliminado;
             try {
-                await axios.delete(STOCK_DELETE + this.stockSeleccionado.id);
-                this.stocks = this.stocks.filter(stock => stock.id !== this.stockSeleccionado.id);
-                console.log("Stock eliminado:", this.stockSeleccionado);
-                this.stockSeleccionado = null; // Limpiar la selección
+                console.log("Id de la carne a eliminar: ", this.stocks[index].id)
+                stockEliminado = this.stocks[index].id
+                await axios.delete(STOCK_DELETE + this.stocks[index].id);
+                // Esto no actualiza la lista
+                // this.stocks = this.stocks.filter(stock => stock.id !== stockEliminado.id);
+                this.verStock(stockEliminado.carne.id)
             } catch (error) {
                 console.error("Error al eliminar el stock:", error);
             }
@@ -204,6 +287,6 @@ Vue.createApp({
 
 
     mounted() {
-        this.doGet();
+        this.getAllCarnes();
     }
 }).mount("#app");

@@ -35,10 +35,10 @@ public class CarneResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/create")
     public Response createCarne(Carne carne) throws URISyntaxException {
-        Carne response = dao.create(carne);
-        if (response == null) return Response.status(Response.Status.CONFLICT).build();
+        Carne carneCreada = dao.create(carne);
+        if (carneCreada == null) return Response.status(Response.Status.CONFLICT).build();
         URI uri = new URI("/carnes/" + carne.getId());
-        return Response.created(uri).build();
+        return Response.status(Response.Status.CREATED).entity(carneCreada).build();
     }
 
     @PUT

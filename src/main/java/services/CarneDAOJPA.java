@@ -10,7 +10,6 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 @ApplicationScoped
 public class CarneDAOJPA {
@@ -24,7 +23,7 @@ public class CarneDAOJPA {
     }
 
     public Carne retrieve(Long id) {
-        return Objects.requireNonNullElse(em.find(Carne.class, id), null);
+        return em.find(Carne.class, id);
     }
 
     @Transactional

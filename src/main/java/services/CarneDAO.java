@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 @ApplicationScoped
-public class CarneDAOJPA {
+public class CarneDAO {
     @Inject
     EntityManager em;
 

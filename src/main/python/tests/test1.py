@@ -17,7 +17,8 @@ def main():
         muerte = extra.get("muerte", "")
         mensaje += f"{vida} es muerte, {muerte} es vida!"
 
-    response = {"message": f"Hola, {data['nombre']}!, mi trabajo es {data['ocupacion']}",
+    response = {"message":
+                f"Hola, {data['nombre']}!, mi trabajo es {data['ocupacion']}",
                 "extra": f"Hay, {mensaje}!"}
     print(json.dumps(response))  # Devolver respuesta en JSON
 

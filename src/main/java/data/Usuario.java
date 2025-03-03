@@ -23,7 +23,16 @@ public class Usuario {
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     private ComercioDetails negocio;
 
-
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id_usuario=" + id_usuario +
+                ", correo='" + correo + '\'' +
+                ", password='" + password + '\'' +
+                ", tipo='" + tipo + '\'' +
+                ", negocio=" + negocio +
+                '}';
+    }
 
     public Long getId_usuario() {
         return id_usuario;

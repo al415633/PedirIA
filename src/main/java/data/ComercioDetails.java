@@ -22,10 +22,15 @@ public class ComercioDetails {
     @JoinColumn(name = "id_negocio")
     private Usuario usuario;
 
-
-
-
-
+    @Override
+    public String toString() {
+        return "ComercioDetails{" +
+                "idNegocio=" + idNegocio +
+                ", nombre='" + nombre + '\'' +
+                ", diaCompraDeStock='" + diaCompraDeStock + '\'' +
+                ", usuario=" + usuario +
+                '}';
+    }
 
     public Long getIdNegocio() {
         return idNegocio;

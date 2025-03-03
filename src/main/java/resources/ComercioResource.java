@@ -36,12 +36,40 @@ public class ComercioResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/create")
-    public Response createComercio(Usuario usuario, ComercioDetails negocio) throws URISyntaxException {
-        if (dao.existeCorreo(usuario.getCorreo())) {
+    public Response createComercio(
+            @QueryParam("correo") String correo,
+            @QueryParam("password") String password,
+            @QueryParam("tipoComercio") String tipoComercio,
+            @QueryParam("nombre") String nombre,
+            @QueryParam("diaCompraDeStock") String diaCompraDeStock
+    ) throws URISyntaxException {
+        // Verificar si ya existe el correo
+        if (dao.existeCorreo(correo)) {
             return Response.status(Response.Status.CONFLICT).build();
         }
+
+        // Crear Usuario
+        Usuario usuario = new Usuario();
+        usuario.setCorreo(correo);
+        usuario.setPassword(password);
+        usuario.setTipo(tipoComercio);
+
+        // Crear ComercioDetails
+        ComercioDetails negocio = new ComercioDetails();
+        negocio.setNombre(nombre);
+        negocio.setDiaCompraDeStock(diaCompraDeStock);
+
+        System.out.println(usuario.toString());
+        System.out.println(negocio.toString());
+        // Establecer relación entre Usuario y ComercioDetails
+        negocio.setUsuario(usuario);
+        usuario.setNegocio(negocio);
+
+        // Guardar en la base de datos
         dao.crearNegocio(usuario, negocio);
-        URI uri = new URI("/comercio/retrieve/" + usuario.getCorreo());
+
+        // Generar URI para el nuevo recurso
+        URI uri = new URI("/comercio/retrieve/" + correo);
         return Response.created(uri).build();
     }
 

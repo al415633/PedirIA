@@ -57,16 +57,20 @@ Vue.createApp({
         },
 
         async createComercio() {
-            const comerciante = {
-                correo: this.correo,
-                password: this.password,
-                nombre: this.nombre,
-                tipoComercio: this.tipoComercio,
-                dia: this.dia
-            };
+            // Obtenemos los datos del formulario
+            const correo = this.correo;
+            const password = this.password;
+            const tipoComercio = this.tipoComercio;
+            const nombre = this.nombre;
+            const diaCompraDeStock = this.dia;
+
+
+            // Construimos la URL con los parámetros query
+            const url = `${POST}?correo=${correo}&password=${password}&tipoComercio=${tipoComercio}&nombre=${nombre}&diaCompraDeStock=${diaCompraDeStock}`;
 
             try {
-                const response = await axios.post(POST, comerciante);
+                // Realizamos el POST con los parámetros de la URL
+                const response = await axios.post(url);
 
                 if (response.status === 201) {
                     alert("Registro exitoso");
@@ -79,7 +83,8 @@ Vue.createApp({
                 alert("Hubo un problema con el registro.");
                 window.location.href = "registroError.html";
             }
-        },
+        }
+        ,
 
 
         async updateComercio() {

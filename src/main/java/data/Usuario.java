@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "usuario")
 public class Usuario {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Se autoincrementa
     private Long id_usuario;

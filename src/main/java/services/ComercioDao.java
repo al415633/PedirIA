@@ -1,27 +1,24 @@
 package services;
 
 import data.ComercioDetails;
+import data.Usuario;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface ComercioDao {
 
 
-    String getTipo(String correo);
+    List<Usuario> getComercios();
 
+    Usuario getComercioPorCorreo(String correo);
 
-    ComercioDetails getComercio(String correo);
+    boolean existeCorreo(String correo);
 
+    Usuario crearNegocio(Usuario usuario, ComercioDetails negocio);
 
+    boolean actualizarNegocio(Usuario usuario, ComercioDetails negocio);
 
-    List<ComercioDetails> getComercios();
-
-
-    ComercioDetails loadComercioByUsername(String correo, String password);
-
-
-    Collection<ComercioDetails> listAllComercios();
+    boolean eliminarNegocio(String correo);
 
 
 

@@ -1,31 +1,23 @@
 package resources;
 
+import data.Usuario;
 import data.ComercioDetails;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import services.ComercioDao;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 
 @Path("/comercio")
-public class
-ComercioResource {
+public class ComercioResource {
     @Inject
     ComercioDao dao;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getData() {
+    public Response getComercios() {
         return Response.ok(dao.getComercios()).build();
     }
 
@@ -33,18 +25,23 @@ ComercioResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/retrieve/{correo}")
     public Response getComercio(@PathParam("correo") final String correo) {
-        if (dao.getComercio(correo) == null) return Response.status(Response.Status.NOT_FOUND).build();
-        return Response.ok(dao.getComercio(correo)).build();
+        Usuario usuario = dao.getComercioPorCorreo(correo);
+        if (usuario == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(usuario).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/create")
-    public Response createComercio(ComercioDetails comercioDetails) throws URISyntaxException {
-        ComercioDetails response = dao.loadComercioByUsername(comercioDetails.getCorreo(), comercioDetails.getPassword());
-        if (response == null) return Response.status(Response.Status.CONFLICT).build();
-        URI uri = new URI("/comercio/" + comercioDetails.getNombre());
+    public Response createComercio(Usuario usuario, ComercioDetails negocio) throws URISyntaxException {
+        if (dao.existeCorreo(usuario.getCorreo())) {
+            return Response.status(Response.Status.CONFLICT).build();
+        }
+        dao.crearNegocio(usuario, negocio);
+        URI uri = new URI("/comercio/retrieve/" + usuario.getCorreo());
         return Response.created(uri).build();
     }
 
@@ -52,25 +49,22 @@ ComercioResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/update")
-    public Response updateComercio(final ComercioDetails comercioDetails) {
-        /*Contact result = dao.;
-        if(result == Contact.NOT_FOUND) return Response.status(Response.Status.NOT_FOUND).build();
+    public Response updateComercio(Usuario usuario, ComercioDetails negocio) {
+        boolean actualizado = dao.actualizarNegocio(usuario, negocio);
+        if (!actualizado) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         return Response.noContent().build();
-        todo*/
-        return null;
     }
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/delete/{correo}")
     public Response deleteComercio(@PathParam("correo") final String correo) {
-       /* Contact result = dao.(correo);
-        if(result == Contact.NOT_FOUND) return Response.status(Response.Status.NOT_FOUND).build();
+        boolean eliminado = dao.eliminarNegocio(correo);
+        if (!eliminado) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         return Response.noContent().build();
-    */
-        //TODO
-        return null;
     }
-
-
 }

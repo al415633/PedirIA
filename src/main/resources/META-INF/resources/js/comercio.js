@@ -10,6 +10,7 @@ Vue.createApp({
             comercios: [],
             correo: "",
             password: "",
+            password2:"",
             nombre: "",
             tipoComercio: "",
             dia: "",

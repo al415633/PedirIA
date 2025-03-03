@@ -1,96 +1,62 @@
 package data;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.NamedQueries;
-import jakarta.persistence.NamedQuery;
+import data.Usuario;
+import jakarta.persistence.*;
 
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @Entity
-@NamedQueries({
-        @NamedQuery(name="Comercio.findAll", query = "SELECT c FROM ComercioDetails c"),
-        @NamedQuery(name = "Comercio.findByCorreo", query = "SELECT c FROM ComercioDetails c WHERE c.correo = :correo")
-})
-
-
+@Table(name = "negocio")
 public class ComercioDetails {
 
     @Id
-    String correo;
-    String password;
-    String nombre;
+    @Column(name = "id_negocio")
+    private Long idNegocio; //El mismo ID que el de Usuario
+
+    @Column(nullable = false)
+    private String nombre;
+
+    @Column(name = "dia")
+    private String diaCompraDeStock;
+
+    @OneToOne
+    @MapsId // Indica que usa el mismo ID que Usuario
+    @JoinColumn(name = "id_negocio")
+    private Usuario usuario;
 
 
-    String tipo;
-    String diaCompraDeStock;
 
 
 
 
-
-
-    @Override
-    public String toString() {
-        return "ComercioDetails{" +
-                "correo='" + correo + '\'' +
-                ", password='" + password + '\'' +
-                ", nombre='" + nombre + '\'' +
-                ", tipo='" + tipo + '\'' +
-                ", diaCompraDeStock='" + diaCompraDeStock + '\'' +
-                '}';
+    public Long getIdNegocio() {
+        return idNegocio;
     }
 
-
-
-
-    public String getCorreo() {
-        return correo;
+    public void setIdNegocio(Long idNegocio) {
+        this.idNegocio = idNegocio;
     }
-
-
-    public void setCorreo(String email) {
-        this.correo = email;
-    }
-
-
-    public String getPassword() {
-        return password;
-    }
-
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
 
     public String getNombre() {
         return nombre;
     }
 
-
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-
-
-    public String getTipo() {
-        return tipo;
-    }
-
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
 
     public String getDiaCompraDeStock() {
         return diaCompraDeStock;
     }
 
-
     public void setDiaCompraDeStock(String diaCompraDeStock) {
         this.diaCompraDeStock = diaCompraDeStock;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
 }

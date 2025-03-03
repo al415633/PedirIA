@@ -32,7 +32,7 @@ ComercioResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/retrieve/{correo}")
-    public Response getContact(@PathParam("correo") final String correo) {
+    public Response getComercio(@PathParam("correo") final String correo) {
         if (dao.getComercio(correo) == null) return Response.status(Response.Status.NOT_FOUND).build();
         return Response.ok(dao.getComercio(correo)).build();
     }
@@ -41,10 +41,10 @@ ComercioResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/create")
-    public Response createContact(ComercioDetails comercioDetails) throws URISyntaxException {
+    public Response createComercio(ComercioDetails comercioDetails) throws URISyntaxException {
         ComercioDetails response = dao.loadComercioByUsername(comercioDetails.getCorreo(), comercioDetails.getPassword());
         if (response == null) return Response.status(Response.Status.CONFLICT).build();
-        URI uri = new URI("/contacts/" + comercioDetails.getNombre());
+        URI uri = new URI("/comercio/" + comercioDetails.getNombre());
         return Response.created(uri).build();
     }
 
@@ -52,7 +52,7 @@ ComercioResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/update")
-    public Response updateContact(final ComercioDetails comercioDetails) {
+    public Response updateComercio(final ComercioDetails comercioDetails) {
         /*Contact result = dao.;
         if(result == Contact.NOT_FOUND) return Response.status(Response.Status.NOT_FOUND).build();
         return Response.noContent().build();
@@ -63,7 +63,7 @@ ComercioResource {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/delete/{correo}")
-    public Response deleteContact(@PathParam("correo") final String correo) {
+    public Response deleteComercio(@PathParam("correo") final String correo) {
        /* Contact result = dao.(correo);
         if(result == Contact.NOT_FOUND) return Response.status(Response.Status.NOT_FOUND).build();
         return Response.noContent().build();

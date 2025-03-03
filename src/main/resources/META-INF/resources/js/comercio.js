@@ -7,20 +7,20 @@ const UPDATE = "/comercio/update";
 Vue.createApp({
     data() {
         return {
-            comerciantes: [],
+            comercios: [],
             correo: "",
             password: "",
             nombre: "",
             tipoComercio: "",
             dia: "",
-            currentComerciante: {}
+            currentComercio: {}
         };
     },
     methods: {
         async doGet() {
             await axios.get(RETRIEVE_ALL)
                 .then((response) => {
-                    this.comerciantes = response.data;
+                    this.comercios = response.data;
                     console.log(response.data);
                 })
                 .catch((error) => {
@@ -38,15 +38,15 @@ Vue.createApp({
                 const response = await axios.get(url);
 
                 if (response.status === 200) {
-                    self.currentComerciante = response.data;
-                    console.log("Comerciante encontrado:", response.data);
+                    self.currentComercio = response.data;
+                    console.log("Comercio encontrado:", response.data);
                 } else {
-                    console.warn("Comerciante no encontrado. Estado HTTP:", response.status);
+                    console.warn("Comercio no encontrado. Estado HTTP:", response.status);
                 }
             } catch (error) {
                 if (error.response) {
-                    console.error("Error al recuperar comerciante:", error.response.data);
-                    alert("No se encontró el comerciante con el correo proporcionado.");
+                    console.error("Error al recuperar comercio:", error.response.data);
+                    alert("No se encontró el comercio con el correo proporcionado.");
                 } else if (error.request) {
                     console.error("No se recibió respuesta del servidor:", error.request);
                 } else {
@@ -55,36 +55,42 @@ Vue.createApp({
             }
         },
 
-        async createComercio(correo, password, nombre, tipoComercio, dia) {
-            let self = this;
-            let comerciante = {
-                correo: correo,
-                password: password,
-                nombre: nombre,
-                tipoComercio: tipoComercio,
-                dia: dia
+        async createComercio() {
+            const comerciante = {
+                correo: this.correo,
+                password: this.password,
+                nombre: this.nombre,
+                tipoComercio: this.tipoComercio,
+                dia: this.dia
             };
 
-            await axios.post(POST, comerciante)
-                .then(function (response) {
-                    console.log("Comerciante creado:", response);
-                    self.doGet();
-                })
-                .catch(function (error) {
-                    console.log("Error al crear comerciante:", error);
-                });
+            try {
+                const response = await axios.post(POST, comerciante);
+
+                if (response.status === 201) {
+                    alert("Registro exitoso");
+                    window.location.href = "registroCorrecto.html";
+                } else {
+                    throw new Error("Error en el registro");
+                }
+            } catch (error) {
+                console.error("Error en el registro:", error);
+                alert("Hubo un problema con el registro.");
+                window.location.href = "registroError.html";
+            }
         },
 
+
         async updateComercio() {
-            console.log("Actualizando comerciante...");
+            console.log("Actualizando comercio...");
             let self = this;
-            await axios.put(UPDATE, this.currentComerciante)
+            await axios.put(UPDATE, this.currentComercio)
                 .then(function (response) {
-                    console.log("Comerciante actualizado:", response);
+                    console.log("Comercio actualizado:", response);
                     self.doGet();
                 })
                 .catch(function (error) {
-                    console.log("Error al actualizar comerciante:", error);
+                    console.log("Error al actualizar comercio:", error);
                 });
         },
 
@@ -107,4 +113,4 @@ Vue.createApp({
     mounted() {
         this.doGet();
     }
-}).mount("#app");
+}).mount("#app"); //entiendo que hace que controlo lo que hay dentro del div de "app"

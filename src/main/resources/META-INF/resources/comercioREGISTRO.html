@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - Aprovechante</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Registro - Comercio</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,7 +13,6 @@
     <div class="header-box">
         <div class="container">
             <img src="images/logo.png" alt="PedirIA Logo" class="logo">
-
             <div>
                 <p class="subtitle">¡BIENVENIDO COMERCIO!</p>
             </div>
@@ -19,64 +20,79 @@
     </div>
 </header>
 <main>
-    <div class="login-container">
-        <form action="#" method="POST">
+    <div id="app">
+        <div class="login-container">
+            <form @submit.prevent="createComercio">
+                <div class="registro">
+                    <div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" v-model="correo" required>
+                        </div>
 
-            <div class="registro">
-                <div>
+                        <div class="form-group">
+                            <label for="password">Contraseña</label>
+                            <input type="password" id="password" v-model="password" required oninput="checkPasswordMatch()">
+                        </div>
 
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
+                        <div class="form-group">
+                            <label for="password2">Repetir contraseña</label>
+                            <input type="password" id="password2" v-model="password2" required oninput="checkPasswordMatch()">
+                        </div>
+                        <p id="passwordError" style="color: red; display: none;">⚠️ Las contraseñas no coinciden</p>
                     </div>
 
-                    <div class="form-group">
-                        <label for="password">Contraseña</label>
-                        <input type="password" id="password" name="password" required>
-                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label for="nombreComercio">Nombre del comercio</label>
+                            <input type="text" id="nombreComercio" v-model="nombre" required>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="password2">Repetir contraseña</label>
-                        <input type="password" id="password2" name="password2" required>
+                        <div class="form-group">
+                            <label for="tipoComercio">Tipo de comercio</label>
+                            <select id="tipoComercio" v-model="tipoComercio" required>
+                                <option value="fruta">Frutería</option>
+                                <option value="pescado">Pescadería</option>
+                                <option value="carne">Carnicería</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dia">Horario de compra de stock</label>
+                            <select id="dia" v-model="dia" required>
+                                <option value="lunes">Lunes</option>
+                                <option value="martes">Martes</option>
+                                <option value="miercoles">Miércoles</option>
+                                <option value="jueves">Jueves</option>
+                                <option value="viernes">Viernes</option>
+                                <option value="sabado">Sábado</option>
+                                <option value="domingo">Domingo</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-
-                <div>
-
-                    <div class="form-group">
-                        <label for="nombreComercio">Nombre del comercio</label>
-                        <input type="text" id="nombreComercio" name="nombreComercio" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="tipoComercio">Tipo de comercio</label>
-                        <select id="tipoComercio" name="tipoComercio" required>
-                            <option value="fruta">Frutería</option>
-                            <option value="pescado">Pescadería</option>
-                            <option value="carne">Carnicería</option>
-                            <option value="otro">Otro</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="dia">Horario de compra de stock</label>
-                        <select id="dia" name="dia" required>
-                            <option value="lunes">Lunes</option>
-                            <option value="martes">Martes</option>
-                            <option value="miercoles">Miércoles</option>
-                            <option value="jueves">Jueves</option>
-                            <option value="viernes">Viernes</option>
-                            <option value="sabado">Sabado</option>
-                            <option value="domingo">Domingo</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-        </form>
-        <p><a href="#" class="btn register">Registrarse</a></p>
+                <button type="submit" class="btn register" id="registerButton" disabled>Registrarse</button>
+            </form>
+        </div>
     </div>
 </main>
+<script>
+    function checkPasswordMatch() {
+        let password = document.getElementById("password").value;
+        let password2 = document.getElementById("password2").value;
+        let errorText = document.getElementById("passwordError");
+        let registerButton = document.getElementById("registerButton");
+
+        if (password !== password2 || password === "" || password2 === "") {
+            errorText.style.display = "block";
+            registerButton.disabled = true;
+        } else {
+            errorText.style.display = "none";
+            registerButton.disabled = false;
+        }
+    }
+</script>
 <script src="js/comercio.js"></script>
 </body>
 </html>

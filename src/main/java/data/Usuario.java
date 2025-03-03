@@ -1,5 +1,6 @@
 package data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -22,6 +23,7 @@ public class Usuario {
     private String tipo; //Valores: Negocio o Aprovechante
 
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
     private ComercioDetails negocio;
 
     @Override
@@ -31,7 +33,7 @@ public class Usuario {
                 ", correo='" + correo + '\'' +
                 ", password='" + password + '\'' +
                 ", tipo='" + tipo + '\'' +
-                ", negocio=" + negocio +
+
                 '}';
     }
 

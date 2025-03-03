@@ -1,5 +1,6 @@
 package data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import data.Usuario;
 import jakarta.persistence.*;
 
@@ -17,9 +18,15 @@ public class ComercioDetails {
     @Column(name = "dia")
     private String diaCompraDeStock;
 
+
+
+    @Column(name = "tipo_negocio")
+    private String tipo_negocio;
+
     @OneToOne
     @MapsId // Indica que usa el mismo ID que Usuario
     @JoinColumn(name = "id_negocio")
+    @JsonIgnore
     private Usuario usuario;
 
     @Override
@@ -30,6 +37,15 @@ public class ComercioDetails {
                 ", diaCompraDeStock='" + diaCompraDeStock + '\'' +
                 ", usuario=" + usuario +
                 '}';
+    }
+
+
+    public String getTipo_negocio() {
+        return tipo_negocio;
+    }
+
+    public void setTipo_negocio(String tipo_negocio) {
+        this.tipo_negocio = tipo_negocio;
     }
 
     public Long getIdNegocio() {

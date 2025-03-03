@@ -1,8 +1,10 @@
 const RETRIEVE_ALL = "/comercio";
 const POST = "/comercio/create";
 const DELETE = "/comercio/delete/";
-const RETRIEVE_ONE = "/comercio/retrieve/";
+const RETRIEVE_ONE = "/comercio/login";
 const UPDATE = "/comercio/update";
+
+
 
 Vue.createApp({
     data() {
@@ -30,34 +32,32 @@ Vue.createApp({
         },
 
         async verificarComercio() {
-            console.log("Verificando comercio con correo:", this.correo);
+            const correo = this.correo;
+            const password = this.password;
 
-            let url = RETRIEVE_ONE + this.correo;
+            console.log("Verificando comercio con correo:", correo);
+
+            // Construimos la URL con los parámetros en la query
+            const url = `${RETRIEVE_ONE}?correo=${encodeURIComponent(correo)}&password=${encodeURIComponent(password)}`;
 
             try {
-                const response = await axios.get(url);
-
+                // Enviar la petición POST sin cuerpo, solo con los parámetros en la URL
+                const response = await axios.post(url);
 
                 if (response.status === 200) {
-                    let usuario = response.data;
-
-                    if (usuario.password === this.password) {
-                        alert("Inicio de sesión exitoso");
-                        window.location.href = "registroCorrecto.html"; // Cambia por la página correcta
-                    } else {
-                        alert("Contraseña incorrecta");
-                        window.location.href = "registroError.html"; // Cambia por la página de error
-                    }
+                    alert("Inicio de sesión exitoso");
+                    window.location.href = "registroCorrecto.html"; // Página correcta
                 } else {
-                    alert("Correo no encontrado");
-                    window.location.href = "registroError.html";
+                    throw new Error("Error en la autenticación");
                 }
             } catch (error) {
                 console.error("Error al verificar el comercio:", error);
-                alert("Hubo un problema con la verificación.");
+                alert("Correo o contraseña incorrectos.");
                 window.location.href = "registroError.html";
             }
-        },
+        }
+
+        ,
 
 
         async createComercio() {

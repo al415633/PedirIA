@@ -38,8 +38,10 @@ public class ComercioDAOJPA implements ComercioDao{
 
         negocio.setIdNegocio(usuario.getId_usuario());
         negocio.setUsuario(usuario);
-        em.persist(negocio);
 
+        em.persist(negocio);
+        negocio.setTipo_negocio(usuario.getTipo());
+        usuario.setTipo("negocio");
         usuario.setNegocio(negocio);
         return usuario;
     }
@@ -76,4 +78,32 @@ public class ComercioDAOJPA implements ComercioDao{
         em.remove(usuario);
         return true;
     }
+
+
+    public Usuario verificarCredenciales(String correo, String password) {
+        try {
+            System.out.println(correo);
+            System.out.println(password);
+            List<Usuario> usuarios = em.createQuery(
+                            "SELECT u FROM Usuario u WHERE u.correo = :correo AND u.password = :password",
+                            Usuario.class)
+                    .setParameter("correo", correo)
+                    .setParameter("password", password)
+                    .getResultList();
+
+            if (usuarios.isEmpty()) {
+                System.out.println("No se encontró ningún usuario con esas credenciales.");
+                return null;
+            }
+
+            Usuario usuario = usuarios.get(0); // Si hay más de un resultado, tomamos el primero
+            System.out.println("Usuario encontrado: " + usuario);
+            return usuario;
+        } catch (Exception e) {
+            e.printStackTrace(); // Imprime el error real
+            return null;
+        }
+    }
+
+
 }

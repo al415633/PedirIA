@@ -59,8 +59,7 @@ public class ComercioResource {
         negocio.setNombre(nombre);
         negocio.setDiaCompraDeStock(diaCompraDeStock);
 
-        System.out.println(usuario.toString());
-        System.out.println(negocio.toString());
+
         // Establecer relación entre Usuario y ComercioDetails
         negocio.setUsuario(usuario);
         usuario.setNegocio(negocio);
@@ -95,4 +94,25 @@ public class ComercioResource {
         }
         return Response.noContent().build();
     }
+
+
+
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/login")
+    public Response login(@QueryParam("correo") String correo,
+                          @QueryParam("password") String password) {
+
+
+        Usuario usuario = dao.verificarCredenciales(correo, password);
+
+        if (usuario == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Credenciales incorrectas").build();
+        }
+        return Response.ok(usuario).build();
+    }
+
+
 }

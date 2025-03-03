@@ -19,6 +19,7 @@ public interface ComercioDao {
     boolean actualizarNegocio(Usuario usuario, ComercioDetails negocio);
 
     boolean eliminarNegocio(String correo);
+    Usuario verificarCredenciales(String correo, String password);
 
 
 

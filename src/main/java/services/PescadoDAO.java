@@ -13,15 +13,12 @@ import java.util.List;
 import java.util.Objects;
 
 @ApplicationScoped
-public class PescadoDAOJPA {
+public class PescadoDAO {
     @Inject
     EntityManager em;
 
     @Transactional
     public Pescado create(Pescado pescado) {
-        if (em.find(Pescado.class, pescado.getId()) != null) {
-            return null;
-        }
         em.persist(pescado);
         return pescado;
     }

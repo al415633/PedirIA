@@ -51,4 +51,14 @@ public class Pescado {
     public void setTipoConserva(TipoConserva tipoConserva) {
         this.tipoConserva = tipoConserva;
     }
+
+    @Override
+    public String toString() {
+        return "Pescado{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", unidad='" + unidad + '\'' +
+                ", tipoConserva=" + tipoConserva +
+                '}';
+    }
 }

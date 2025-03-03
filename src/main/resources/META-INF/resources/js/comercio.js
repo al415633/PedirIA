@@ -29,32 +29,36 @@ Vue.createApp({
                 });
         },
 
-        async getComercio(correo) {
-            console.log("Buscando comercio con correo:", correo);
+        async verificarComercio() {
+            console.log("Verificando comercio con correo:", this.correo);
 
-            let url = RETRIEVE_ONE + correo;  // Construimos la URL del endpoint
-            let self = this;  // Guardamos la referencia a `this` para usar dentro de `then`
+            let url = RETRIEVE_ONE + this.correo;
 
             try {
                 const response = await axios.get(url);
 
+
                 if (response.status === 200) {
-                    self.currentComercio = response.data;
-                    console.log("Comercio encontrado:", response.data);
+                    let usuario = response.data;
+
+                    if (usuario.password === this.password) {
+                        alert("Inicio de sesión exitoso");
+                        window.location.href = "registroCorrecto.html"; // Cambia por la página correcta
+                    } else {
+                        alert("Contraseña incorrecta");
+                        window.location.href = "registroError.html"; // Cambia por la página de error
+                    }
                 } else {
-                    console.warn("Comercio no encontrado. Estado HTTP:", response.status);
+                    alert("Correo no encontrado");
+                    window.location.href = "registroError.html";
                 }
             } catch (error) {
-                if (error.response) {
-                    console.error("Error al recuperar comercio:", error.response.data);
-                    alert("No se encontró el comercio con el correo proporcionado.");
-                } else if (error.request) {
-                    console.error("No se recibió respuesta del servidor:", error.request);
-                } else {
-                    console.error("Error en la solicitud:", error.message);
-                }
+                console.error("Error al verificar el comercio:", error);
+                alert("Hubo un problema con la verificación.");
+                window.location.href = "registroError.html";
             }
         },
+
 
         async createComercio() {
             const comerciante = {

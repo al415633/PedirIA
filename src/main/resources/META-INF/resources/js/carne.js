@@ -9,6 +9,7 @@ const STOCK_RETRIEVE = "/carnes/stock/producto/";
 const STOCK_ADD = "/carnes/stock";
 const STOCK_UPDATE = "/carnes/stock/";
 const STOCK_DELETE = "/carnes/stock/";
+const STOCK_PREDICT = "/carnes/stock/predict";
 
 const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO", "VIVO"];
 
@@ -32,6 +33,7 @@ const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO", "VIVO"];
             fechaVencimientoStock: '',
             mostrarStock: false,
             stockSeleccionado: {},
+            stockPrediction: '',
         };
     },
         
@@ -300,6 +302,18 @@ const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO", "VIVO"];
 
             } catch (error) {
                 console.error("Error al eliminar stock:", error);
+            }
+        },
+
+        // Para pedir una prediccion
+        async predecirStock() {
+            try {
+                const response = await axios.get(STOCK_PREDICT);
+                this.stockPrediction = response.data;
+
+                console.log("predicción cargada:", response.data);
+            } catch (error) {
+                console.error("Error al obtener los datos:", error);
             }
         },
 

@@ -257,6 +257,15 @@
     </div>
 </div>
 
+    <!-- Modal obtener predicción   -->
+    <div class="container mt-4" id="getPrediction">
+        <button type="button" v-on:click="predecirStock()" class="btn btn-primary">Obtener predicción</button>
+        <div class="col-md-3">
+            <h3 v-model="stockPrediction" type="text" class="form-control" placeholder="Prediccion"> </h3>
+
+        </div>
+    </div>
+
 </div>
 
 <script src="./js/carne.js"></script>

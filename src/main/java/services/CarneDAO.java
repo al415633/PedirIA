@@ -47,6 +47,7 @@ public class CarneDAO {
     public Collection<Carne> getAll() {
         TypedQuery<Carne> query = em.createQuery("SELECT c FROM Carne c", Carne.class);
         List<Carne> result = query.getResultList();
+        System.out.println(result);
         return result != null ? result : new ArrayList<>();
     }
 }

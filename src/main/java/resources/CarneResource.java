@@ -18,7 +18,9 @@ public class CarneResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll() {
-        return Response.ok(dao.getAll()).build();
+        Response response = Response.ok(dao.getAll()).build();
+        System.out.println(response);
+        return response;
     }
 
     @GET

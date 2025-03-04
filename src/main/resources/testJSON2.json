@@ -1,0 +1,11 @@
+{
+  "stock_actual":[{
+    "nombre":"pato",
+    "cantidad":"35"
+  },{
+    "nombre":"vaca",
+    "cantidad":"51.45"
+  }
+  ],
+  "historicos": "(todo el csv de historicos sin estos paréntesis)"
+}

@@ -27,6 +27,7 @@ public class StockCarneResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/retrieve/{id}")
     public Response obtenerPorId(@PathParam("id") Long id) {
+
         StockCarne stockCarne = stockCarneDAO.retrieve(id);
         if (stockCarne != null) {
             return Response.ok(stockCarne).build();
@@ -37,6 +38,8 @@ public class StockCarneResource {
     @GET
     @Path("/producto/{idCarne}")
     public List<StockCarne> obtenerPorIdCarne(@PathParam("idCarne") Long idCarne) {
+        obtenerTodos();
+
         return stockCarneDAO.retrieveByCarne(idCarne);
     }
 
@@ -67,5 +70,14 @@ public class StockCarneResource {
             return Response.noContent().build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/predict")
+    public Response obtenerPrediccion() {
+
+//        return stockCarneDAO.getPrediction();
+        return Response.ok(stockCarneDAO.getPrediction()).build();
     }
 }

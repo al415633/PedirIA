@@ -79,4 +79,45 @@ public class PythonManager {
         }
         return null;
     }
+
+    public JSONObject sendPythonJSONAsFile(String pythonFilePath, String csv){
+
+        try {
+            File file = File.createTempFile(
+                    "temp", ".txt",
+                    new File(
+                            "src/main/resources/temp"));
+
+            String line;
+            ProcessBuilder pb = new ProcessBuilder("python3", pythonFilePath);
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+//            System.out.println(csv);
+            // Escribir el JSON en la entrada estándar (stdin) de Python
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
+                writer.write("{ \"csv\": \"" + csv + "\"}");
+                writer.flush();  // Asegurar que los datos se envíen
+            }
+            catch(Exception e){
+                System.out.println("es esto");
+                e.printStackTrace();
+            }
+
+            // Leer la salida del proceso (respuesta del script Python)
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder output = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                output.append(line);
+            }
+            Gson gson = new Gson();
+
+            process.waitFor(); // Espera a que el proceso termine
+//            System.out.println("Respuesta de Python: " + output.toString());
+            return gson.fromJson(output.toString(), JSONObject.class);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

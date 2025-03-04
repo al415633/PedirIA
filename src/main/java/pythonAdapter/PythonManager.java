@@ -84,11 +84,11 @@ public class PythonManager {
 
         try {
             File file = File.createTempFile(
-                    "temp", ".tmp",
+                    "temp", ".json",
                     new File(
                             "src/main/resources/temp"));
             System.out.println(file.getName());
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file.getName()))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file.getPath()))) {
                 writer.write(json.toJSONString());
             }
             String line;
@@ -98,7 +98,7 @@ public class PythonManager {
 //            System.out.println(json);
             // Escribir el JSON en la entrada estándar (stdin) de Python
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
-                writer.write(file.getName());
+                writer.write(file.getPath());
                 writer.flush();  // Asegurar que los datos se envíen
             }
             catch(Exception e){
@@ -116,7 +116,8 @@ public class PythonManager {
             Gson gson = new Gson();
 
             process.waitFor(); // Espera a que el proceso termine
-//            System.out.println("Respuesta de Python: " + output.toString());
+            if (!file.delete())
+                file.deleteOnExit();
             return gson.fromJson(output.toString(), JSONObject.class);
 
         } catch (Exception e) {

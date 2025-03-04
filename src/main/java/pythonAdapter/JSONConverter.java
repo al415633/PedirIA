@@ -15,7 +15,8 @@ import java.util.Map;
 public class JSONConverter {
 
     public String extractHistoricStockCarne(List<StockCarne> listaStock){
-        StringBuilder stringBuilder = new StringBuilder("ds,producto,y\n");
+        StringBuilder stringBuilder = new StringBuilder("ds,producto,y");
+        stringBuilder.append(System.lineSeparator());
         for (StockCarne stock : listaStock){
             stringBuilder
                     .append(stock.getFechaIngreso().toString())
@@ -23,10 +24,11 @@ public class JSONConverter {
                     .append(stock.getCarne().getNombre())
                     .append(", ")
                     .append(stock.getCantidad())
-                    .append("\n");
+                    .append(System.lineSeparator());
+
         }
         String finalString = stringBuilder.toString();
-        System.out.println(finalString);
+        System.out.println("csv: " + finalString);
         return finalString;
     }
     public JSONObject extractMapCurrentStockCarne(List<StockCarne> listaStock){
@@ -93,10 +95,13 @@ public class JSONConverter {
         String currentStock = extractCurrentStockCarne(listaStock);
         String historicosCSV = extractHistoricStockCarne(listaStock);
         stringBuilder
-                .append("{\n")
+                .append("{")
+                .append(System.lineSeparator())
                 .append(currentStock)
-                .append(",\n")
-                .append("\"historicos\":\n")
+                .append(",")
+                .append(System.lineSeparator())
+                .append("\"historicos\":")
+                .append(System.lineSeparator())
                 .append("\"")
                 .append(historicosCSV)
                 .append("\"")

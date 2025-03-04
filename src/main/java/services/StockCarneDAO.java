@@ -52,20 +52,26 @@ public class StockCarneDAO {
     public List<StockCarne> getAll() {
         List< StockCarne > result = em.createQuery("SELECT s FROM StockCarne s", StockCarne.class)
                 .getResultList();
-        JSONConverter converter = new JSONConverter();
+//        JSONConverter converter = new JSONConverter();
 //        converter.extractHistoricStockCarne(result);
 //        converter.extractMapCurrentStockCarne(result);
 //        converter.extractCurrentStockCarne(result);
-        converter.preparePythonMessage(result);
+//        converter.preparePythonMessage(result);
         return result;
     }
 
     public String getPrediction() {
         JSONConverter converter = new JSONConverter();
         JSONObject data = converter.preparePythonMessage(getAll());
+        System.out.println(data.toJSONString());
+        System.out.println(data);
         PythonManager pythonManager = new PythonManager();
-        pythonManager.sendPythonJSONAsFile("src/main/python/tests/test2.py", data);
+        JSONObject prediction = pythonManager.sendPythonJSONAsFile("src/main/python/tests/test3.py", data);
+        System.out.println(prediction);
+        System.out.println(prediction.get("message"));
+        String stringValue = (String) prediction.get("message");
+        System.out.println(stringValue);
 //        pythonManager.execPython()
-        return "result of prediction";
+        return stringValue;
     }
 }

@@ -64,6 +64,7 @@ public class StockCarneDAO {
         JSONConverter converter = new JSONConverter();
         JSONObject data = converter.preparePythonMessage(getAll());
         PythonManager pythonManager = new PythonManager();
+        pythonManager.sendPythonJSONAsFile("src/main/python/tests/test2.py", data);
 //        pythonManager.execPython()
         return "result of prediction";
     }

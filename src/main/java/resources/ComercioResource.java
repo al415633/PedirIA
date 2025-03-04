@@ -10,6 +10,8 @@ import jakarta.ws.rs.core.Response;
 import services.ComercioDao;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Set;
 
 @Path("/comercio")
 public class ComercioResource {
@@ -105,16 +107,21 @@ public class ComercioResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/login")
-    public Response login(@QueryParam("correo") String correo,
-                          @QueryParam("password") String password) {
-
-
+    public Response login(@QueryParam("correo") String correo, @QueryParam("password") String password) {
         Usuario usuario = dao.verificarCredenciales(correo, password);
 
         if (usuario == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Credenciales incorrectas").build();
         }
-        return Response.ok(usuario).build();
+
+        // Definir roles (esto se puede cambiar según la lógica de tu aplicación)
+        Set<String> roles = Collections.singleton("user");
+
+        // Generar el token JWT
+        String token = JwtUtils.generateToken(usuario.getCorreo(), roles);
+
+        // Devolver el token en la respuesta
+        return Response.ok().entity("{\"token\":\"" + token + "\"}").build();
     }
 
 

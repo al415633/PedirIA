@@ -1,59 +1,58 @@
 package resources;
 
 import data.Carne;
-import jakarta.inject.Inject;
+import data.Pescado;
 import jakarta.persistence.PersistenceException;
+import services.PescadoDAO;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import services.CarneDAO;
+import java.util.Collection;
 
-import java.net.URISyntaxException;
+@Path("/pescados")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class PescadoResource {
 
-@Path("/carnes")
-public class CarneResource {
     @Inject
-    CarneDAO dao;
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getAll() {
-        Response response = Response.ok(dao.getAll()).build();
-        System.out.println(response);
-        return response;
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/retrieve/{id}")
-    public Response getCarne(@PathParam("id") final Long id) {
-        Carne carne = dao.retrieve(id);
-        if (carne == null) return Response.status(Response.Status.NOT_FOUND).build();
-        return Response.ok(carne).build();
-    }
+    PescadoDAO pescadoDAO;
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/create")
-    public Response createCarne(Carne carne) throws URISyntaxException {
-        Carne carneCreada = dao.create(carne);
-        if (carneCreada == null) return Response.status(Response.Status.CONFLICT).build();
-        return Response.status(Response.Status.CREATED).entity(carneCreada).build();
+    public Response create(Pescado pescado) {
+        Pescado nuevoPescado = pescadoDAO.create(pescado);
+        if (nuevoPescado == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: El pescado ya existe.").build();
+        }
+        return Response.status(Response.Status.CREATED).entity(nuevoPescado).build();
+    }
+
+    @GET
+    public Collection<Pescado> getAll() {
+        return pescadoDAO.getAll();
+    }
+
+    @GET
+    @Path("/retrieve/{id}")
+    public Response retrieve(@PathParam("id") Long id) {
+        Pescado pescado = pescadoDAO.retrieve(id);
+        if (pescado == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Pescado no encontrado").build();
+        }
+        return Response.ok(pescado).build();
     }
 
     @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/update")
-    public Response updateCarne(final Carne carne) {
+    public Response update(Pescado pescado) {
         int maxRetries = 3; // Número máximo de reintentos
         int attempt = 0; // Contador de intentos
         long delay = 1000; // Retraso en milisegundos entre intentos
 
         while (attempt < maxRetries) {
             try {
-                Carne result = dao.update(carne);
+                Pescado result = pescadoDAO.update(pescado);
                 if (result == null) {
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
@@ -85,12 +84,12 @@ public class CarneResource {
     }
 
     @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/delete/{id}")
-    public Response deleteCarne(@PathParam("id") final Long id) {
-        Carne result = dao.delete(id);
-        if (result == null) return Response.status(Response.Status.NOT_FOUND).build();
-        return Response.noContent().build();
+    public Response delete(@PathParam("id") Long id) {
+        Pescado deletedPescado = pescadoDAO.delete(id);
+        if (deletedPescado == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Error: Pescado no encontrado").build();
+        }
+        return Response.ok(deletedPescado).build();
     }
-
 }

@@ -115,44 +115,18 @@
 <!--      <version>1.8.2</version>-->
 <!--      <scope>test</scope>-->
 <!--    </dependency>-->
-
-
-
-
-
-
-
-
-
-
-
+    <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
     <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-elytron-security</artifactId>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.12.1</version>
     </dependency>
-
-
-
+    <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
     <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-smallrye-jwt</artifactId>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+      <version>1.1</version>
     </dependency>
-
-    <!-- Dependencia para seguridad en Quarkus -->
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-security</artifactId>
-    </dependency>
-
-    <!-- Dependencia para trabajar con JWT en Quarkus -->
-    <dependency>
-      <groupId>io.smallrye</groupId>
-      <artifactId>smallrye-jwt</artifactId>
-    </dependency>
-
-
-
-
 
 
   </dependencies>

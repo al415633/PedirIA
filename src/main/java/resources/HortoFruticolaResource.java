@@ -1,59 +1,57 @@
 package resources;
 
-import data.Carne;
+import data.HortoFruticola;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import services.CarneDAO;
+import services.HortoFruticolaDAOJPA;
 
 import java.net.URISyntaxException;
 
-@Path("/carnes")
-public class CarneResource {
+@Path("/hortofruticolas")
+public class HortoFruticolaResource {
     @Inject
-    CarneDAO dao;
+    HortoFruticolaDAOJPA dao;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll() {
-        Response response = Response.ok(dao.getAll()).build();
-        System.out.println(response);
-        return response;
+        return Response.ok(dao.getAll()).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/retrieve/{id}")
-    public Response getCarne(@PathParam("id") final Long id) {
-        Carne carne = dao.retrieve(id);
-        if (carne == null) return Response.status(Response.Status.NOT_FOUND).build();
-        return Response.ok(carne).build();
+    public Response getHortoFruticola(@PathParam("id") final Long id) {
+        HortoFruticola hortoFruticola = dao.retrieve(id);
+        if (hortoFruticola == null) return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.ok(hortoFruticola).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/create")
-    public Response createCarne(Carne carne) throws URISyntaxException {
-        Carne carneCreada = dao.create(carne);
-        if (carneCreada == null) return Response.status(Response.Status.CONFLICT).build();
-        return Response.status(Response.Status.CREATED).entity(carneCreada).build();
+    public Response createHortoFruticola(HortoFruticola hortoFruticola) throws URISyntaxException {
+        HortoFruticola hortoFruticolaCreado = dao.create(hortoFruticola);
+        if (hortoFruticolaCreado == null) return Response.status(Response.Status.CONFLICT).build();
+        return Response.status(Response.Status.CREATED).entity(hortoFruticolaCreado).build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/update")
-    public Response updateCarne(final Carne carne) {
+    public Response updateHortoFruticola(final HortoFruticola hortoFruticola) {
         int maxRetries = 3; // Número máximo de reintentos
         int attempt = 0; // Contador de intentos
         long delay = 1000; // Retraso en milisegundos entre intentos
 
         while (attempt < maxRetries) {
             try {
-                Carne result = dao.update(carne);
+                HortoFruticola result = dao.update(hortoFruticola);
                 if (result == null) {
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
@@ -80,17 +78,16 @@ public class CarneResource {
 
         // Si se sale del bucle sin éxito, devolver un error
         return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                .entity("No se pudo actualizar la carne después de varios intentos. Inténtelo de nuevo más tarde.")
+                .entity("No se pudo actualizar el horto-frutícola después de varios intentos. Inténtelo de nuevo más tarde.")
                 .build();
     }
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/delete/{id}")
-    public Response deleteCarne(@PathParam("id") final Long id) {
-        Carne result = dao.delete(id);
+    public Response deleteHortoFruticola(@PathParam("id") final Long id) {
+        HortoFruticola result = dao.delete(id);
         if (result == null) return Response.status(Response.Status.NOT_FOUND).build();
         return Response.noContent().build();
     }
-
 }

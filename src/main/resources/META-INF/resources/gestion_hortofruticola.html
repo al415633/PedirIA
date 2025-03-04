@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gestión de Carne</title>
+    <title>Gestión de HortoFruticola</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -19,7 +19,7 @@
             height: 40px;
             margin-right: 10px;
         }
-        /* Efecto de hover para las filas de la tabla de carnes */
+        /* Efecto de hover para las filas de la tabla de hortofrutícolas */
         .table-striped tbody tr {
             cursor: pointer; /* Cambia el cursor al pasar sobre la fila */
         }
@@ -27,33 +27,7 @@
         .table-striped tbody tr:hover {
             background-color: #f1f1f1; /* Color de fondo al pasar el ratón */
         }
-
-        /* Quitar el efecto de hover para la fila del stock y el formulario */
-        .table-striped tbody tr.stock-row {
-            cursor: default; /* Cambia el cursor a default */
-            background-color: transparent; /* Asegura que no haya color de fondo al pasar el ratón */
-        }
-
-        .table-striped tbody tr.stock-row:hover {
-            background-color: transparent; /* Asegura que no haya cambio de color al pasar el ratón */
-        }
-
-        /* Quitar el efecto de hover para toda la tabla de stock */
-        .table-bordered {
-            cursor: default; /* Cambia el cursor a default para la tabla de stock */
-        }
-
-        .table-bordered tbody tr:hover,
-        .table-bordered thead tr:hover {
-            background-color: transparent; /* Asegura que no haya cambio de color al pasar el ratón */
-        }
-
-        .table-bordered tbody tr {
-            cursor: default; /* Cambia el cursor a default para las filas de la tabla de stock */
-        }
     </style>
-
-
 </head>
 <body>
 <!-- Encabezado verde con logo -->
@@ -61,32 +35,32 @@
     <a href="menu_productos.html">
         <img src="./static/logo.png" alt="Logo Empresa"> <!-- Cambia la URL por la de tu logo -->
     </a>
-    <h1>Gestión de Carne</h1>
+    <h1>Gestión de HortoFruticola</h1>
 </header>
 
 <div id="app" class="container mt-4">
 
-    <!-- Formulario para agregar carne -->
+    <!-- Formulario para agregar horto-frutícola -->
     <div class="card p-3 mb-4">
-        <h4>Agregar Nueva Carne</h4>
+        <h4>Agregar Nuevo HortoFruticola</h4>
         <form class="row g-3">
             <div class="col-md-3">
-                <input v-model="nombreCarne" type="text" class="form-control" placeholder="Nombre">
+                <input v-model="nombreHortoFruticola" type="text" class="form-control" placeholder="Nombre">
             </div>
             <div class="col-md-2">
-                <input v-model="unidadCarne" type="text" class="form-control" placeholder="Unidad">
+                <input v-model="unidadHortoFruticola" type="text" class="form-control" placeholder="Unidad">
             </div>
             <select v-model="tipoConserva" class="form-control">
                 <option v-for="tipo in tiposConserva" :key="tipo" :value="tipo">{{ tipo }}</option>
             </select>
 
             <div class="col-md-1">
-                <button v-on:click="createCarne()" type="button" class="btn btn-primary">Agregar</button>
+                <button v-on:click="createHortoFruticola()" type="button" class="btn btn-primary">Agregar</button>
             </div>
         </form>
     </div>
 
-    <!-- Tabla de carnes -->
+    <!-- Tabla de horto-frutícolas -->
     <table class="table table-striped">
         <thead>
         <tr>
@@ -97,15 +71,13 @@
         </tr>
         </thead>
         <tbody>
-        <!-- Bucle principal con <template> -->
-        <template v-for="(carne, index) in carnes" :key="carne.id">
-            <!-- Fila de la carne -->
-            <tr @click="retrieveStockandCarne(index)">
-                <td>{{ carne.nombre }}</td>
-                <td>{{ carne.unidad }}</td>
-                <td>{{ carne.tipoConserva }}</td>
+        <template v-for="(hortoFruticola, index) in hortofruticolas" :key="hortoFruticola.id">
+            <tr @click="retrieveStockandHortofruticola(index)">
+                <td>{{ hortoFruticola.nombre }}</td>
+                <td>{{ hortoFruticola.unidad }}</td>
+                <td>{{ hortoFruticola.tipoConserva }}</td>
                 <td>
-                    <button v-on:click.stop="retrieveCarne(index)"
+                    <button v-on:click.stop="retrieveHortoFruticola(index)"
                             class="btn btn-primary"
                             data-bs-toggle="modal"
                             data-bs-target="#editModal">
@@ -113,17 +85,16 @@
                     </button>
                     <button type="button"
                             class="btn btn-danger"
-                            @click="deleteCarne(index)">
-                        Eliminar Carne
+                            @click="deleteHortoFruticola(index)">
+                        Eliminar
                     </button>
                 </td>
             </tr>
-
-            <!-- Fila del stock (solo para la carne seleccionada) -->
-            <tr v-if="mostrarStock && carneSeleccionada.id === carne.id" class="stock-row">
+            <!-- Fila del stock (solo para la hortofruticola seleccionada) -->
+            <tr v-if="mostrarStock && hortoFruticolaSeleccionada.id === hortoFruticola.id" class="stock-row">
                 <td colspan="4">
                     <div class="mt-2">
-                        <h4>Stock de {{ carne.nombre }}</h4>
+                        <h4>Stock de {{ hortoFruticola.nombre }}</h4>
                         <table class="table table-bordered">
                             <thead>
                             <tr>
@@ -173,29 +144,29 @@
         </tbody>
     </table>
 
-    <!-- Modal para editar carne -->
+    <!-- Modal para editar horto-frutícola -->
     <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Editar Carne</h5>
+                    <h5 class="modal-title">Editar HortoFruticola</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form>
                         <label>Nombre:</label>
-                        <input v-model="carneSeleccionada.nombre" type="text" class="form-control">
+                        <input v-model="hortoFruticolaSeleccionado.nombre" type="text" class="form-control">
                         <label>Unidad:</label>
-                        <input v-model="carneSeleccionada.unidad" type="text" class="form-control">
+                        <input v-model="hortoFruticolaSeleccionado.unidad" type="text" class="form-control">
                         <label>Tipo de Conserva:</label>
-                        <select v-model="carneSeleccionada.tipoConserva" class="form-control">
+                        <select v-model="hortoFruticolaSeleccionado.tipoConserva" class="form-control">
                             <option v-for="tipo in tiposConserva" :key="tipo" :value="tipo">{{ tipo }}</option>
                         </select>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" v-on:click="updateCarne()" class="btn btn-primary">Guardar</button>
+                    <button type="button" v-on:click="updateHortoFruticola()" class="btn btn-primary">Guardar</button>
                 </div>
             </div>
         </div>
@@ -210,7 +181,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ¿Estás seguro de que deseas eliminar esta carne?
+                    ¿Estás seguro de que deseas eliminar esta hortofruticola?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -221,7 +192,7 @@
     </div>
 
     <!-- Toast para mensajes Feedback usuario -->
-    <div id="toastCarne" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 20px; right: 20px; z-index: 1050;">
+    <div id="toastHortofruticola" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 20px; right: 20px; z-index: 1050;">
         <div class="toast-header">
             <strong class="me-auto">Notificación</strong>
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -233,41 +204,32 @@
 
     <!-- Modal para editar stock -->
     <div class="modal fade" id="editStockModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Editar Stock</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <label>Cantidad:</label>
+                        <input v-model="stockSeleccionado.cantidad" type="number" class="form-control">
+                        <label>Fecha de Ingreso:</label>
+                        <input v-model="stockSeleccionado.fechaIngreso" type="date" class="form-control">
+                        <label>Fecha de Vencimiento:</label>
+                        <input v-model="stockSeleccionado.fechaVencimiento" type="date" class="form-control">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" v-on:click="modificarStock()" class="btn btn-primary">Guardar Cambios</button>
+                </div>
             </div>
-            <div class="modal-body">
-                <form>
-                    <label>Cantidad:</label>
-                    <input v-model="stockSeleccionado.cantidad" type="number" class="form-control">
-                    <label>Fecha de Ingreso:</label>
-                    <input v-model="stockSeleccionado.fechaIngreso" type="date" class="form-control">
-                    <label>Fecha de Vencimiento:</label>
-                    <input v-model="stockSeleccionado.fechaVencimiento" type="date" class="form-control">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" v-on:click="modificarStock()" class="btn btn-primary">Guardar Cambios</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-    <!-- Modal obtener predicción   -->
-    <div class="container mt-4" id="getPrediction">
-        <button type="button" v-on:click="predecirStock()" class="btn btn-primary">Obtener predicción</button>
-        <div class="col-md-3">
-            <h3 v-model="stockPrediction" type="text" class="form-control" placeholder="Prediccion"> </h3>
-
         </div>
     </div>
 
 </div>
 
-<script src="./js/carne.js"></script>
+<script src="./js/hortofruticola.js"></script>
 </body>
 </html>

@@ -2,18 +2,37 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Inicio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PedirIA - Inicio</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-<div class="container text-center mt-5">
-    <h1>Bienvenido a PedirIA</h1>
-    <p>Seleccione una opción:</p>
-
-    <a href="gestion_carne.html" class="btn btn-success btn-lg">Ir a Gestión de Carne</a>
-</div>
-
+<header>
+    <div class="header-box">
+        <div class="container">
+            <img src="images/logo.png" alt="PedirIA Logo" class="logo">
+            <div>
+                <p class="subtitle">¿Quienes somos?</p>
+                <p class="subsubtitle">En PedirIA, ayudamos a los pequeños comercios a optimizar su gestión de inventarios con inteligencia artificial. Analizamos ventas pasadas y tendencias cercanas para reducir excedentes, minimizar pérdidas y evitar el desperdicio de alimentos. Apostamos por la innovación, la sostenibilidad y la transparencia, ofreciendo una herramienta intuitiva que mejora la eficiencia y el impacto ambiental de cada negocio.</p>
+            </div>
+        </div>
+    </div>
+</header>
+<main>
+    <div class="buttons">
+        <button class="btn" onclick="window.location.href='aprovechanteLOGIN.html'">SOY UN APROVECHANTE</button>
+        <button class="btn" onclick="window.location.href='comercioLOGIN.html'"> SOY UNA EMPRESA DE  <br>VENTA DE COMIDA</button>
+    </div>
+    <section class="info">
+        <div class="content">
+            <h2>¿Qué es un aprovechante?</h2>
+            <p>Las ONGs, bancos de alimentos y comedores sociales recolectan y redistribuyen los excedentes de comida a personas vulnerables. Los ganaderos pueden aprovechar estos alimentos para la alimentación animal, reduciendo desperdicios. También existen proyectos de economía circular que los reutilizan en compostaje o biogás. Estas iniciativas fomentan la sostenibilidad y el aprovechamiento responsable de los recursos.</p>
+        </div>
+        <div class="content">
+            <h2>¿Qué empresas pueden contratarnos?</h2>
+            <p>Cualquier pequeña empresa de venta de carne, pescado, fruta o todas a la vez.</p>
+        </div>
+    </section>
+</main>
 </body>
 </html>

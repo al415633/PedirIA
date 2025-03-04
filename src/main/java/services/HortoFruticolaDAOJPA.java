@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 @ApplicationScoped
-public class HortoFruticolaDAOJPA {
+public class  HortoFruticolaDAOJPA {
     @Inject
     EntityManager em;
 
@@ -28,7 +28,7 @@ public class HortoFruticolaDAOJPA {
     }
 
     public HortoFruticola retrieve(Long id) {
-        return Objects.requireNonNullElse(em.find(HortoFruticola.class, id), null);
+        return em.find(HortoFruticola.class, id);
     }
 
     @Transactional

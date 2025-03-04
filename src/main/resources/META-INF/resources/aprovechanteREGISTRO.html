@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Aprovechante</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+    <div class="header-box">
+        <div class="container">
+            <img src="images/logo.png" alt="PedirIA Logo" class="logo">
+
+            <div>
+                <p class="subtitle">¡BIENVENIDO APROVECHANTE!</p>
+            </div>
+        </div>
+    </div>
+</header>
+<main>
+    <div class="login-container">
+        <form action="#" method="POST">
+
+            <div class="registro">
+            <div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password2">Repetir contraseña</label>
+                    <input type="password" id="password2" name="password2" required>
+                </div>
+            </div>
+
+            <div>
+
+                <div class="form-group">
+                    <label for="tipoComida">Tipo Comida</label>
+                    <select id="tipoComida" name="tipoComida" required>
+                        <option value="fruta">Fruta</option>
+                        <option value="pescado">Pescado</option>
+                        <option value="carne">Carne</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="condiciones">Condiciones</label>
+                    <input type="text" id="condiciones" name="condiciones" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="condiciones2">Otras condiciones</label>
+                    <input type="text" id="condiciones2" name="condiciones2" required>
+                </div>
+            </div>
+            </div>
+
+        </form>
+        <p><a href="#" class="btn register">Registrarse</a></p>
+    </div>
+</main>
+</body>
+</html>

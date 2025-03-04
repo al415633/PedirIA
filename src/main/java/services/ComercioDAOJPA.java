@@ -2,6 +2,7 @@ package services;
 import data.Usuario;
 import data.ComercioDetails;
 import jakarta.enterprise.context.ApplicationScoped;
+import io.quarkus.elytron.security.common.BcryptUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -33,6 +34,7 @@ public class ComercioDAOJPA implements ComercioDao{
 
     @Transactional
     public Usuario crearNegocio(Usuario usuario, ComercioDetails negocio) {
+        System.out.println(usuario);
         em.persist(usuario);
         em.flush(); // Asegura que el ID se genera antes de usarlo en el negocio
 
@@ -43,6 +45,7 @@ public class ComercioDAOJPA implements ComercioDao{
         negocio.setTipo_negocio(usuario.getTipo());
         usuario.setTipo("negocio");
         usuario.setNegocio(negocio);
+        System.out.println(usuario);
         return usuario;
     }
 
@@ -82,28 +85,30 @@ public class ComercioDAOJPA implements ComercioDao{
 
     public Usuario verificarCredenciales(String correo, String password) {
         try {
-            System.out.println(correo);
-            System.out.println(password);
             List<Usuario> usuarios = em.createQuery(
-                            "SELECT u FROM Usuario u WHERE u.correo = :correo AND u.password = :password",
+                            "SELECT u FROM Usuario u WHERE u.correo = :correo",
                             Usuario.class)
                     .setParameter("correo", correo)
-                    .setParameter("password", password)
                     .getResultList();
 
             if (usuarios.isEmpty()) {
-                System.out.println("No se encontró ningún usuario con esas credenciales.");
+                System.out.println("No se encontró ningún usuario con ese correo.");
                 return null;
             }
 
-            Usuario usuario = usuarios.get(0); // Si hay más de un resultado, tomamos el primero
-            System.out.println("Usuario encontrado: " + usuario);
-            return usuario;
+            Usuario usuario = usuarios.get(0); // Tomamos el primer usuario encontrado
+
+            // Verificar la contraseña con Bcrypt
+            if (BcryptUtil.matches(password, usuario.getPassword())) {
+                return usuario; // Contraseña correcta
+            } else {
+                System.out.println("Contraseña incorrecta.");
+                return null; // Contraseña incorrecta
+            }
         } catch (Exception e) {
             e.printStackTrace(); // Imprime el error real
             return null;
         }
     }
-
 
 }

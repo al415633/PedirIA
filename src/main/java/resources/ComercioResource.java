@@ -2,6 +2,7 @@ package resources;
 
 import data.Usuario;
 import data.ComercioDetails;
+import io.quarkus.elytron.security.common.BcryptUtil;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -51,7 +52,9 @@ public class ComercioResource {
         // Crear Usuario
         Usuario usuario = new Usuario();
         usuario.setCorreo(correo);
-        usuario.setPassword(password);
+
+        String encr_pass = BcryptUtil.bcryptHash(password);
+        usuario.setPassword(encr_pass);
         usuario.setTipo(tipoComercio);
 
         // Crear ComercioDetails

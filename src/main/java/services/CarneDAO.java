@@ -49,4 +49,13 @@
             List<Carne> result = query.getResultList();
             return result != null ? result : new ArrayList<>();
         }
+
+        em.remove(found);
+        return found;
+    }
+
+    public Collection<Carne> getAll() {
+        TypedQuery<Carne> query = em.createQuery("SELECT c FROM Carne c", Carne.class);
+        List<Carne> result = query.getResultList();
+        return result != null ? result : new ArrayList<>();
     }

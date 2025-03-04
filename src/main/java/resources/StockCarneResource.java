@@ -38,8 +38,6 @@ public class StockCarneResource {
     @GET
     @Path("/producto/{idCarne}")
     public List<StockCarne> obtenerPorIdCarne(@PathParam("idCarne") Long idCarne) {
-        obtenerTodos();
-
         return stockCarneDAO.retrieveByCarne(idCarne);
     }
 
@@ -77,7 +75,7 @@ public class StockCarneResource {
     @Path("/predict")
     public Response obtenerPrediccion() {
 
-//        return stockCarneDAO.getPrediction();
+//        return stockPescadoDAO.getPrediction();
         return Response.ok(stockCarneDAO.getPrediction()).build();
     }
 }

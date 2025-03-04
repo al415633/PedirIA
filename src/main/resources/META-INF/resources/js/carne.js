@@ -11,7 +11,7 @@ const STOCK_UPDATE = "/carnes/stock/";
 const STOCK_DELETE = "/carnes/stock/";
 const STOCK_PREDICT = "/carnes/stock/predict";
 
-const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO", "VIVO"];
+const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO"];
 
 
     Vue.createApp({

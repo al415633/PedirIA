@@ -56,10 +56,10 @@
 
 </head>
 <body>
-<!-- Encabezado verde con logo -->
+<!-- Encabezado con logo -->
 <header class="d-flex align-items-center px-4">
-    <a href="menu_productos.html">
-        <img src="./static/logo.png" alt="Logo Empresa"> <!-- Cambia la URL por la de tu logo -->
+    <a href="../menu_productos.html">
+        <img src="../static/logo.png" alt="Logo PedirIA">
     </a>
     <h1>Gestión de Pescadería</h1>
 </header>
@@ -79,7 +79,6 @@
             <select v-model="tipoConserva" class="form-control">
                 <option v-for="tipo in tiposConserva" :key="tipo" :value="tipo">{{ tipo }}</option>
             </select>
-
             <div class="col-md-1">
                 <button v-on:click="createPescado()" type="button" class="btn btn-primary">Agregar</button>
             </div>
@@ -100,7 +99,7 @@
         <!-- Bucle principal con <template> -->
         <template v-for="(pescado, index) in pescados" :key="pescado.id">
             <!-- Fila de info de cada producto -->
-            <tr>
+            <tr @click="retrieveStockandProduct(index)">
                 <td>{{ pescado.nombre }}</td>
                 <td>{{ pescado.unidad }}</td>
                 <td>{{ pescado.tipoConserva }}</td>
@@ -119,12 +118,11 @@
                 </td>
             </tr>
 
-            <!-- Fila del stock (solo para la carne seleccionada) -->
-<!--
-            <tr v-if="mostrarStock && carneSeleccionada.id === carne.id" class="stock-row">
+            <!-- Fila del stock -->
+            <tr v-if="mostrarStock && pescadoSeleccionado.id === pescado.id" class="stock-row">
                 <td colspan="4">
                     <div class="mt-2">
-                        <h4>Stock de {{ carne.nombre }}</h4>
+                        <h4>Stock de {{ pescado.nombre }}</h4>
                         <table class="table table-bordered">
                             <thead>
                             <tr>
@@ -169,8 +167,7 @@
                         </form>
                     </div>
                 </td>
-            </tr class="stock-row">
--->
+            </tr>
         </template>
         </tbody>
     </table>
@@ -234,7 +231,7 @@
     </div>
 
     <!-- Modal para editar stock -->
-    <!--<div class="modal fade" id="editStockModal" tabindex="-1">
+    <div class="modal fade" id="editStockModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -257,10 +254,10 @@
                 </div>
             </div>
         </div>
-    </div>-->
+    </div>
 
 </div>
 
-<script src="./js/pescado.js"></script>
+<script src="../js/pescado.js"></script>
 </body>
 </html>

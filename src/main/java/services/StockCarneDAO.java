@@ -53,9 +53,6 @@ public class StockCarneDAO {
         List< StockCarne > result = em.createQuery("SELECT s FROM StockCarne s", StockCarne.class)
                 .getResultList();
         JSONConverter converter = new JSONConverter();
-//        converter.extractHistoricStockCarne(result);
-//        converter.extractMapCurrentStockCarne(result);
-//        converter.extractCurrentStockCarne(result);
         converter.preparePythonMessage(result);
         return result;
     }
@@ -64,7 +61,6 @@ public class StockCarneDAO {
         JSONConverter converter = new JSONConverter();
         JSONObject data = converter.preparePythonMessage(getAll());
         PythonManager pythonManager = new PythonManager();
-//        pythonManager.execPython()
         return "result of prediction";
     }
 }

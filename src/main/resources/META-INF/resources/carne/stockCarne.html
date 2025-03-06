@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalles de Carne</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        /* Asegura que todas las imágenes del producto tengan el mismo tamaño */
+        .product-img {
+            width: 100%;
+            height: 250px;        /* Altura fija */
+            object-fit: cover;      /* Recorta la imagen y la centra */
+        }
+        /* Ajustes para las tablas */
+        .table {
+            font-size: 0.9rem;
+        }
+
+        header {
+            background-color: #28a745; /* Color verde */
+            color: white;
+            padding: 10px 0;
+        }
+
+        header img {
+            height: 40px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="d-flex align-items-center px-4">
+    <a href="../menu_productos.html">
+        <img src="/static/logo.png" alt="Logo Empresa"> <!-- Cambia la URL por la de tu logo -->
+    </a>
+    <h1>Gestión de Carne</h1>
+</header>
+
+<div id="app" class="container mt-4">
+    <div class="row">
+        <!-- Columna 1: Información del producto -->
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <img :src="'data:image/jpeg;base64,' + product.imagenDatos"
+                     :alt="product.nombre"
+                     class="product-img card-img-top">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.nombre }}</h5>
+                    <p class="card-text">
+                        <strong>Unidad:</strong> {{ product.unidad }}<br>
+                        <strong>Tipo de Conserva:</strong> {{ product.tipoConserva }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna 2: Stock actual, ordenado por fecha de vencimiento -->
+        <div class="col-md-4">
+            <h4>Stock Actual</h4>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Cantidad</th>
+                    <th>Fecha Ingreso</th>
+                    <th>Fecha Vencimiento</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="stock in sortedCurrentStock" :key="stock.id">
+                    <td>{{ stock.cantidad }}</td>
+                    <td>{{ formatDate(stock.fechaIngreso) }}</td>
+                    <td>{{ formatDate(stock.fechaVencimiento) }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Columna 3: Histórico del producto -->
+        <div class="col-md-4">
+            <h4>Histórico</h4>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Cantidad</th>
+                    <th>Fecha Ingreso</th>
+                    <th>Fecha Vencimiento</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="hist in historicalStock" :key="hist.id">
+                    <td>{{ hist.cantidad }}</td>
+                    <td>{{ formatDate(hist.fechaIngreso) }}</td>
+                    <td>{{ formatDate(hist.fechaVencimiento) }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const { createApp } = Vue;
+    const RETRIEVE_ONE_CARNE = "/carnes/";
+    const STOCK_RETRIEVE_ONE = "/carnes/stock/retrieve/";
+    createApp({
+        data() {
+            return {
+                product: {},         // Objeto con los detalles del producto
+                currentStock: [],    // Stock actual (recibido del endpoint: /api/carnes/stock/producto/{id})
+                historicalStock: []  // Histórico del producto (recibido del endpoint: /api/carnes/stock/historico/{id})
+            };
+        },
+        computed: {
+            // Ordena el stock actual por fecha de vencimiento (los que caducan antes aparecen primero)
+            sortedCurrentStock() {
+                return this.currentStock.sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento));
+            }
+        },
+        methods: {
+            loadProductDetails() {
+                // Obtener el ID del producto de la URL (por ejemplo, details.html?id=31)
+                const params = new URLSearchParams(window.location.search);
+                const id = params.get('id');
+                // Llamada para obtener los detalles del producto
+                axios.get(RETRIEVE_ONE_CARNE + id)
+                    .then(response => {
+                        this.product = response.data;
+                    })
+                    .catch(error => {
+                        console.error("Error al cargar detalles del producto:", error);
+                    });
+            },
+            loadCurrentStock() {
+                const params = new URLSearchParams(window.location.search);
+                const id = params.get('id');
+                // Llamada para obtener el stock actual del producto
+                axios.get(STOCK_RETRIEVE_ONE + id)
+                    .then(response => {
+                        this.currentStock = response.data;
+                    })
+                    .catch(error => {
+                        console.error("Error al cargar stock actual:", error);
+                    });
+            },
+            loadHistoricalStock() {
+                const params = new URLSearchParams(window.location.search);
+                const id = params.get('id');
+                // Llamada para obtener el histórico del producto
+                // Asegúrate de tener un endpoint que devuelva el histórico. Por ejemplo: /api/carnes/stock/historico/{id}
+                axios.get(`/api/carnes/stock/historico/${id}`)
+                    .then(response => {
+                        this.historicalStock = response.data;
+                    })
+                    .catch(error => {
+                        console.error("Error al cargar el histórico:", error);
+                    });
+            },
+            // Formatea la fecha a un formato legible (por ejemplo, DD/MM/AAAA)
+            formatDate(dateStr) {
+                const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                return new Date(dateStr).toLocaleDateString('es-ES', options);
+            }
+        },
+        mounted() {
+            this.loadProductDetails();
+            this.loadCurrentStock();
+            this.loadHistoricalStock();
+        }
+    }).mount("#app");
+</script>
+</body>
+</html>

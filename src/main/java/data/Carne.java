@@ -2,8 +2,30 @@ package data;
 
 import jakarta.persistence.*;
 
+import java.util.Arrays;
+
 @Entity
 @Table(name = "Carne")
+@SqlResultSetMapping(
+        name = "CarneMapping",
+        entities = {
+                @EntityResult(
+                        entityClass = Carne.class,
+                        fields = {
+                                @FieldResult(name = "id", column = "id_carne"),
+                                @FieldResult(name = "nombre", column = "nombre"),
+                                @FieldResult(name = "unidad", column = "unidad"),
+                                @FieldResult(name = "tipoConserva", column = "tipo_conserva"),
+                                @FieldResult(name = "idImg", column = "id_img")
+                        }
+                )
+        },
+        columns = {
+                @ColumnResult(name = "imagenNombre", type = String.class),
+                @ColumnResult(name = "imagenTipo", type = String.class),
+                @ColumnResult(name = "imagenDatos", type = byte[].class)
+        }
+)
 public class Carne {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +41,17 @@ public class Carne {
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_conserva", nullable = false, length = 50)
     private TipoConserva tipoConserva;
+
+    @Column(name = "id_img", nullable = false)
+    private Integer idImg;
+
+    // Estos campos no se persisten en la tabla Carne, sino que se cargan a través de JOIN en el DAO
+    @Transient
+    private String imagenNombre;
+    @Transient
+    private String imagenTipo;
+    @Transient
+    private byte[] imagenDatos;
 
 
     public Long getId() {
@@ -53,6 +86,38 @@ public class Carne {
         this.tipoConserva = tipoConserva;
     }
 
+    public Integer getIdImg() {
+        return idImg;
+    }
+
+    public void setIdImg(Integer idImg) {
+        this.idImg = idImg;
+    }
+
+    public String getImagenNombre() {
+        return imagenNombre;
+    }
+
+    public void setImagenNombre(String imagenNombre) {
+        this.imagenNombre = imagenNombre;
+    }
+
+    public String getImagenTipo() {
+        return imagenTipo;
+    }
+
+    public void setImagenTipo(String imagenTipo) {
+        this.imagenTipo = imagenTipo;
+    }
+
+    public byte[] getImagenDatos() {
+        return imagenDatos;
+    }
+
+    public void setImagenDatos(byte[] imagenDatos) {
+        this.imagenDatos = imagenDatos;
+    }
+
     @Override
     public String toString() {
         return "Carne{" +
@@ -60,6 +125,10 @@ public class Carne {
                 ", nombre='" + nombre + '\'' +
                 ", unidad='" + unidad + '\'' +
                 ", tipoConserva=" + tipoConserva +
+                ", idImg=" + idImg +
+                ", imagenNombre='" + imagenNombre + '\'' +
+                ", imagenTipo='" + imagenTipo + '\'' +
+                ", imagenDatos=" + Arrays.toString(imagenDatos) +
                 '}';
     }
 }

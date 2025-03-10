@@ -89,7 +89,7 @@
 
 </head>
 <body>
-<!-- Encabezado verde con logo -->
+
 <header class="d-flex align-items-center px-4">
     <a href="../menu_productos.html">
         <img src="/static/logo.png" alt="Logo Empresa"> <!-- Cambia la URL por la de tu logo -->
@@ -105,11 +105,13 @@
         <form class="row g-3" @submit.prevent="createCarne">
             <div class="col-md-4">
                 <label for="nombreCarne" class="form-label">Nombre de la Carne</label>
-                <input v-model="nombreCarne" type="text" id="nombreCarne" class="form-control" placeholder="Nombre">
+                <input v-model="nombreCarne" type="text" id="nombreCarne" class="form-control" placeholder="Nombre" @input="validateCarne">
+                <small v-if="nombreError" class="text-danger">{{ nombreError }}</small>
             </div>
             <div class="col-md-2">
                 <label for="unidadCarne" class="form-label">Unidad</label>
-                <input v-model="unidadCarne" type="text" id="unidadCarne" class="form-control" placeholder="Unidad">
+                <input v-model="unidadCarne" type="text" id="unidadCarne" class="form-control" placeholder="Unidad" @input="validateCarne">
+                <small v-if="unidadError" class="text-danger">{{ unidadError }}</small>
             </div>
             <div class="col-md-3">
                 <label for="tipoConserva" class="form-label">Tipo de Conserva</label>
@@ -123,10 +125,11 @@
                 <input type="file" id="imagenCarne" class="form-control" @change="onFileChange">
             </div>
             <div class="col-12 text-end">
-                <button type="submit" class="btn btn-primary">Agregar Carne</button>
+                <button type="submit" class="btn btn-primary" :disabled="isInvalid">Agregar Carne</button>
             </div>
         </form>
     </div>
+
 
     <!-- Listado de carnes en formato cards -->
     <div class="row">
@@ -165,34 +168,6 @@
             </li>
         </ul>
     </nav>
-
-    <!-- Modal para editar carne -->
-    <div class="modal fade" id="editModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Carne</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <label>Nombre:</label>
-                        <input v-model="carneSeleccionada.nombre" type="text" class="form-control">
-                        <label>Unidad:</label>
-                        <input v-model="carneSeleccionada.unidad" type="text" class="form-control">
-                        <label>Tipo de Conserva:</label>
-                        <select v-model="carneSeleccionada.tipoConserva" class="form-control">
-                            <option v-for="tipo in tiposConserva" :key="tipo" :value="tipo">{{ tipo }}</option>
-                        </select>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" v-on:click="updateCarne()" class="btn btn-primary">Guardar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal de Confirmación de Borrado -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"

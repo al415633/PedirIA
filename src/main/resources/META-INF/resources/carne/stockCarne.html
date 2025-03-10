@@ -75,7 +75,44 @@
                     </p>
                 </div>
             </div>
+
+            <!-- Botón para abrir el modal de edición -->
+            <button class="btn btn-warning w-100" @click="openEditCarneModal"> Editar Carne</button>
         </div>
+
+        <!--  Modal para editar carne -->
+        <div class="modal fade" id="editCarneModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Carne</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="updateCarne">
+                            <div class="mb-3">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" class="form-control" v-model="editingCarne.nombre" @input="validateEditCarne" required>
+                                <small v-if="nombreError" class="text-danger">{{ nombreError }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Unidad</label>
+                                <input type="text" class="form-control" v-model="editingCarne.unidad" @input="validateEditCarne" required>
+                                <small v-if="unidadError" class="text-danger">{{ unidadError }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tipo de Conserva</label>
+                                <select class="form-select" v-model="editingCarne.tipoConserva">
+                                    <option v-for="tipo in tiposConserva" :key="tipo" :value="tipo">{{ tipo }}</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success" :disabled="isInvalid">Guardar Cambios</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Sección que cambia entre Stock Actual e Histórico -->
         <div class="col-md-8">
@@ -221,6 +258,19 @@
             </div>
         </div>
     </div>
+
+    <!-- Toast para edición de carne -->
+    <div class="toast-container">
+        <div id="editToast" class="toast custom-toast text-white" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <strong>{{ toastMessage }}</strong>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -230,6 +280,8 @@
     const ADD_STOCK = "/carnes/stock";
     const API_STOCK = "/carnes/stock/";
     const API_HISTORICO = "/carnes/stock/historico/";
+    const API_CARNE = "/carnes/";
+    const VALIDAR_CARNE = "/carnes/validar";
 
     createApp({
         data() {
@@ -246,6 +298,11 @@
                 sellStockData: { id: null, cantidad: '' },
                 historicoStock: [],
                 activeTab: "stock",
+                editingCarne: { nombre: '', unidad: '', tipoConserva: '' },
+                tiposConserva: ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO"],
+                nombreError: '',
+                unidadError: '',
+                isInvalid: false
             };
         },
         computed: {
@@ -352,7 +409,67 @@
             },
             formatNumber(value) {
                 return new Intl.NumberFormat('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(value);
+            },
+            openEditCarneModal() {
+                this.editingCarne = { ...this.product }; // Copiar datos actuales
+                this.nombreError = '';
+                this.unidadError = '';
+                this.isInvalid = false;
+                new bootstrap.Modal(document.getElementById("editCarneModal")).show();
+            },
+            validateEditCarne() {
+                const nombre = this.editingCarne.nombre.trim().toLowerCase();
+                const unidad = this.editingCarne.unidad.trim().toLowerCase();
+
+                // No validar si no se ha cambiado nada
+                if (nombre === this.product.nombre.trim().toLowerCase() && unidad === this.product.unidad.trim().toLowerCase()) {
+                    this.nombreError = '';
+                    this.unidadError = '';
+                    this.isInvalid = false;
+                    return;
+                }
+
+                axios.get(`${VALIDAR_CARNE}?nombre=${encodeURIComponent(nombre)}&unidad=${encodeURIComponent(unidad)}`)
+                    .then(response => {
+                        if (response.data.existe) {
+                            this.nombreError = "Ya existe una carne con este nombre y unidad.";
+                            this.unidadError = "Por favor, elija un nombre o unidad diferente.";
+                            this.isInvalid = true;
+                        } else {
+                            this.nombreError = '';
+                            this.unidadError = '';
+                            this.isInvalid = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error en la validación:", error);
+                        this.nombreError = "Error al validar el nombre.";
+                        this.isInvalid = true;
+                    });
+            },
+            updateCarne() {
+                if (this.isInvalid) return; // 📌 No permitir actualizar si hay error
+
+                axios.put(API_CARNE, this.editingCarne)
+                    .then(() => {
+                        this.product = { ...this.editingCarne }; // Actualizar UI
+                        bootstrap.Modal.getInstance(document.getElementById("editCarneModal")).hide();
+                        this.showToast("✔️ Carne actualizada correctamente.", "bg-success");
+                    })
+                    .catch(error => {
+                        console.error("Error al actualizar carne:", error);
+                        this.showToast("❌ Error al actualizar la carne.", "bg-danger");
+                    });
+            },
+
+            showToast(message, bgClass) {
+                this.toastMessage = message;
+                const toastEl = document.getElementById("editToast");
+                toastEl.className = `toast custom-toast text-white ${bgClass} show`;
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
             }
+
         },
         mounted() {
             this.loadProductDetails();

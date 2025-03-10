@@ -53,6 +53,7 @@ public class CarneDAO {
         String imagenNombre = (String) result[1];
         String imagenTipo = (String) result[2];
         byte[] imagenDatos = (byte[]) result[3];
+        
         carne.setImagenNombre(imagenNombre);
         carne.setImagenTipo(imagenTipo);
         carne.setImagenDatos(imagenDatos);
@@ -115,5 +116,15 @@ public class CarneDAO {
         );
         List<Carne> list = q.getResultList();
         return list;
+    }
+
+    public boolean existeCarne(String nombre, String unidad) {
+        Long count = em.createQuery(
+                        "SELECT COUNT(c) FROM Carne c WHERE LOWER(c.nombre) = LOWER(:nombre) AND LOWER(c.unidad) = LOWER(:unidad)",
+                        Long.class)
+                .setParameter("nombre", nombre.trim().toLowerCase())
+                .setParameter("unidad", unidad.trim().toLowerCase())
+                .getSingleResult();
+        return count > 0;
     }
 }

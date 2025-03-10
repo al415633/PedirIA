@@ -8,6 +8,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import services.CarneDAO;
 
+import java.util.Collections;
+
 @Path("/carnes")
 public class CarneResource {
 
@@ -106,4 +108,13 @@ public class CarneResource {
                     .build();
         }
     }
+
+    @GET
+    @Path("/validar")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response validarCarne(@QueryParam("nombre") String nombre, @QueryParam("unidad") String unidad) {
+        boolean existe = dao.existeCarne(nombre, unidad);
+        return Response.ok(Collections.singletonMap("existe", existe)).build();
+    }
+
 }

@@ -1,17 +1,18 @@
 package resources;
 
+import jakarta.annotation.security.RolesAllowed;
 import data.Usuario;
 import data.ComercioDetails;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import services.ComercioDao;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.Set;
+
 
 @Path("/comercio")
 public class ComercioResource {
@@ -28,11 +29,23 @@ public class ComercioResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/retrieve/{correo}")
     public Response getComercio(@PathParam("correo") final String correo) {
+
         Usuario usuario = dao.getComercioPorCorreo(correo);
         if (usuario == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         return Response.ok(usuario).build();
+    }
+
+
+    @GET
+    @Path("/obtener")
+    public Response obtenerPerfil(@CookieParam("usuario") String usuario) {
+        System.out.println(usuario);
+        if (usuario == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("No hay sesión activa").build();
+        }
+        return Response.ok("Perfil del usuario en sesión: " + usuario).build();
     }
 
     @POST
@@ -114,14 +127,20 @@ public class ComercioResource {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Credenciales incorrectas").build();
         }
 
-        // Definir roles (esto se puede cambiar según la lógica de tu aplicación)
-        Set<String> roles = Collections.singleton("user");
+        System.out.println("usuario: " + password);
+        System.out.println("encriptada: " + usuario.getPassword());
 
-        // Generar el token JWT
-        String token = JwtUtils.generateToken(usuario.getCorreo(), roles);
+        // Verificar la contraseña encriptada con Bcrypt
+        if (!BcryptUtil.matches(password, usuario.getPassword())) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Contraseña incorrecta").build();
+        }
 
-        // Devolver el token en la respuesta
-        return Response.ok().entity("{\"token\":\"" + token + "\"}").build();
+
+        NewCookie cookie = new NewCookie("usuario", correo, "/", null, "Usuario en sesión", 3600, false);
+        System.out.println(cookie);
+        return Response.ok("Sesión iniciada para " + correo).cookie(cookie).build();
+
+
     }
 
 

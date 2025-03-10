@@ -14,10 +14,10 @@ import java.util.Map;
 @ApplicationScoped
 public class JSONConverter {
 
-    public String extractHistoricStockCarne(List<StockCarne> listaStock){
+    public String extractHistoricStockCarne(List<StockCarne> listaStock) {
         StringBuilder stringBuilder = new StringBuilder("ds,producto,y");
         stringBuilder.append(System.lineSeparator());
-        for (StockCarne stock : listaStock){
+        for (StockCarne stock : listaStock) {
             stringBuilder
                     .append(stock.getFechaIngreso().toString())
                     .append(", ")
@@ -31,42 +31,28 @@ public class JSONConverter {
         System.out.println("csv: " + finalString);
         return finalString;
     }
-    public JSONObject extractMapCurrentStockCarne(List<StockCarne> listaStock){
-        Map<String, BigDecimal> carneMap = new HashMap<String, BigDecimal>();
-//        StringBuilder stringBuilder = new StringBuilder("ds, producto\n");
 
-        for (StockCarne stock : listaStock){
+    public JSONObject extractMapCurrentStockCarne(List<StockCarne> listaStock) {
+        Map<String, BigDecimal> carneMap = new HashMap<String, BigDecimal>();
+
+        for (StockCarne stock : listaStock) {
             if (stock.getFechaIngreso().isBefore(LocalDate.now()) && stock.getFechaVencimiento().isAfter(LocalDate.now()))
-                carneMap.compute(stock.getCarne().getNombre(),(key, old)-> (old == null) ? stock.getCantidad() : old.add(stock.getCantidad()));
+                carneMap.compute(stock.getCarne().getNombre(), (key, old) -> (old == null) ? stock.getCantidad() : old.add(stock.getCantidad()));
         }
 
-//        for (Map.Entry<String,BigDecimal> par: carneMap.entrySet()){
-//            stringBuilder
-//                    .append(par.getKey())
-//                    .append(", ")
-//                    .append(par.getValue())
-//                    .append("\n");
-//        }
         Gson gson = new Gson();
         return gson.fromJson(JSONObject.toJSONString(carneMap), JSONObject.class);
-//        System.out.println( JSONObject.toJSONString(carneMap));
-
-
-
-//        String finalString = stringBuilder.toString();
-//        System.out.println(finalString);
-//        return null;
     }
 
-    public String extractCurrentStockCarne(List<StockCarne> listaStock){
+    public String extractCurrentStockCarne(List<StockCarne> listaStock) {
         Map<String, BigDecimal> carneMap = new HashMap<String, BigDecimal>();
-        StringBuilder stringBuilder = new StringBuilder("\"stock_actual\":[");
+        StringBuilder stringBuilder = new StringBuilder("{\"stock_actual\":[");
 
-        for (StockCarne stock : listaStock){
+        for (StockCarne stock : listaStock) {
             if (stock.getFechaIngreso().isBefore(LocalDate.now()) && stock.getFechaVencimiento().isAfter(LocalDate.now()))
-                carneMap.compute(stock.getCarne().getNombre(),(key, old)-> (old == null) ? stock.getCantidad() : old.add(stock.getCantidad()));
+                carneMap.compute(stock.getCarne().getNombre(), (key, old) -> (old == null) ? stock.getCantidad() : old.add(stock.getCantidad()));
         }
-        for (Map.Entry<String,BigDecimal> par: carneMap.entrySet()){
+        for (Map.Entry<String, BigDecimal> par : carneMap.entrySet()) {
             stringBuilder
                     .append("{")
                     .append("\"nombre\":\"")
@@ -76,41 +62,9 @@ public class JSONConverter {
                     .append(par.getValue())
                     .append("\"},");
         }
-        stringBuilder.deleteCharAt(stringBuilder.length()-1);
-        stringBuilder.append("]");
-        Gson gson = new Gson();
-//        System.out.println(stringBuilder.toString());
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        stringBuilder.append("]}");
         return stringBuilder.toString();
-//        System.out.println( JSONObject.toJSONString(carneMap));
 
-
-
-//        String finalString = stringBuilder.toString();
-//        System.out.println(finalString);
-//        return null;
     }
-
-    public JSONObject preparePythonMessage(List<StockCarne> listaStock){
-        StringBuilder stringBuilder = new StringBuilder();
-        String currentStock = extractCurrentStockCarne(listaStock);
-        String historicosCSV = extractHistoricStockCarne(listaStock);
-        stringBuilder
-                .append("{")
-                .append(System.lineSeparator())
-                .append(currentStock)
-                .append(",")
-                .append(System.lineSeparator())
-                .append("\"historicos\":")
-                .append(System.lineSeparator())
-                .append("\"")
-                .append(historicosCSV)
-                .append("\"")
-                .append("}");
-
-//        System.out.println(stringBuilder);
-        Gson gson = new Gson();
-        return gson.fromJson(stringBuilder.toString(), JSONObject.class);
-    }
-
-
 }

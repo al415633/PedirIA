@@ -187,7 +187,7 @@ public class PythonManager {
     public JSONObject sendPythonInfo(String pythonFilePath, List<StockCarne> datos){
         JSONConverter converter = new JSONConverter();
 
-        String currentStock = "{" + converter.extractCurrentStockCarne(datos) + "}";
+        String currentStock = converter.extractCurrentStockCarne(datos);
 
         JSONObject json = new Gson().fromJson(currentStock, JSONObject.class);
 
@@ -206,7 +206,6 @@ public class PythonManager {
                     "temp", ".csv",
                     new File(
                             "src/main/resources/temp"));
-            System.out.println(csvFile.getName());
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile.getPath()))) {
                 writer.write(csv);
             }
@@ -216,7 +215,6 @@ public class PythonManager {
             ProcessBuilder pb = new ProcessBuilder("python", pythonFilePath);
             pb.redirectErrorStream(true);
             Process process = pb.start();
-//            System.out.println(json);
             // Escribir el JSON en la entrada estándar (stdin) de Python
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
                 writer.write(directionsJSON);

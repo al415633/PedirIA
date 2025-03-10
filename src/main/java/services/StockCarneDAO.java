@@ -1,5 +1,6 @@
 package services;
 
+import com.google.gson.Gson;
 import data.StockCarne;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -63,14 +64,20 @@ public class StockCarneDAO {
     public String getPrediction() {
         JSONConverter converter = new JSONConverter();
         JSONObject data = converter.preparePythonMessage(getAll());
-        System.out.println(data.toJSONString());
-        System.out.println(data);
+//        System.out.println(data.toJSONString());
+//        System.out.println(data);
         PythonManager pythonManager = new PythonManager();
-        JSONObject prediction = pythonManager.sendPythonJSONAsFile("src/main/python/tests/test3.py", data);
-        System.out.println(prediction);
-        System.out.println(prediction.get("message"));
-        String stringValue = (String) prediction.get("message");
-        System.out.println(stringValue);
+//        JSONObject prediction = pythonManager.sendPythonJSONAsFile("src/main/python/tests/test4.py", data);
+        String currentStock = "{" + converter.extractCurrentStockCarne(getAll()) + "}";
+        System.out.println("current stock: " + currentStock);
+        JSONObject json = new Gson().fromJson(currentStock, JSONObject.class);
+
+//        JSONObject prediction = pythonManager.sendPythonSeparateJSONAndCSV("src/main/python/tests/test5.py",json, converter.extractHistoricStockCarne(getAll()));
+        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/tests/test5.py", getAll());
+//        System.out.println(prediction);
+//        System.out.println(prediction.get("message"));
+        String stringValue =prediction.get("message").toString();
+//        System.out.println(stringValue);
 //        pythonManager.execPython()
         return stringValue;
     }

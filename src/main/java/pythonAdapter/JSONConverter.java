@@ -79,7 +79,7 @@ public class JSONConverter {
         stringBuilder.deleteCharAt(stringBuilder.length()-1);
         stringBuilder.append("]");
         Gson gson = new Gson();
-        System.out.println(stringBuilder.toString());
+//        System.out.println(stringBuilder.toString());
         return stringBuilder.toString();
 //        System.out.println( JSONObject.toJSONString(carneMap));
 
@@ -107,7 +107,7 @@ public class JSONConverter {
                 .append("\"")
                 .append("}");
 
-        System.out.println(stringBuilder);
+//        System.out.println(stringBuilder);
         Gson gson = new Gson();
         return gson.fromJson(stringBuilder.toString(), JSONObject.class);
     }

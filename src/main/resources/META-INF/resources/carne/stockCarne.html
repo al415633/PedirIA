@@ -3,32 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Detalles de Carne</title>
+    <title>Gestión de Stock</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
-        /* Asegura que todas las imágenes del producto tengan el mismo tamaño */
         .product-img {
             width: 100%;
-            height: 250px;        /* Altura fija */
-            object-fit: cover;      /* Recorta la imagen y la centra */
+            height: 250px;
+            object-fit: cover;
         }
-        /* Ajustes para las tablas */
         .table {
             font-size: 0.9rem;
         }
-
         header {
-            background-color: #28a745; /* Color verde */
+            background-color: #28a745;
             color: white;
             padding: 10px 0;
         }
-
         header img {
             height: 40px;
             margin-right: 10px;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+        .custom-toast {
+            font-family: Arial, sans-serif;
+            font-size: 1rem;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            width: 300px;
         }
     </style>
 </head>
@@ -36,19 +47,26 @@
 
 <header class="d-flex align-items-center px-4">
     <a href="../menu_productos.html">
-        <img src="/static/logo.png" alt="Logo Empresa"> <!-- Cambia la URL por la de tu logo -->
+        <img src="/static/logo.png" alt="Logo Empresa">
     </a>
     <h1>Gestión de Carne</h1>
 </header>
 
+<!-- Botón para volver atrás -->
+<div class="container mt-3">
+    <button class="btn btn-secondary" onclick="window.history.back()">← Volver</button>
+</div>
+
 <div id="app" class="container mt-4">
     <div class="row">
-        <!-- Columna 1: Información del producto -->
+        <!-- Información del producto (siempre visible) -->
         <div class="col-md-4">
             <div class="card mb-3">
-                <img :src="'data:image/jpeg;base64,' + product.imagenDatos"
+                <img v-if="product.imagenDatos"
+                     :src="'data:image/jpeg;base64,' + product.imagenDatos"
                      :alt="product.nombre"
                      class="product-img card-img-top">
+                <img v-else src="/static/default.webp" alt="Imagen no disponible" class="product-img card-img-top">
                 <div class="card-body">
                     <h5 class="card-title">{{ product.nombre }}</h5>
                     <p class="card-text">
@@ -59,46 +77,148 @@
             </div>
         </div>
 
-        <!-- Columna 2: Stock actual, ordenado por fecha de vencimiento -->
-        <div class="col-md-4">
-            <h4>Stock Actual</h4>
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>Cantidad</th>
-                    <th>Fecha Ingreso</th>
-                    <th>Fecha Vencimiento</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="stock in sortedCurrentStock" :key="stock.id">
-                    <td>{{ stock.cantidad }}</td>
-                    <td>{{ formatDate(stock.fechaIngreso) }}</td>
-                    <td>{{ formatDate(stock.fechaVencimiento) }}</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+        <!-- Sección que cambia entre Stock Actual e Histórico -->
+        <div class="col-md-8">
+            <!-- Navbar de selección -->
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link" :class="{ active: activeTab === 'stock' }" @click="activeTab = 'stock'">Stock Actual</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" :class="{ active: activeTab === 'historico' }" @click="loadHistorico">Histórico de Ventas</a>
+                </li>
+            </ul>
 
-        <!-- Columna 3: Histórico del producto -->
-        <div class="col-md-4">
-            <h4>Histórico</h4>
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>Cantidad</th>
-                    <th>Fecha Ingreso</th>
-                    <th>Fecha Vencimiento</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="hist in historicalStock" :key="hist.id">
-                    <td>{{ hist.cantidad }}</td>
-                    <td>{{ formatDate(hist.fechaIngreso) }}</td>
-                    <td>{{ formatDate(hist.fechaVencimiento) }}</td>
-                </tr>
-                </tbody>
-            </table>
+            <!-- Contenido de Stock Actual -->
+            <div v-if="activeTab === 'stock'">
+                <h4>Stock Disponible</h4>
+
+                <!-- Formulario para añadir stock -->
+                <form @submit.prevent="addStock" class="row g-2 align-items-center mb-3">
+                    <div class="col-auto">
+                        <input type="number" class="form-control" v-model="newStock.cantidad" placeholder="Cantidad" required min="0" step="0.001">
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" class="form-control" v-model="newStock.fechaIngreso" required>
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" class="form-control" v-model="newStock.fechaVencimiento" required>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">Añadir</button>
+                    </div>
+                </form>
+
+                <!-- Tabla de stock -->
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Cantidad</th>
+                        <th>Fecha Ingreso</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="stock in sortedCurrentStock" :key="stock.id">
+                        <td>{{ stock.cantidad }}</td>
+                        <td>{{ formatDate(stock.fechaIngreso) }}</td>
+                        <td>{{ formatDate(stock.fechaVencimiento) }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning stock-actions" @click="editStock(stock)">✏️ Editar</button>
+                            <button class="btn btn-sm btn-danger stock-actions" @click="openSellStock(stock)">🛒 Vender</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Contenido del Histórico -->
+            <div v-if="activeTab === 'historico'">
+                <h4>Histórico de Ventas</h4>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Cantidad Vendida</th>
+                        <th>Fecha Venta</th>
+                        <th>Fecha Ingreso</th>
+                        <th>Fecha Vencimiento</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="venta in historicoStock" :key="venta.id">
+                        <td>{{ venta.cantidad }}</td>
+                        <td>{{ formatDate(venta.fechaVenta) }}</td>
+                        <td>{{ formatDate(venta.fechaIngreso) }}</td>
+                        <td>{{ formatDate(venta.fechaVencimiento) }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal para editar stock -->
+    <div class="modal fade" id="editStockModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="updateStock">
+                        <div class="mb-3">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" v-model="editingStock.cantidad" required min="0" step="0.001">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fecha de Ingreso</label>
+                            <input type="date" class="form-control" v-model="editingStock.fechaIngreso" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fecha de Vencimiento</label>
+                            <input type="date" class="form-control" v-model="editingStock.fechaVencimiento" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para VENDER stock -->
+    <div class="modal fade" id="sellStockModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Vender Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="sellStock">
+                        <div class="mb-3">
+                            <label class="form-label">Cantidad a vender</label>
+                            <input type="number" class="form-control" v-model="sellStockData.cantidad" required min="0.001" step="0.001">
+                        </div>
+                        <button type="submit" class="btn btn-danger">Confirmar Venta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Toast de Bootstrap -->
+    <div class="toast-container">
+        <div id="toastMessage" class="toast custom-toast text-white" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <strong>{{ toastMessage }}</strong>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+            </div>
         </div>
     </div>
 </div>
@@ -106,27 +226,42 @@
 <script>
     const { createApp } = Vue;
     const RETRIEVE_ONE_CARNE = "/carnes/";
-    const STOCK_RETRIEVE_ONE = "/carnes/stock/retrieve/";
+    const STOCK_RETRIEVE_ONE = "/carnes/stock/producto/";
+    const ADD_STOCK = "/carnes/stock";
+    const API_STOCK = "/carnes/stock/";
+    const API_HISTORICO = "/carnes/stock/historico/";
+
     createApp({
         data() {
             return {
-                product: {},         // Objeto con los detalles del producto
-                currentStock: [],    // Stock actual (recibido del endpoint: /api/carnes/stock/producto/{id})
-                historicalStock: []  // Histórico del producto (recibido del endpoint: /api/carnes/stock/historico/{id})
+                product: {},
+                currentStock: [],
+                newStock: {
+                    cantidad: '',
+                    fechaIngreso: '',
+                    fechaVencimiento: ''
+                },
+                toastMessage: '',
+                editingStock: { id: null, cantidad: '', fechaIngreso: '', fechaVencimiento: '' },
+                sellStockData: { id: null, cantidad: '' },
+                historicoStock: [],
+                activeTab: "stock",
             };
         },
         computed: {
-            // Ordena el stock actual por fecha de vencimiento (los que caducan antes aparecen primero)
             sortedCurrentStock() {
-                return this.currentStock.sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento));
+                return [...this.currentStock]
+                    .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
+                    .map(stock => ({
+                        ...stock,
+                        cantidad: this.formatNumber(stock.cantidad) // 📌 Formatea la cantidad
+                    }));
             }
         },
         methods: {
             loadProductDetails() {
-                // Obtener el ID del producto de la URL (por ejemplo, details.html?id=31)
                 const params = new URLSearchParams(window.location.search);
                 const id = params.get('id');
-                // Llamada para obtener los detalles del producto
                 axios.get(RETRIEVE_ONE_CARNE + id)
                     .then(response => {
                         this.product = response.data;
@@ -135,10 +270,35 @@
                         console.error("Error al cargar detalles del producto:", error);
                     });
             },
+            addStock() {
+                const params = new URLSearchParams(window.location.search);
+                const idCarne = params.get('id');
+
+                if (!idCarne) {
+                    this.showToast("Error: Producto no encontrado", "bg-danger");
+                    return;
+                }
+
+                const stockData = {
+                    cantidad: parseFloat(this.newStock.cantidad),
+                    fechaIngreso: this.newStock.fechaIngreso,
+                    fechaVencimiento: this.newStock.fechaVencimiento,
+                    carne: { id: idCarne }
+                };
+
+                axios.post(ADD_STOCK, stockData)
+                    .then(response => {
+                        this.showToast(`${stockData.cantidad} unidades añadidas. Ingreso: ${this.formatDate(stockData.fechaIngreso)}, Vence: ${this.formatDate(stockData.fechaVencimiento)}`, "bg-primary");
+                        this.loadCurrentStock();
+                        this.newStock = { cantidad: '', fechaIngreso: '', fechaVencimiento: '' };
+                    })
+                    .catch(error => {
+                        this.showToast("Error al agregar stock", "bg-danger");
+                    });
+            },
             loadCurrentStock() {
                 const params = new URLSearchParams(window.location.search);
                 const id = params.get('id');
-                // Llamada para obtener el stock actual del producto
                 axios.get(STOCK_RETRIEVE_ONE + id)
                     .then(response => {
                         this.currentStock = response.data;
@@ -147,31 +307,59 @@
                         console.error("Error al cargar stock actual:", error);
                     });
             },
-            loadHistoricalStock() {
-                const params = new URLSearchParams(window.location.search);
-                const id = params.get('id');
-                // Llamada para obtener el histórico del producto
-                // Asegúrate de tener un endpoint que devuelva el histórico. Por ejemplo: /api/carnes/stock/historico/{id}
-                axios.get(`/api/carnes/stock/historico/${id}`)
+            loadHistorico() {
+                const id = new URLSearchParams(window.location.search).get('id');
+                axios.get(API_HISTORICO + id)
                     .then(response => {
-                        this.historicalStock = response.data;
+                        this.historicoStock = response.data;
+                        this.activeTab = "historico"; // 📌 Cambiar de pestaña después de cargar los datos
                     })
-                    .catch(error => {
-                        console.error("Error al cargar el histórico:", error);
-                    });
+                    .catch(error => console.error("Error al cargar el historial:", error));
             },
-            // Formatea la fecha a un formato legible (por ejemplo, DD/MM/AAAA)
+            editStock(stock) {
+                this.editingStock = JSON.parse(JSON.stringify(stock)); // Evita modificar el original directamente
+                new bootstrap.Modal(document.getElementById("editStockModal")).show();
+            },
+            updateStock() {
+                axios.put(API_STOCK + this.editingStock.id, this.editingStock)
+                    .then(() => {
+                        this.loadCurrentStock();
+                        bootstrap.Modal.getInstance(document.getElementById("editStockModal")).hide();
+                    })
+                    .catch(error => console.error("Error al actualizar stock:", error));
+            },
+            showToast(message, bgClass) {
+                this.toastMessage = message;
+                const toastEl = document.getElementById("toastMessage");
+                toastEl.className = `toast custom-toast text-white ${bgClass} show`;
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            },
+            openSellStock(stock) {
+                this.sellStockData = { id: stock.id, cantidad: '' };
+                new bootstrap.Modal(document.getElementById("sellStockModal")).show();
+            },
+            sellStock() {
+                axios.post(API_STOCK + "vender/" + this.sellStockData.id + "/" +this.sellStockData.cantidad)
+                    .then(() => {
+                        this.loadCurrentStock(); // Recargar stock actualizado
+                        bootstrap.Modal.getInstance(document.getElementById("sellStockModal")).hide();
+                    })
+                    .catch(error => console.error("Error al vender stock:", error));
+            },
             formatDate(dateStr) {
-                const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-                return new Date(dateStr).toLocaleDateString('es-ES', options);
+                return new Date(dateStr).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            },
+            formatNumber(value) {
+                return new Intl.NumberFormat('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(value);
             }
         },
         mounted() {
             this.loadProductDetails();
             this.loadCurrentStock();
-            this.loadHistoricalStock();
         }
     }).mount("#app");
 </script>
+
 </body>
 </html>

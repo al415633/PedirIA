@@ -1,14 +1,16 @@
 package services;
 
 import data.AprovechanteDetails;
-import data.ComercioDetails;
 import data.Usuario;
 import io.quarkus.elytron.security.common.BcryptUtil;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
+@ApplicationScoped
 public class AprovechanteDAOJPA implements AprovechanteDao{
 
     @PersistenceContext
@@ -37,9 +39,9 @@ public class AprovechanteDAOJPA implements AprovechanteDao{
         return getAprovechantePorCorreo(correo) != null;
     }
 
-    @Override
+    @Transactional
     public Usuario crearAprovechante(Usuario usuario, AprovechanteDetails aprovechante) {
-/*        em.persist(usuario);
+        em.persist(usuario);
         em.flush(); // Asegura que el ID se genera antes de usarlo en el negocio
 
         aprovechante.setIdAprovechante(usuario.getId_usuario());
@@ -48,31 +50,32 @@ public class AprovechanteDAOJPA implements AprovechanteDao{
         em.persist(aprovechante);
         aprovechante.setTipo_aprovechante(usuario.getTipo());
         usuario.setTipo("aprovechante");
-        usuario.setNegocio(aprovechante);*/
+        usuario.setAprovechante(aprovechante);
+        return usuario;
     }
 
-    @Override
+    @Transactional
     public boolean actualizarAprovechante(Usuario usuario, AprovechanteDetails aprovechante) {
         Usuario usuarioExistente = getAprovechantePorCorreo(usuario.getCorreo());
-/*        if (usuarioExistente == null) return false;
+        if (usuarioExistente == null) return false;
 
         usuarioExistente.setPassword(usuario.getPassword());
         usuarioExistente.setTipo(usuario.getTipo());
 
-        AprovechanteDetails negocioExistente = usuarioExistente.getNegocio();
-        if (negocioExistente != null) {
-            negocioExistente.setNombre(aprovechante.getNombre());
-            negocioExistente.setDiaCompraDeStock(negocio.getDiaCompraDeStock());
+        AprovechanteDetails aprovechanteExistente = usuarioExistente.getAprovechante();
+        if (aprovechanteExistente != null) {
+            aprovechanteExistente.setCondiciones(aprovechante.getCondiciones());
+            aprovechanteExistente.setCondiciones2(aprovechante.getCondiciones2());
         } else {
-            negocio.setIdNegocio(usuarioExistente.getId_usuario());
-            negocio.setUsuario(usuarioExistente);
-            em.persist(negocio);
-            usuarioExistente.setNegocio(negocio);
+            aprovechanteExistente.setIdAprovechante(usuarioExistente.getId_usuario());
+            aprovechanteExistente.setUsuario(usuarioExistente);
+            em.persist(aprovechante);
+            usuarioExistente.setAprovechante(aprovechante);
         }
-        return true;*/
+        return true;
     }
 
-    @Override
+    @Transactional
     public boolean eliminarAprovechante(String correo) {
         Usuario usuario = getAprovechantePorCorreo(correo);
         if (usuario == null) return false;

@@ -14,6 +14,7 @@ public class ComercioDAOJPA implements ComercioDao{
     @PersistenceContext
     EntityManager em;
 
+    @Override
     public List<Usuario> getComercios() {
         return em.createQuery("SELECT u FROM Usuario u WHERE u.tipo = 'negocio'", Usuario.class).getResultList();
     }

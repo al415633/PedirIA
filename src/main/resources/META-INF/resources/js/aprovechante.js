@@ -69,9 +69,11 @@ Vue.createApp({
             const condiciones2 = this.condiciones2;
 
 
+
             // Construimos la URL con los parámetros query
             const url = `${POST}?correo=${correo}&password=${password}&tipoAprovechante=${tipoAprovechante}&condiciones=${condiciones}&condiciones2=${condiciones2}`;
 
+            console.log(url);
             try {
                 // Realizamos el POST con los parámetros de la URL
                 const response = await axios.post(url);
@@ -87,6 +89,7 @@ Vue.createApp({
                 alert("Hubo un problema con el registro.");
                 window.location.href = "registroError.html";
             }
+
         }
         ,
 
@@ -104,7 +107,7 @@ Vue.createApp({
                 });
         },
 
-        async deleteAprovechante(correo) {
+        async deleteAprovechante(correo){
 
             //TODO: ESTA MAL
             console.log("Eliminando correo:", correo);

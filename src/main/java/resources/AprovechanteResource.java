@@ -3,7 +3,6 @@ package resources;
 import data.AprovechanteDetails;
 import jakarta.annotation.security.RolesAllowed;
 import data.Usuario;
-import data.ComercioDetails;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -53,7 +52,7 @@ public class AprovechanteResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/create")
-    public Response createComercio(
+    public Response createAprovechante(
             @QueryParam("correo") String correo,
             @QueryParam("password") String password,
             @QueryParam("tipoAprovechante") String tipoAprovechante,
@@ -73,15 +72,15 @@ public class AprovechanteResource {
         usuario.setPassword(encr_pass);
         usuario.setTipo(tipoAprovechante);
 
-        // Crear ComercioDetails
+        // Crear AprovechanteDetails
         AprovechanteDetails aprovechante = new AprovechanteDetails();
         aprovechante.setCondiciones(condiciones);
         aprovechante.setCondiciones2(condiciones2);
 
 
-        // Establecer relación entre Usuario y ComercioDetails
+        // Establecer relación entre Usuario y AprovechanteDetails
         aprovechante.setUsuario(usuario);
-        usuario.setNegocio(aprovechante);
+        usuario.setAprovechante(aprovechante);
 
         // Guardar en la base de datos
         dao.crearAprovechante(usuario, aprovechante);

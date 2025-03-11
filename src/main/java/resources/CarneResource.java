@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import services.CarneDAO;
 import services.ComercioDAOJPA;
+import services.ComercioDao;
 
 import java.util.Collections;
 
@@ -18,7 +19,7 @@ public class CarneResource {
     CarneDAO daoCarne;
 
     @Inject
-    ComercioDAOJPA daoComercio;
+    ComercioDao daoComercio;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

@@ -7,78 +7,90 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import services.CarneDAO;
+import services.ComercioDAOJPA;
 
-import java.net.URISyntaxException;
+import java.util.Collections;
 
 @Path("/carnes")
 public class CarneResource {
+
     @Inject
-    CarneDAO dao;
+    CarneDAO daoCarne;
+
+    @Inject
+    ComercioDAOJPA daoComercio;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll() {
-        Response response = Response.ok(dao.getAll()).build();
-        System.out.println(response);
-        return response;
+        return Response.ok(daoCarne.getAll()).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/retrieve/{id}")
-    public Response getCarne(@PathParam("id") final Long id) {
-        Carne carne = dao.retrieve(id);
-        if (carne == null) return Response.status(Response.Status.NOT_FOUND).build();
+    @Path("/{id}")
+    public Response getCarne(@PathParam("id") Long id) {
+        Carne carne = daoCarne.retrieve(id);
+        if (carne == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         return Response.ok(carne).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/create")
-    public Response createCarne(Carne carne) throws URISyntaxException {
-        Carne carneCreada = dao.create(carne);
-        if (carneCreada == null) return Response.status(Response.Status.CONFLICT).build();
-        return Response.status(Response.Status.CREATED).entity(carneCreada).build();
+    public Response createCarne(Carne carne) {
+        try {
+            // El objeto 'carne' incluirá los datos de imagen (por ejemplo, imagenNombre, imagenTipo y imagenDatos)
+            Carne carneCreada = daoCarne.create(carne);
+            if (carneCreada == null) {
+                return Response.status(Response.Status.CONFLICT).build();
+            }
+            return Response.status(Response.Status.CREATED).entity(carneCreada).build();
+        } catch (PersistenceException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error de persistencia: " + e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Ocurrió un error inesperado: " + e.getMessage())
+                    .build();
+        }
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/update")
-    public Response updateCarne(final Carne carne) {
-        int maxRetries = 3; // Número máximo de reintentos
-        int attempt = 0; // Contador de intentos
-        long delay = 1000; // Retraso en milisegundos entre intentos
+    public Response updateCarne(Carne carne) {
+        int maxRetries = 3;
+        int attempt = 0;
+        long delay = 1000;
 
         while (attempt < maxRetries) {
             try {
-                Carne result = dao.update(carne);
+                // Si en el objeto 'carne' se han incluido nuevos datos de imagen, el DAO actualizará ambas tablas.
+                Carne result = daoCarne.update(carne);
                 if (result == null) {
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
-                // Se realiza correctamente, enviamos una respuesta vacía
                 return Response.noContent().build();
             } catch (PersistenceException e) {
                 attempt++;
-                // Esperar antes de intentar de nuevo
                 try {
-                    Thread.sleep(delay); // Esperar el tiempo especificado
+                    Thread.sleep(delay);
                 } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt(); // Restaurar el estado de interrupción
+                    Thread.currentThread().interrupt();
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                            .entity("Ocurrió un error inesperado. Por favor, inténtelo de nuevo.")
+                            .entity("Error en el sistema, inténtelo de nuevo.")
                             .build();
                 }
             } catch (Exception e) {
-                // Manejo de otros errores
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .entity("Ocurrió un error inesperado. Por favor, inténtelo de nuevo.")
+                        .entity("Ocurrió un error inesperado: " + e.getMessage())
                         .build();
             }
         }
-
-        // Si se sale del bucle sin éxito, devolver un error
         return Response.status(Response.Status.SERVICE_UNAVAILABLE)
                 .entity("No se pudo actualizar la carne después de varios intentos. Inténtelo de nuevo más tarde.")
                 .build();
@@ -86,11 +98,38 @@ public class CarneResource {
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/delete/{id}")
-    public Response deleteCarne(@PathParam("id") final Long id) {
-        Carne result = dao.delete(id);
-        if (result == null) return Response.status(Response.Status.NOT_FOUND).build();
-        return Response.noContent().build();
+    @Path("/{id}")
+    public Response deleteCarne(@PathParam("id") Long id) {
+        try {
+            Carne result = daoCarne.delete(id);
+            if (result == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            return Response.noContent().build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Ocurrió un error al eliminar: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/validar")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response validarCarne(@QueryParam("nombre") String nombre, @QueryParam("unidad") String unidad) {
+        boolean existe = daoCarne.existeCarne(nombre, unidad);
+        return Response.ok(Collections.singletonMap("existe", existe)).build();
+    }
+
+    @GET
+    @Path("/mis-carnes")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerCarnesDeUsuario(@CookieParam("usuario") String correo) {
+        if (correo == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("No hay sesión activa").build();
+        }
+        Long idNegocio = daoComercio.getComercioPorCorreo(correo).getId_usuario();
+        return Response.ok(daoCarne.getAllByUsuario(idNegocio)).build();
     }
 
 }

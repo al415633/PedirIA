@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gestión de Pescadería</title>
+    <title>Gestión de Pescados</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -15,53 +15,52 @@
             color: white;
             padding: 10px 0;
         }
+
         header img {
             height: 40px;
             margin-right: 10px;
         }
-        /* Efecto de hover para las filas de la tabla de carnes */
-        .table-striped tbody tr {
-            cursor: pointer; /* Cambia el cursor al pasar sobre la fila */
+
+        /* Clase para que la tarjeta se vea como botón */
+        .clickable {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .table-striped tbody tr:hover {
-            background-color: #f1f1f1; /* Color de fondo al pasar el ratón */
+        .clickable:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        /* Quitar el efecto de hover para la fila del stock y el formulario */
-        .table-striped tbody tr.stock-row {
-            cursor: default; /* Cambia el cursor a default */
-            background-color: transparent; /* Asegura que no haya color de fondo al pasar el ratón */
+        a.text-decoration-none {
+            color: inherit;
         }
 
-        .table-striped tbody tr.stock-row:hover {
-            background-color: transparent; /* Asegura que no haya cambio de color al pasar el ratón */
+        a.text-decoration-none:hover {
+            color: inherit;
         }
 
-        /* Quitar el efecto de hover para toda la tabla de stock */
-        .table-bordered {
-            cursor: default; /* Cambia el cursor a default para la tabla de stock */
+        /* Fijamos el tamaño de la imagen de la tarjeta */
+        .card-img-top {
+            height: 200px; /* Altura fija para todas las imágenes */
+            object-fit: cover; /* Se recorta y centra la imagen para ajustarse */
         }
 
-        .table-bordered tbody tr:hover,
-        .table-bordered thead tr:hover {
-            background-color: transparent; /* Asegura que no haya cambio de color al pasar el ratón */
-        }
-
-        .table-bordered tbody tr {
-            cursor: default; /* Cambia el cursor a default para las filas de la tabla de stock */
+        /* Forzamos que todas las tarjetas tengan la misma altura */
+        .card {
+            height: 100%;
         }
     </style>
 
 
 </head>
 <body>
-<!-- Encabezado con logo -->
+
 <header class="d-flex align-items-center px-4">
     <a href="../menu_productos.html">
         <img src="../static/logo.png" alt="Logo PedirIA">
     </a>
-    <h1>Gestión de Pescadería</h1>
+    <h1>Gestión de Pescados</h1>
 </header>
 
 <div id="app" class="container mt-4">
@@ -69,190 +68,80 @@
     <!-- Formulario para agregar producto -->
     <div class="card p-3 mb-4">
         <h4>Agregar Nuevo Pescado</h4>
-        <form class="row g-3">
-            <div class="col-md-3">
-                <input v-model="nombrePescado" type="text" class="form-control" placeholder="Nombre">
+        <form class="row g-3" @submit.prevent="create">
+            <div class="col-md-4">
+                <label for="nombre" class="form-label">Nombre del Pescado</label>
+                <input v-model="nombre" type="text" id="nombre" class="form-control" placeholder="Nombre" @input="validate">
+                <small v-if="nombreError" class="text-danger">{{ nombreError }}</small>
             </div>
             <div class="col-md-2">
-                <input v-model="unidadPescado" type="text" class="form-control" placeholder="Unidad">
+                <label for="unidad" class="form-label">Unidad</label>
+                <input v-model="unidad" type="text" id="unidad" class="form-control" placeholder="Unidad" @input="validate">
+                <small v-if="unidadError" class="text-danger">{{ unidadError }}</small>
             </div>
-            <select v-model="tipoConserva" class="form-control">
-                <option v-for="tipo in tiposConserva" :key="tipo" :value="tipo">{{ tipo }}</option>
-            </select>
-            <div class="col-md-1">
-                <button v-on:click="createPescado()" type="button" class="btn btn-primary">Agregar</button>
+            <div class="col-md-3">
+                <label for="tipoConserva" class="form-label">Tipo de Conserva</label>
+                <select v-model="tipoConserva" id="tipoConserva" class="form-select">
+                    <option disabled value="">Seleccione una opción</option>
+                    <option v-for="tipo in tiposConserva" :key="tipo" :value="tipo">{{ tipo }}</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="imagen" class="form-label">Imagen del Pescado</label>
+                <input type="file" id="imagen" class="form-control" @change="onFileChange">
+            </div>
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary" :disabled="isInvalid">Agregar Pescado</button>
             </div>
         </form>
     </div>
 
-    <!-- Tabla de productos -->
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Unidad</th>
-            <th>Tipo de Conserva</th>
-            <th>Acciones</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- Bucle principal con <template> -->
-        <template v-for="(pescado, index) in pescados" :key="pescado.id">
-            <!-- Fila de info de cada producto -->
-            <tr @click="retrieveStockandProduct(index)">
-                <td>{{ pescado.nombre }}</td>
-                <td>{{ pescado.unidad }}</td>
-                <td>{{ pescado.tipoConserva }}</td>
-                <td>
-                    <button v-on:click.stop="retrievePescado(index)"
-                            class="btn btn-primary"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editModal">
-                        Editar
-                    </button>
-                    <button type="button"
-                            class="btn btn-danger"
-                            @click="deletePescado(index)">
-                        Eliminar
-                    </button>
-                </td>
-            </tr>
-
-            <!-- Fila del stock -->
-            <tr v-if="mostrarStock && pescadoSeleccionado.id === pescado.id" class="stock-row">
-                <td colspan="4">
-                    <div class="mt-2">
-                        <h4>Stock de {{ pescado.nombre }}</h4>
-                        <table class="table table-bordered">
-                            <thead>
-                            <tr>
-                                <th>Cantidad</th>
-                                <th>Fecha Ingreso</th>
-                                <th>Fecha Vencimiento</th>
-                                <th>Acciones</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="(stock, stockIndex) in stocks" :key="stock.id">
-                                <td>{{ stock.cantidad }}</td>
-                                <td>{{ stock.fechaIngreso }}</td>
-                                <td>{{ stock.fechaVencimiento }}</td>
-                                <td>
-                                    <button @click="modificarStock(stockIndex)" class="btn btn-warning">
-                                        Modificar
-                                    </button>
-                                    <button @click="eliminarStock(stockIndex)"
-                                            class="btn btn-danger">
-                                        Eliminar
-                                    </button>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-
-                        <h5>Añadir Stock</h5>
-                        <form @submit.prevent="agregarStock" class="row g-3">
-                            <div class="col-md-3">
-                                <input v-model="cantidadStock" type="number" class="form-control" placeholder="Cantidad">
-                            </div>
-                            <div class="col-md-3">
-                                <input v-model="fechaIngresoStock" type="date" class="form-control">
-                            </div>
-                            <div class="col-md-3">
-                                <input v-model="fechaVencimientoStock" type="date" class="form-control">
-                            </div>
-                            <div class="col-md-1">
-                                <button v-on:click="agregarStock()" type="button" class="btn btn-primary">Agregar</button>
-                            </div>
-                        </form>
+    <!-- Listado de carnes en formato cards -->
+    <div class="row">
+        <!-- Se muestran las tarjetas de la página actual -->
+        <template v-for="(pescado, index) in displayedItems" :key="pescado.id">
+            <div class="col-md-3 mb-4">
+                <a :href="'StockPescado.html?id=' + pescado.id" class="text-decoration-none">
+                    <div class="card h-100 clickable">
+                        <img :src="'data:image/jpeg;base64,' + pescado.imagenDatos" :alt="pescado.nombre"
+                             class="card-img-top"/>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ pescado.nombre }}</h5>
+                            <p class="card-text">
+                                <strong>Unidad:</strong> {{ pescado.unidad }}<br>
+                                <strong>Tipo de Conserva:</strong> {{ pescado.tipoConserva }}
+                            </p>
+                        </div>
                     </div>
-                </td>
-            </tr>
+                </a>
+            </div>
         </template>
-        </tbody>
-    </table>
-
-    <!-- Modal para editar un producto -->
-    <div class="modal fade" id="editModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Pescado</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <label>Nombre:</label>
-                        <input v-model="pescadoSeleccionado.nombre" type="text" class="form-control">
-                        <label>Unidad:</label>
-                        <input v-model="pescadoSeleccionado.unidad" type="text" class="form-control">
-                        <label>Tipo de Conserva:</label>
-                        <select v-model="pescadoSeleccionado.tipoConserva" class="form-control">
-                            <option v-for="tipo in tiposConserva" :key="tipo" :value="tipo">{{ tipo }}</option>
-                        </select>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" v-on:click="updatePescado()" class="btn btn-primary">Guardar</button>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- Modal de Confirmación de Borrado -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Estás seguro de que deseas eliminar este pescado?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">Eliminar</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Paginación -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                <a class="page-link" href="#" @click.prevent="prevPage">Anterior</a>
+            </li>
+            <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: page === currentPage }">
+                <a class="page-link" href="#" @click.prevent="goToPage(page)">{{ page }}</a>
+            </li>
+            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                <a class="page-link" href="#" @click.prevent="nextPage">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
 
     <!-- Toast para mensajes Feedback usuario -->
-    <div id="toastPescado" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 20px; right: 20px; z-index: 1050;">
+    <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true"
+         style="position: absolute; top: 20px; right: 20px; z-index: 1050;">
         <div class="toast-header">
             <strong class="me-auto">Notificación</strong>
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body" id="toast-body">
-            ¡Pescado ...... con éxito!
-        </div>
-    </div>
-
-    <!-- Modal para editar stock -->
-    <div class="modal fade" id="editStockModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Stock</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <label>Cantidad:</label>
-                        <input v-model="stockSeleccionado.cantidad" type="number" class="form-control">
-                        <label>Fecha de Ingreso:</label>
-                        <input v-model="stockSeleccionado.fechaIngreso" type="date" class="form-control">
-                        <label>Fecha de Vencimiento:</label>
-                        <input v-model="stockSeleccionado.fechaVencimiento" type="date" class="form-control">
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" v-on:click="modificarStock()" class="btn btn-primary">Guardar Cambios</button>
-                </div>
-            </div>
+            ¡Pescado algo con éxito!
         </div>
     </div>
 

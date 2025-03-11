@@ -116,4 +116,28 @@ public class CarneDAO {
         List<Carne> list = q.getResultList();
         return list;
     }
+
+    public boolean existeCarne(String nombre, String unidad) {
+        Long count = em.createQuery(
+                        "SELECT COUNT(c) FROM Carne c WHERE LOWER(c.nombre) = LOWER(:nombre) AND LOWER(c.unidad) = LOWER(:unidad)",
+                        Long.class)
+                .setParameter("nombre", nombre.trim().toLowerCase())
+                .setParameter("unidad", unidad.trim().toLowerCase())
+                .getSingleResult();
+        return count > 0;
+    }
+
+    public Collection<Carne> getAllByUsuario(Long idNegocio) {
+        Query q = em.createNativeQuery(
+                "SELECT c.id_carne, c.nombre, c.unidad, c.tipo_conserva, c.id_img, " +
+                        "i.nombre AS imagenNombre, i.tipo AS imagenTipo, i.datos AS imagenDatos " +
+                        "FROM Carne c " +
+                        "JOIN ImagenesCarnes i ON c.id_img = i.id_img " +
+                        "WHERE c.id_negocio = ?",
+                "CarneMapping"
+        );
+        q.setParameter(1, idNegocio);
+        return q.getResultList();
+    }
+
 }

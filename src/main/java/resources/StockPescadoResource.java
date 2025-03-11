@@ -6,8 +6,11 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import services.HistoricoStockCarneDAO;
+import services.HistoricoStockPescadoDAO;
 import services.StockPescadoDAO;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Path("/pescados/stock")
@@ -17,6 +20,9 @@ public class StockPescadoResource {
 
     @Inject
     StockPescadoDAO stockPescadoDAO;
+
+    @Inject
+    HistoricoStockPescadoDAO historicoStockPescadoDAO;
 
     @GET
     public List<StockPescado> obtenerTodos() {
@@ -37,7 +43,7 @@ public class StockPescadoResource {
     @GET
     @Path("/producto/{idPescado}")
     public List<StockPescado> obtenerPorIdCarne(@PathParam("idPescado") Long idPescado) {
-        return stockPescadoDAO.retrieveByCarne(idPescado);
+        return stockPescadoDAO.retrieveByPescado(idPescado);
     }
 
     @POST
@@ -51,7 +57,7 @@ public class StockPescadoResource {
     public Response actualizarStock(@PathParam("id") Long id, StockPescado stockPescado) {
         StockPescado stockExistente = stockPescadoDAO.retrieve(id);
         if (stockExistente != null) {
-            stockPescado.setId(id); // Asegura que el ID coincida con el ID enviado
+            stockPescado.setId(id);
             StockPescado stockActualizado = stockPescadoDAO.actualizarStock(stockPescado);
             return Response.ok(stockActualizado).build();
         }
@@ -68,12 +74,18 @@ public class StockPescadoResource {
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
+    @POST
+    @Path("/vender/{idStock}/{cantidad}")
+    public Response venderStock(@PathParam("idStock") Long idStock, @PathParam("cantidad") BigDecimal cantidadVendida) {
+        stockPescadoDAO.venderStock(idStock, cantidadVendida);
+        return Response.ok().build();
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/predict")
-    public Response obtenerPrediccion() {
-
-//        return stockPescadoDAO.getPrediction();
-        return Response.ok(stockPescadoDAO.getPrediction()).build();
+    @Path("/historico/{idPescado}")
+    public Response getAllHistoricoStockCarne(@PathParam("idPescado") Long idPescado) {
+        return Response.ok(historicoStockPescadoDAO.obtenerHistorialPorProducto(idPescado)).build();
     }
+
 }

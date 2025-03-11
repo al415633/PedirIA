@@ -40,7 +40,6 @@
             color: inherit;
         }
 
-
         /* Fijamos el tamaño de la imagen de la tarjeta */
         .card-img-top {
             height: 200px; /* Altura fija para todas las imágenes */
@@ -51,65 +50,34 @@
         .card {
             height: 100%;
         }
-
-        /* Efecto de hover para las filas de la tabla de carnes */
-        .table-striped tbody tr {
-            cursor: pointer; /* Cambia el cursor al pasar sobre la fila */
-        }
-
-        .table-striped tbody tr:hover {
-            background-color: #f1f1f1; /* Color de fondo al pasar el ratón */
-        }
-
-        /* Quitar el efecto de hover para la fila del stock y el formulario */
-        .table-striped tbody tr.stock-row {
-            cursor: default; /* Cambia el cursor a default */
-            background-color: transparent; /* Asegura que no haya color de fondo al pasar el ratón */
-        }
-
-        .table-striped tbody tr.stock-row:hover {
-            background-color: transparent; /* Asegura que no haya cambio de color al pasar el ratón */
-        }
-
-        /* Quitar el efecto de hover para toda la tabla de stock */
-        .table-bordered {
-            cursor: default; /* Cambia el cursor a default para la tabla de stock */
-        }
-
-        .table-bordered tbody tr:hover,
-        .table-bordered thead tr:hover {
-            background-color: transparent; /* Asegura que no haya cambio de color al pasar el ratón */
-        }
-
-        .table-bordered tbody tr {
-            cursor: default; /* Cambia el cursor a default para las filas de la tabla de stock */
-        }
     </style>
 
 
 </head>
 <body>
-<!-- Encabezado verde con logo -->
+
 <header class="d-flex align-items-center px-4">
     <a href="../menu_productos.html">
-        <img src="/static/logo.png" alt="Logo Empresa"> <!-- Cambia la URL por la de tu logo -->
+        <img src="/static/logo.png" alt="Logo PedirIA">
     </a>
     <h1>Gestión de Carne</h1>
 </header>
 
 <div id="app" class="container mt-4">
 
-    <!-- Formulario para agregar carne -->
+    <!-- Formulario para agregar producto -->
     <div class="card p-3 mb-4">
         <h4>Agregar Nueva Carne</h4>
         <form class="row g-3" @submit.prevent="createCarne">
             <div class="col-md-4">
                 <label for="nombreCarne" class="form-label">Nombre de la Carne</label>
-                <input v-model="nombreCarne" type="text" id="nombreCarne" class="form-control" placeholder="Nombre">
+                <input v-model="nombreCarne" type="text" id="nombreCarne" class="form-control" placeholder="Nombre" @input="validateCarne">
+                <small v-if="nombreError" class="text-danger">{{ nombreError }}</small>
             </div>
             <div class="col-md-2">
                 <label for="unidadCarne" class="form-label">Unidad</label>
-                <input v-model="unidadCarne" type="text" id="unidadCarne" class="form-control" placeholder="Unidad">
+                <input v-model="unidadCarne" type="text" id="unidadCarne" class="form-control" placeholder="Unidad" @input="validateCarne">
+                <small v-if="unidadError" class="text-danger">{{ unidadError }}</small>
             </div>
             <div class="col-md-3">
                 <label for="tipoConserva" class="form-label">Tipo de Conserva</label>
@@ -123,10 +91,11 @@
                 <input type="file" id="imagenCarne" class="form-control" @change="onFileChange">
             </div>
             <div class="col-12 text-end">
-                <button type="submit" class="btn btn-primary">Agregar Carne</button>
+                <button type="submit" class="btn btn-primary" :disabled="isInvalid">Agregar Carne</button>
             </div>
         </form>
     </div>
+
 
     <!-- Listado de carnes en formato cards -->
     <div class="row">
@@ -166,54 +135,6 @@
         </ul>
     </nav>
 
-    <!-- Modal para editar carne -->
-    <div class="modal fade" id="editModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Carne</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <label>Nombre:</label>
-                        <input v-model="carneSeleccionada.nombre" type="text" class="form-control">
-                        <label>Unidad:</label>
-                        <input v-model="carneSeleccionada.unidad" type="text" class="form-control">
-                        <label>Tipo de Conserva:</label>
-                        <select v-model="carneSeleccionada.tipoConserva" class="form-control">
-                            <option v-for="tipo in tiposConserva" :key="tipo" :value="tipo">{{ tipo }}</option>
-                        </select>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" v-on:click="updateCarne()" class="btn btn-primary">Guardar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmación de Borrado -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Estás seguro de que deseas eliminar esta carne?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">Eliminar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Toast para mensajes Feedback usuario -->
     <div id="toastCarne" class="toast" role="alert" aria-live="assertive" aria-atomic="true"
          style="position: absolute; top: 20px; right: 20px; z-index: 1050;">
@@ -223,17 +144,6 @@
         </div>
         <div class="toast-body" id="toast-body">
             ¡Carne algo con éxito!
-        </div>
-    </div>
-
-    <!-- Modal obtener predicción   -->
-    <div class="container mt-4" id="getPrediction">
-        <button type="button" v-on:click="predecirStock()" class="btn btn-primary">Obtener predicción</button>
-        <div class="col-md-3">
-            <label>
-                <textarea v-model="stockPrediction" type="text" class="form-control"
-                          placeholder="Prediccion"> </textarea>
-            </label>
         </div>
     </div>
 

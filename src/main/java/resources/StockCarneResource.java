@@ -6,8 +6,10 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import services.HistoricoStockCarneDAO;
 import services.StockCarneDAO;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Path("/carnes/stock")
@@ -17,6 +19,9 @@ public class StockCarneResource {
 
     @Inject
     StockCarneDAO stockCarneDAO;
+
+    @Inject
+    HistoricoStockCarneDAO stockCarneHistoricoDAO;
 
     @GET
     public List<StockCarne> obtenerTodos() {
@@ -43,7 +48,6 @@ public class StockCarneResource {
 
     @POST
     public Response agregarStock(StockCarne stockCarne) {
-        System.out.println("Agregando stock: " + stockCarne);
         StockCarne nuevoStock = stockCarneDAO.agregarStock(stockCarne);
         return Response.status(Response.Status.CREATED).entity(nuevoStock).build();
     }
@@ -70,12 +74,17 @@ public class StockCarneResource {
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
+    @POST
+    @Path("/vender/{idStock}/{cantidad}")
+    public Response venderStock(@PathParam("idStock") Long idStock, @PathParam("cantidad") BigDecimal cantidadVendida) {
+        stockCarneDAO.venderStock(idStock, cantidadVendida);
+        return Response.ok().build();
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/predict")
-    public Response obtenerPrediccion() {
-
-//        return stockPescadoDAO.getPrediction();
-        return Response.ok(stockCarneDAO.getPrediction()).build();
+    @Path("/historico/{idCarne}")
+    public Response getAllHistoricoStockCarne(@PathParam("idCarne") Long idCarne) {
+        return Response.ok(stockCarneHistoricoDAO.obtenerHistorialPorProducto(idCarne)).build();
     }
 }

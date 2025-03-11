@@ -7,6 +7,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import services.CarneDAO;
+import services.ComercioDAOJPA;
 
 import java.util.Collections;
 
@@ -14,19 +15,22 @@ import java.util.Collections;
 public class CarneResource {
 
     @Inject
-    CarneDAO dao;
+    CarneDAO daoCarne;
+
+    @Inject
+    ComercioDAOJPA daoComercio;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll() {
-        return Response.ok(dao.getAll()).build();
+        return Response.ok(daoCarne.getAll()).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public Response getCarne(@PathParam("id") Long id) {
-        Carne carne = dao.retrieve(id);
+        Carne carne = daoCarne.retrieve(id);
         if (carne == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -39,7 +43,7 @@ public class CarneResource {
     public Response createCarne(Carne carne) {
         try {
             // El objeto 'carne' incluirá los datos de imagen (por ejemplo, imagenNombre, imagenTipo y imagenDatos)
-            Carne carneCreada = dao.create(carne);
+            Carne carneCreada = daoCarne.create(carne);
             if (carneCreada == null) {
                 return Response.status(Response.Status.CONFLICT).build();
             }
@@ -66,7 +70,7 @@ public class CarneResource {
         while (attempt < maxRetries) {
             try {
                 // Si en el objeto 'carne' se han incluido nuevos datos de imagen, el DAO actualizará ambas tablas.
-                Carne result = dao.update(carne);
+                Carne result = daoCarne.update(carne);
                 if (result == null) {
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
@@ -97,7 +101,7 @@ public class CarneResource {
     @Path("/{id}")
     public Response deleteCarne(@PathParam("id") Long id) {
         try {
-            Carne result = dao.delete(id);
+            Carne result = daoCarne.delete(id);
             if (result == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
@@ -113,8 +117,19 @@ public class CarneResource {
     @Path("/validar")
     @Produces(MediaType.APPLICATION_JSON)
     public Response validarCarne(@QueryParam("nombre") String nombre, @QueryParam("unidad") String unidad) {
-        boolean existe = dao.existeCarne(nombre, unidad);
+        boolean existe = daoCarne.existeCarne(nombre, unidad);
         return Response.ok(Collections.singletonMap("existe", existe)).build();
+    }
+
+    @GET
+    @Path("/mis-carnes")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerCarnesDeUsuario(@CookieParam("usuario") String correo) {
+        if (correo == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("No hay sesión activa").build();
+        }
+        Long idNegocio = daoComercio.getComercioPorCorreo(correo).getId_usuario();
+        return Response.ok(daoCarne.getAllByUsuario(idNegocio)).build();
     }
 
 }

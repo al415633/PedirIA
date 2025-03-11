@@ -127,4 +127,19 @@ public class CarneDAO {
                 .getSingleResult();
         return count > 0;
     }
+
+    public Collection<Carne> getAllByUsuario(Long idNegocio) {
+        Query q = em.createNativeQuery(
+                "SELECT c.id_carne, c.nombre, c.unidad, c.tipo_conserva, c.id_img, " +
+                        "i.nombre AS imagenNombre, i.tipo AS imagenTipo, i.datos AS imagenDatos " +
+                        "FROM Carne c " +
+                        "JOIN ImagenesCarnes i ON c.id_img = i.id_img " +
+                        "JOIN Negocio n ON n.id_negocio = c.id_negocio " +
+                        "WHERE c.id_negocio = ?",
+                "CarneMapping"
+        );
+        q.setParameter(1, idNegocio);
+        return q.getResultList();
+    }
+
 }

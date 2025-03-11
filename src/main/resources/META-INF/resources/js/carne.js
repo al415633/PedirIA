@@ -99,7 +99,7 @@ Vue.createApp({
         // Obtiene el listado de carnes completo
         async getAllCarnes() {
             try {
-                const response = await axios.get(RETRIEVE_ALL_CARNES);
+                const response = await axios.get(RETRIEVE_ALL_CARNES + "/mis-carnes");
                 this.carnes = response.data.map(carneArray => {
                     const carne = carneArray[0];
                     return {

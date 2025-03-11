@@ -4,13 +4,13 @@ const DELETE = "/pescados/delete/";
 const RETRIEVE_ONE_PESCADO = "/pescados/retrieve/";
 const UPDATE = "/pescados/update";
 
-const STOCK_RETRIEVE_ONE = "/carnes/stock/retrieve/";
-const STOCK_RETRIEVE = "/carnes/stock/producto/";
-const STOCK_ADD = "/carnes/stock";
-const STOCK_UPDATE = "/carnes/stock/";
-const STOCK_DELETE = "/carnes/stock/";
+const STOCK_RETRIEVE_ONE = "/pescados/stock/retrieve/";
+const STOCK_RETRIEVE = "/pescados/stock/producto/";
+const STOCK_ADD = "/pescados/stock";
+const STOCK_UPDATE = "/pescados/stock/";
+const STOCK_DELETE = "/pescados/stock/";
 
-const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO", "VIVO"];
+const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "VIVO"];
 
 
 Vue.createApp({
@@ -171,7 +171,7 @@ Vue.createApp({
             }
         },
         // Llama al modal para confirmar el borrado
-        deletePescado(index) {
+        async deletePescado(index) {
             // Mostrar el modal de confirmación
             const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
             modal.show();
@@ -222,11 +222,11 @@ Vue.createApp({
         },
 
         // Métodos de gestión del stock
-/*
+
         // Obtiene el listado de stock para la carne seleccionada
-        async getStockByCarne(carneId) {
+        async getStockByProduct(productId) {
             try {
-                const response = await axios.get(STOCK_RETRIEVE + carneId);
+                const response = await axios.get(STOCK_RETRIEVE + productId);
                 this.stocks = response.data;
             } catch (error) {
                 console.error("Error al obtener el stock:", error);
@@ -234,33 +234,32 @@ Vue.createApp({
         },
 
         // Para seleccionar una carne y cargar su stock
-        async retrieveStockandCarne(index) {
+        async retrieveStockandProduct(index) {
             try {
-                const carneId = this.carnes[index].id;
-                console.log("Seleccionando Carne con ID para mostrar stock:", carneId);
-                const response = await axios.get(RETRIEVE_ONE_CARNE + carneId);
-                this.carneSeleccionada = response.data;
+                const productID = this.pescados[index].id;
+                const response = await axios.get(RETRIEVE_ONE_PESCADO + productID);
+                this.pescadoSeleccionado = response.data;
+                console.log("Pescado obtenido: ", response.data)
 
-                // Obtener el stock de la carne seleccionada
-                await this.getStockByCarne(carneId);
-                console.log("Carne para mostrar stock:", this.carneSeleccionada);
-                console.log("Carnes cargadas: ", this.carnes)
-                this.mostrarStock = true; // Mostrar la sección de stock
+                await this.getStockByProduct(productID);
+                this.mostrarStock = true;
 
             } catch (error) {
-                console.error("Error al cargar la carne o el stock:", error);
-                this.mostrarStock = false; // Asegúrate de ocultar el stock si hay un error
+                console.error("Error al cargar el producto el stock:", error);
+                this.mostrarStock = false;
             }
         },
 
         // Se emplea para agregar stock
         async agregarStock() {
             try {
+                console.log("Pescado seleccionado: ", this.pescadoSeleccionado)
+
                 const nuevoStock = {
                     cantidad: this.cantidadStock,
                     fechaIngreso: this.fechaIngresoStock,
                     fechaVencimiento: this.fechaVencimientoStock,
-                    carne: this.carneSeleccionada
+                    pescado: this.pescadoSeleccionado
                 };
 
                 const response = await axios.post(STOCK_ADD, nuevoStock);
@@ -275,8 +274,8 @@ Vue.createApp({
 
                 // Mostrar mensaje de éxito
                 const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = 'Stock agregado con éxito!';
-                const toastEl = document.getElementById('toastCarne');
+                toastBody.textContent = '¡Stock agregado con éxito!';
+                const toastEl = document.getElementById('toastPescado');
                 const toast = new bootstrap.Toast(toastEl);
                 toast.show();
 
@@ -294,18 +293,16 @@ Vue.createApp({
 
                 // Mostrar mensaje de éxito
                 const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = 'Stock eliminado con éxito!';
-                const toastEl = document.getElementById('toastCarne');
+                toastBody.textContent = '¡Stock eliminado con éxito!';
+                const toastEl = document.getElementById('toastPescado');
                 const toast = new bootstrap.Toast(toastEl);
                 toast.show();
 
             } catch (error) {
                 console.error("Error al eliminar stock:", error);
             }
-        },*/
-
+        },
     },
-
 
     mounted() {
         this.getAllPescados();

@@ -1,6 +1,5 @@
 package services;
 
-import com.google.gson.Gson;
 import data.StockCarne;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -8,7 +7,8 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.json.simple.JSONObject;
-import pythonAdapter.JSONConverter;
+import pythonAdapter.JSONPacker.IJSONPacker;
+import pythonAdapter.JSONPacker.JSONCarnePacker;
 import pythonAdapter.PythonManager;
 
 import java.util.List;
@@ -53,17 +53,20 @@ public class StockCarneDAO {
     public List<StockCarne> getAll() {
         List< StockCarne > result = em.createQuery("SELECT s FROM StockCarne s", StockCarne.class)
                 .getResultList();
-//        JSONConverter converter = new JSONConverter();
-//        converter.extractHistoricStockCarne(result);
-//        converter.extractMapCurrentStockCarne(result);
-//        converter.extractCurrentStockCarne(result);
-//        converter.preparePythonMessage(result);
         return result;
     }
 
     public String getPrediction() {
         PythonManager pythonManager = new PythonManager();
-        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/tests/test5.py", getAll());
+        String JSONtoFiles;
+        IJSONPacker<StockCarne> packer = new JSONCarnePacker();
+        try {
+            JSONtoFiles = packer.packageData(getAll());
+        }catch (Exception e){
+            return "No se pudo enviar información al servidor";
+        }
+        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/tests/test5.py", JSONtoFiles);
+        packer.closeFiles();
         String stringValue =prediction.get("message").toString();
         return stringValue;
     }

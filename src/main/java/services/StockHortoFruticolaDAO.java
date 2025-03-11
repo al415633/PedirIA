@@ -1,11 +1,18 @@
 package services;
 
+import data.StockCarne;
 import data.StockHortoFruticola;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.json.simple.JSONObject;
+import pythonAdapter.JSONPacker.IJSONPacker;
+import pythonAdapter.JSONPacker.JSONCarnePacker;
+import pythonAdapter.JSONPacker.JSONHortoFruticolaPacker;
+import pythonAdapter.PythonManager;
+
 import java.util.List;
 
 @ApplicationScoped
@@ -47,5 +54,19 @@ public class StockHortoFruticolaDAO {
     public List<StockHortoFruticola> getAll() {
         return em.createQuery("SELECT s FROM StockHortoFruticola s", StockHortoFruticola.class)
                 .getResultList();
+    }
+    public String getPrediction() {
+        PythonManager pythonManager = new PythonManager();
+        String JSONtoFiles;
+        IJSONPacker<StockHortoFruticola> packer = new JSONHortoFruticolaPacker();
+        try {
+            JSONtoFiles = packer.packageData(getAll());
+        }catch (Exception e){
+            return "No se pudo enviar información al servidor";
+        }
+        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/tests/test5.py", JSONtoFiles);
+        packer.closeFiles();
+        String stringValue =prediction.get("message").toString();
+        return stringValue;
     }
 }

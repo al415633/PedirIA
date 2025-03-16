@@ -6,52 +6,69 @@ import jakarta.persistence.PersistenceException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import services.HortoFruticolaDAOJPA;
+import services.ComercioDao;
+import services.HortoFruticolaDAO;
 
-import java.net.URISyntaxException;
+import java.util.Collections;
 
 @Path("/hortofruticolas")
 public class HortoFruticolaResource {
     @Inject
-    HortoFruticolaDAOJPA dao;
+    HortoFruticolaDAO daoHortofruticola;
+
+    @Inject
+    ComercioDao daoComercio;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll() {
-        return Response.ok(dao.getAll()).build();
+        return Response.ok(daoHortofruticola.getAll()).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/retrieve/{id}")
-    public Response getHortoFruticola(@PathParam("id") final Long id) {
-        HortoFruticola hortoFruticola = dao.retrieve(id);
-        if (hortoFruticola == null) return Response.status(Response.Status.NOT_FOUND).build();
-        return Response.ok(hortoFruticola).build();
+    @Path("/{id}")
+    public Response getHortoFruticola(@PathParam("id") Long id) {
+        HortoFruticola hortofruticola = daoHortofruticola.retrieve(id);
+        if (hortofruticola == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(hortofruticola).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/create")
-    public Response createHortoFruticola(HortoFruticola hortoFruticola) throws URISyntaxException {
-        HortoFruticola hortoFruticolaCreado = dao.create(hortoFruticola);
-        if (hortoFruticolaCreado == null) return Response.status(Response.Status.CONFLICT).build();
-        return Response.status(Response.Status.CREATED).entity(hortoFruticolaCreado).build();
+    public Response createHortoFruticola(HortoFruticola hortofruticola) {
+        try {
+            // El objeto 'carne' incluirá los datos de imagen (por ejemplo, imagenNombre, imagenTipo y imagenDatos)
+            HortoFruticola hortofruticolaCreada = daoHortofruticola.create(hortofruticola);
+            if (hortofruticolaCreada == null) {
+                return Response.status(Response.Status.CONFLICT).build();
+            }
+            return Response.status(Response.Status.CREATED).entity(hortofruticolaCreada).build();
+        } catch (PersistenceException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error de persistencia: " + e.getMessage())
+                    .build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Ocurrió un error inesperado: " + e.getMessage())
+                    .build();
+        }
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/update")
-    public Response updateHortoFruticola(final HortoFruticola hortoFruticola) {
+    public Response updateHortoFruticola(HortoFruticola hortoFruticola) {
         int maxRetries = 3; // Número máximo de reintentos
         int attempt = 0; // Contador de intentos
         long delay = 1000; // Retraso en milisegundos entre intentos
 
         while (attempt < maxRetries) {
             try {
-                HortoFruticola result = dao.update(hortoFruticola);
+                HortoFruticola result = daoHortofruticola.update(hortoFruticola);
                 if (result == null) {
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
@@ -84,10 +101,37 @@ public class HortoFruticolaResource {
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/delete/{id}")
-    public Response deleteHortoFruticola(@PathParam("id") final Long id) {
-        HortoFruticola result = dao.delete(id);
-        if (result == null) return Response.status(Response.Status.NOT_FOUND).build();
-        return Response.noContent().build();
+    @Path("/{id}")
+    public Response deleteHortoFruticola(@PathParam("id") Long id) {
+        try {
+            HortoFruticola result = daoHortofruticola.delete(id);
+            if (result == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            return Response.noContent().build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Ocurrió un error al eliminar: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/validar")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response validarCarne(@QueryParam("nombre") String nombre, @QueryParam("unidad") String unidad) {
+        boolean existe = daoHortofruticola.existeHortofruticola(nombre, unidad);
+        return Response.ok(Collections.singletonMap("existe", existe)).build();
+    }
+
+    @GET
+    @Path("/mis-hortofruticolas")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerHortofruticolasDeUsuario(@CookieParam("usuario") String correo) {
+        if (correo == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("No hay sesión activa").build();
+        }
+        Long idNegocio = daoComercio.getComercioPorCorreo(correo).getId_usuario();
+        return Response.ok(daoHortofruticola.getAllByUsuario(idNegocio)).build();
     }
 }

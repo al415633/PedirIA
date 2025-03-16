@@ -2,6 +2,8 @@ package data;
 
 import jakarta.persistence.*;
 
+import java.util.Arrays;
+
 @Entity
 @Table(name = "HortoFruticola")
 public class HortoFruticola {
@@ -20,17 +22,17 @@ public class HortoFruticola {
     @Column(name = "tipo_conserva", nullable = false, length = 50)
     private TipoConserva tipoConserva;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column(name = "id_img", nullable = false)
+    private Integer idImg;
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+    // Estos campos no se persisten en la tabla Carne, sino que se cargan a través de JOIN en el DAO
+    @Transient
+    private String imagenNombre;
+    @Transient
+    private String imagenTipo;
+    @Transient
+    private byte[] imagenDatos;
 
-    public void setUnidad(String unidad) {
-        this.unidad = unidad;
-    }
 
     public Long getId() {
         return id;
@@ -44,11 +46,69 @@ public class HortoFruticola {
         return unidad;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setUnidad(String unidad) {
+        this.unidad = unidad;
+    }
+
     public TipoConserva getTipoConserva() {
         return tipoConserva;
     }
 
     public void setTipoConserva(TipoConserva tipoConserva) {
         this.tipoConserva = tipoConserva;
+    }
+
+    public Integer getIdImg() {
+        return idImg;
+    }
+
+    public void setIdImg(Integer idImg) {
+        this.idImg = idImg;
+    }
+
+    public String getImagenNombre() {
+        return imagenNombre;
+    }
+
+    public void setImagenNombre(String imagenNombre) {
+        this.imagenNombre = imagenNombre;
+    }
+
+    public String getImagenTipo() {
+        return imagenTipo;
+    }
+
+    public void setImagenTipo(String imagenTipo) {
+        this.imagenTipo = imagenTipo;
+    }
+
+    public byte[] getImagenDatos() {
+        return imagenDatos;
+    }
+
+    public void setImagenDatos(byte[] imagenDatos) {
+        this.imagenDatos = imagenDatos;
+    }
+
+    @Override
+    public String toString() {
+        return "Hortofruticola{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", unidad='" + unidad + '\'' +
+                ", tipoConserva=" + tipoConserva +
+                ", idImg=" + idImg +
+                ", imagenNombre='" + imagenNombre + '\'' +
+                ", imagenTipo='" + imagenTipo + '\'' +
+                ", imagenDatos=" + Arrays.toString(imagenDatos) +
+                '}';
     }
 }

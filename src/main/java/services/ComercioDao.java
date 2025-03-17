@@ -21,6 +21,4 @@ public interface ComercioDao {
     boolean eliminarNegocio(String correo);
     Usuario verificarCredenciales(String correo, String password);
 
-
-
 }

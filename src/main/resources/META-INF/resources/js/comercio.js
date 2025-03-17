@@ -46,7 +46,7 @@ Vue.createApp({
 
                 if (response.status === 200) {
                     alert("Inicio de sesión exitoso");
-                    window.location.href = "registroCorrecto.html"; // Página correcta
+                    window.location.href = "menu_productos.html"; // Página correcta
                 } else {
                     throw new Error("Error en la autenticación");
                 }
@@ -78,7 +78,7 @@ Vue.createApp({
 
                 if (response.status === 201) {
                     alert("Registro exitoso");
-                    window.location.href = "registroCorrecto.html";
+                    window.location.href = "menu_productos.html";
                 } else {
                     throw new Error("Error en el registro");
                 }

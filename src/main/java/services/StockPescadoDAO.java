@@ -1,113 +1,95 @@
 package services;
 
 import data.HistoricoCarne;
+import data.HistoricoPescado;
 import data.StockCarne;
-
+import data.StockPescado;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
-import org.json.simple.JSONObject;
-import pythonAdapter.JSONPacker.IJSONPacker;
-import pythonAdapter.JSONPacker.JSONCarnePacker;
-import pythonAdapter.PythonManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 @ApplicationScoped
-public class StockCarneDAO {
+public class StockPescadoDAO {
 
     @Inject
     EntityManager em;
 
     @Transactional
-    public StockCarne agregarStock(StockCarne stockCarne) {
-        em.persist(stockCarne);
-        return stockCarne;
+    public StockPescado agregarStock(StockPescado stockPescado) {
+        em.persist(stockPescado);
+        return stockPescado;
     }
 
-    public StockCarne retrieve(Long id) {
-        return em.find(StockCarne.class, id);
+    public StockPescado retrieve(Long id) {
+        return em.find(StockPescado.class, id);
     }
 
-    public List<StockCarne> retrieveByCarne(Long idCarne) {
-        return em.createQuery("SELECT s FROM StockCarne s WHERE s.carne.id = :idCarne", StockCarne.class)
-                .setParameter("idCarne", idCarne)
+    public List<StockPescado> retrieveByPescado(Long idPescado) {
+        return em.createQuery("SELECT s FROM StockPescado s WHERE s.pescado.id = :idPescado", StockPescado.class)
+                .setParameter("idPescado", idPescado)
                 .getResultList();
     }
 
 
     @Transactional
-    public StockCarne actualizarStock(StockCarne stockCarne) {
-        return em.merge(stockCarne);
+    public StockPescado actualizarStock(StockPescado stockPescado) {
+        return em.merge(stockPescado);
     }
 
     @Transactional
-    public StockCarne eliminarStock(Long id) {
-        StockCarne stockCarne = em.find(StockCarne.class, id);
-        if (stockCarne != null) {
-            em.remove(stockCarne);
+    public StockPescado eliminarStock(Long id) {
+        StockPescado stockPescado = em.find(StockPescado.class, id);
+        if (stockPescado != null) {
+            em.remove(stockPescado);
         }
-        return stockCarne;
+        return stockPescado;
     }
 
-    public List<StockCarne> getAll() {
-        List< StockCarne > result = em.createQuery("SELECT s FROM StockCarne s", StockCarne.class)
+    public List<StockPescado> getAll() {
+        List< StockPescado > result = em.createQuery("SELECT s FROM StockPescado s", StockPescado.class)
                 .getResultList();
         return result;
     }
 
-    public String getPrediction() {
-        PythonManager pythonManager = new PythonManager();
-        String JSONtoFiles;
-        IJSONPacker<StockCarne> packer = new JSONCarnePacker();
-        try {
-            JSONtoFiles = packer.packageData(getAll());
-        }catch (Exception e){
-            return "No se pudo enviar información al servidor";
-        }
-        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/tests/test5.py", JSONtoFiles);
-        packer.closeFiles();
-        String stringValue =prediction.get("message").toString();
-        return stringValue;
-    }
-
     @Transactional
     public void venderStock(Long idStock, BigDecimal cantidadVendida) {
-        StockCarne stock = em.find(StockCarne.class, idStock);
+        StockPescado stock = em.find(StockPescado.class, idStock);
         if (stock != null && stock.getCantidad().compareTo(cantidadVendida) >= 0) {
 
             LocalDate today = LocalDate.now();
 
             //  Buscar si ya existe una venta del mismo stock y fecha
-            TypedQuery<HistoricoCarne> query = em.createQuery(
-                    "SELECT h FROM HistoricoCarne h WHERE h.carne.id = :idCarne " +
+            TypedQuery<HistoricoPescado> query = em.createQuery(
+                    "SELECT h FROM HistoricoPescado h WHERE h.pescado.id = :idPescado " +
                             "AND h.fechaVenta = :fechaVenta AND h.fechaIngreso = :fechaIngreso AND h.fechaVencimiento = :fechaVencimiento",
-                    HistoricoCarne.class
+                    HistoricoPescado.class
             );
-            query.setParameter("idCarne", stock.getCarne().getId());
+            query.setParameter("idPescado", stock.getPescado().getId());
             query.setParameter("fechaVenta", today);
             query.setParameter("fechaIngreso", stock.getFechaIngreso());
             query.setParameter("fechaVencimiento", stock.getFechaVencimiento());
 
-            List<HistoricoCarne> ventasHoy = query.getResultList();
+            List<HistoricoPescado> ventasHoy = query.getResultList();
 
             if (!ventasHoy.isEmpty()) {
                 //  Ya existe una venta del mismo stock hoy, actualizar la cantidad
-                HistoricoCarne historico = ventasHoy.getFirst();
+                HistoricoPescado historico = ventasHoy.getFirst();
                 historico.setCantidad(historico.getCantidad().add(cantidadVendida));
                 em.merge(historico);
             } else {
                 //  No existe una venta hoy, crear una nueva entrada en el historial
-                HistoricoCarne historico = new HistoricoCarne();
+                HistoricoPescado historico = new HistoricoPescado();
                 historico.setCantidad(cantidadVendida);
                 historico.setFechaIngreso(stock.getFechaIngreso());
                 historico.setFechaVencimiento(stock.getFechaVencimiento());
                 historico.setFechaVenta(today);
-                historico.setCarne(stock.getCarne());
+                historico.setPescado(stock.getPescado());
                 em.persist(historico);
             }
 
@@ -122,4 +104,5 @@ public class StockCarneDAO {
             }
         }
     }
+
 }

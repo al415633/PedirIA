@@ -1,75 +1,126 @@
 const RETRIEVE_ALL_CARNES = "/carnes";
-const POST = "/carnes/create";
-const DELETE = "/carnes/delete/";
-const RETRIEVE_ONE_CARNE = "/carnes/retrieve/";
-const UPDATE = "/carnes/update";
+const CARNE_ADD = "/carnes";
+const DELETE = "/carnes/";
+const RETRIEVE_ONE_CARNE = "/carnes/";
+const VALIDAR_CARNE = "/carnes/validar";
 
-const STOCK_RETRIEVE_ONE = "/carnes/stock/retrieve/";
-const STOCK_RETRIEVE = "/carnes/stock/producto/";
-const STOCK_ADD = "/carnes/stock";
-const STOCK_UPDATE = "/carnes/stock/";
-const STOCK_DELETE = "/carnes/stock/";
-const STOCK_PREDICT = "/carnes/stock/predict";
+const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO"];
 
-const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO", "VIVO"];
-
-
-    Vue.createApp({
+Vue.createApp({
     data() {
         return {
-
             // Gestión de las carnes
             carnes: [],
             nombreCarne: "",
-            categoriaCarne: "",
             unidadCarne: "",
             tipoConserva: "",
             carneSeleccionada: {},
+            imagenNombre: '',
+            imagenTipo: '',
+            imagenDatos: null,
 
-            // Gestión stock carne
-            stocks: [],
-            cantidadStock: 0,
-            fechaIngresoStock: '',
-            fechaVencimientoStock: '',
-            mostrarStock: false,
-            stockSeleccionado: {},
-            stockPrediction: '',
+            // Paginación de carnes
+            currentPage: 1,
+            itemsPerPage: 8, // 8 tarjetas por página (2 filas x 4 columnas)
+
+            // Validación de datos
+            nombreError: '',
+            unidadError: '',
+            isInvalid: false
         };
     },
-        
-    // Permite hacer visible la enumeración constante    
+
     computed: {
         tiposConserva() {
             return TIPOS_CONSERVA;
+        },
+        totalPages() {
+            return Math.ceil(this.carnes.length / this.itemsPerPage);
+        },
+        displayedCarnes() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            return this.carnes.slice(start, start + this.itemsPerPage);
         }
     },
 
     methods: {
+        // Validación de existencia de la carne basándonos en el nombre y la unidad
+        validateCarne() {
+            if (!this.nombreCarne || !this.unidadCarne) {
+                this.nombreError = this.unidadError = '';
+                this.isInvalid = false;
+                return;
+            }
+
+            axios.get(`${VALIDAR_CARNE}?nombre=${this.nombreCarne}&unidad=${this.unidadCarne}`)
+                .then(response => {
+                    if (response.data.existe) {
+                        this.nombreError = "Ya existe una carne con este nombre y unidad.";
+                        this.unidadError = "Por favor, elija un nombre o unidad diferente.";
+                        this.isInvalid = true;
+                    } else {
+                        this.nombreError = this.unidadError = '';
+                        this.isInvalid = false;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error en la validación:", error);
+                    this.nombreError = "Error al validar el nombre.";
+                    this.isInvalid = true;
+                });
+        },
+
+        // Captura de imagen
+        onFileChange(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            this.imagenNombre = file.name;
+            this.imagenTipo = file.type;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.imagenDatos = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        },
+
+        // Métodos para paginación
+        prevPage() {
+            if (this.currentPage > 1) this.currentPage--;
+        },
+        nextPage() {
+            if (this.currentPage < this.totalPages) this.currentPage++;
+        },
+        goToPage(page) {
+            this.currentPage = page;
+        },
 
         // Obtiene el listado de carnes completo
         async getAllCarnes() {
             try {
-                const response = await axios.get(RETRIEVE_ALL_CARNES);
-                this.carnes = response.data;
-
-                // Ordenar las carnes después
-                this.carnes.sort((a, b) => {
-                    if (a.nombre < b.nombre) return -1;
-                    if (a.nombre > b.nombre) return 1;
-                    return 0;
+                const response = await axios.get(RETRIEVE_ALL_CARNES + "/mis-carnes");
+                this.carnes = response.data.map(carneArray => {
+                    const carne = carneArray[0];
+                    return {
+                        ...carne,
+                        imagenNombre: carneArray[1],
+                        imagenDatos: carneArray[3],
+                        imagenTipo: carneArray[2]
+                    };
                 });
 
-                console.log("Carnes cargadas:", response.data);
+                this.carnes.sort((a, b) => a.nombre.localeCompare(b.nombre));
+                console.log("Carnes cargadas:", this.carnes);
             } catch (error) {
                 console.error("Error al obtener los datos:", error);
             }
         },
 
-        // Para cargar los datos de la carne a modificar
+        // Recuperar una carne específica
         async retrieveCarne(index) {
             try {
                 const carneId = this.carnes[index].id;
-                console.log("Recuperando Carne con ID:", carneId);
                 const response = await axios.get(RETRIEVE_ONE_CARNE + carneId);
                 this.carneSeleccionada = response.data;
             } catch (error) {
@@ -77,248 +128,50 @@ const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO", "VIVO"];
             }
         },
 
+        //  Crear una nueva carne
         async createCarne() {
+            if (this.isInvalid) return; // Evita el envío si hay errores
+
             try {
                 let newCarne = {
                     nombre: this.nombreCarne,
-                    categoria: this.categoriaCarne,
                     unidad: this.unidadCarne,
-                    tipoConserva: this.tipoConserva
+                    tipoConserva: this.tipoConserva,
+                    imagenNombre: this.imagenNombre,
+                    imagenTipo: this.imagenTipo,
+                    imagenDatos: this.imagenDatos.split(',')[1]
                 };
 
-                const response = await axios.post(POST, newCarne);
-                console.log("Carne creada:", newCarne);
+                const response = await axios.post(CARNE_ADD, newCarne);
+                this.carnes.push(response.data);
+                this.carnes.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
-                // Agregar la nueva carne al listado localmente
-                console.log("Carne devuelta por API:", response.data);
-                this.carnes.push(response.data); // Suponiendo que la respuesta contiene el objeto creado
-
-                // Ordenar las carnes después
-                this.carnes.sort((a, b) => {
-                    if (a.nombre < b.nombre) return -1;
-                    if (a.nombre > b.nombre) return 1;
-                    return 0;
-                });
-
-                // Limpiar los campos después de crear
+                // Limpiar el formulario
                 this.nombreCarne = "";
-                this.categoriaCarne = "";
                 this.unidadCarne = "";
                 this.tipoConserva = "";
+                this.imagenNombre = "";
+                this.imagenTipo = "";
+                this.imagenDatos = null;
 
-                // Mostrar el toast de éxito
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = 'Carne añadida con éxito!'; // Mensaje de éxito
-                const toastEl = document.getElementById('toastCarne');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-
+                // Mostrar mensaje de éxito
+                this.showToast('¡Carne añadida con éxito!', 'bg-success');
             } catch (error) {
                 console.error("Error al crear Carne:", error);
+                this.showToast('Error al crear la carne. Inténtalo de nuevo.', 'bg-danger');
             }
         },
 
-        // Se llama una vez se pulsa guardar en el modal de edición
-        async updateCarne() {
-            try {
-                if (!this.carneSeleccionada.id) {
-                    console.error("Error: ID de carne no definido.");
-                    return;
-                }
-                console.log("Actualizando Carne:", this.carneSeleccionada);
-
-                // Mostrar un mensaje de carga
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = 'Actualizando carne...'; // Mensaje de carga
-                const toastEl = document.getElementById('toastCarne');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-
-                // Realizar la solicitud de actualización
-                const response = await axios.put(UPDATE, this.carneSeleccionada);
-
-                // Verificar si la respuesta es exitosa
-                if (response.status === 204) { // 204 No Content indica éxito, lógica en el resource
-                    // Actualizar el listado de carnes localmente
-                    const index = this.carnes.findIndex(carne => carne.id === this.carneSeleccionada.id);
-                    if (index !== -1) {
-                        this.carnes.splice(index, 1, { ...this.carneSeleccionada }); // Reemplaza el elemento modificado
-                    }
-
-                    // Ordenar las carnes después de la actualización
-                    this.carnes.sort((a, b) => a.nombre.localeCompare(b.nombre));
-
-                    // Cerrar el modal manualmente
-                    let modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-                    if (modal) {
-                        modal.hide();
-                    }
-
-                    // Mostrar el toast de éxito
-                    toastBody.textContent = 'Carne actualizada con éxito!'; // Mensaje de éxito
-                    toastEl.classList.add('bg-success'); // Cambiar el color de fondo a verde
-                    toast.show();
-                } else {
-                    // Lanzar una excepción si la respuesta no es 204
-                    throw new Error('Error inesperado al actualizar la carne. Código de estado: ' + response.status);
-                }
-            } catch (error) {
-                console.error("Error al actualizar Carne:", error);
-                // Mostrar el toast de error
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = 'Ocurrió un error al actualizar la carne. Por favor, intenta nuevamente.';
-                const toastEl = document.getElementById('toastCarne');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-            }
-        },
-        // Llama al modal para confirmar el borrado
-        deleteCarne(index) {
-            // Mostrar el modal de confirmación
-            const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
-            modal.show();
-
-            // Asignar el índice a un atributo del modal para usarlo en la confirmación
-            const confirmButton = document.getElementById('confirmDeleteButton');
-            confirmButton.onclick = () => {
-                // Cerrar el modal aquí para evitar problemas
-                modal.hide();
-                this.confirmDelete(index);
-            };
-        },
-
-        // Se encarga de comunicar con backend y eliminar la carne
-        async confirmDelete(index) {
-            // Verificar que el índice sea válido
-            if (index < 0 || index >= this.carnes.length) {
-                console.error("Índice de carne no válido:", index);
-                return;
-            }
-
-            try {
-                const carneId = this.carnes[index].id; // Obtener el ID de la carne
-                console.log("Eliminando Carne con ID:", carneId);
-                await axios.delete(DELETE + carneId);
-
-                console.log("Eliminada de la BBDD");
-                // Eliminar la carne del listado localmente
-                this.carnes.splice(index, 1);
-
-                // Mostrar el toast de éxito
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = 'Carne eliminada con éxito!'; // Mensaje de éxito
-                const toastEl = document.getElementById('toastCarne');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-
-            } catch (error) {
-                console.error("Error al eliminar Carne:", error);
-                // Mostrar el toast de error
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = 'Ocurrió un error al eliminar la carne. Por favor, intenta nuevamente.';
-                const toastEl = document.getElementById('toastCarne');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-            }
-        },
-
-     // Métodos de gestión del stock
-
-        // Obtiene el listado de stock para la carne seleccionada
-        async getStockByCarne(carneId) {
-            try {
-                const response = await axios.get(STOCK_RETRIEVE + carneId);
-                this.stocks = response.data;
-            } catch (error) {
-                console.error("Error al obtener el stock:", error);
-            }
-        },
-
-        // Para seleccionar una carne y cargar su stock
-        async retrieveStockandCarne(index) {
-            try {
-                const carneId = this.carnes[index].id;
-                console.log("Seleccionando Carne con ID para mostrar stock:", carneId);
-                const response = await axios.get(RETRIEVE_ONE_CARNE + carneId);
-                this.carneSeleccionada = response.data;
-
-                // Obtener el stock de la carne seleccionada
-                await this.getStockByCarne(carneId);
-                console.log("Carne para mostrar stock:", this.carneSeleccionada);
-                console.log("Carnes cargadas: ", this.carnes)
-                this.mostrarStock = true; // Mostrar la sección de stock
-
-            } catch (error) {
-                console.error("Error al cargar la carne o el stock:", error);
-                this.mostrarStock = false; // Asegúrate de ocultar el stock si hay un error
-            }
-        },
-
-        // Se emplea para agregar stock
-        async agregarStock() {
-            try {
-                const nuevoStock = {
-                    cantidad: this.cantidadStock,
-                    fechaIngreso: this.fechaIngresoStock,
-                    fechaVencimiento: this.fechaVencimientoStock,
-                    carne: this.carneSeleccionada
-                };
-
-                const response = await axios.post(STOCK_ADD, nuevoStock);
-
-                this.stocks.push(response.data);
-
-                // Ordenar con algún criterio
-
-                this.cantidadStock = 0;
-                this.fechaIngresoStock = '';
-                this.fechaVencimientoStock = '';
-
-                // Mostrar mensaje de éxito
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = 'Stock agregado con éxito!';
-                const toastEl = document.getElementById('toastCarne');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-
-            } catch (error) {
-                console.error("Error al agregar stock:", error);
-            }
-        },
-
-        // Para eliminar stock
-        async eliminarStock(index) {
-            const stockId = this.stocks[index].id;
-            try {
-                await axios.delete(STOCK_DELETE + stockId);
-                this.stocks.splice(index, 1);
-
-                // Mostrar mensaje de éxito
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = 'Stock eliminado con éxito!';
-                const toastEl = document.getElementById('toastCarne');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-
-            } catch (error) {
-                console.error("Error al eliminar stock:", error);
-            }
-        },
-
-        // Para pedir una prediccion
-        async predecirStock() {
-            try {
-                const response = await axios.get(STOCK_PREDICT);
-                this.stockPrediction = response.data;
-
-                console.log("predicción cargada:", response.data);
-            } catch (error) {
-                console.error("Error al obtener los datos:", error);
-            }
-        },
-
+        //  Mostrar notificaciones tipo Toast
+        showToast(message, colorClass) {
+            const toastBody = document.getElementById('toast-body');
+            toastBody.textContent = message;
+            const toastEl = document.getElementById('toastCarne');
+            toastEl.classList.add(colorClass);
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
     },
-
 
     mounted() {
         this.getAllCarnes();

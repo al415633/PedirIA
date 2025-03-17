@@ -24,6 +24,7 @@ header {
     margin: 20px auto; /* Centrarlo horizontalmente */
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
 }
+
 .navbar-box {
     background-color: #5a7d4b;
     border-radius: 15px;
@@ -39,9 +40,71 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    overflow: hidden;
 }
 
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 180px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    top: 100%;
+    left: 0;
+    border-radius: 4px;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 10px;
+    display: block;
+    text-decoration: none;
+    background: white;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 180px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    top: 100%;
+    left: 0;
+    border-radius: 4px;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 10px;
+    display: block;
+    text-decoration: none;
+    background: white;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
 
 .logo {
     height: 400px;
@@ -85,7 +148,7 @@ header {
     margin-left: auto;
 }
 
-.navbar_container a:not(:first-child)::before {
+.navbar_container *:not(:first-child)::before {
     content: "";
     position: absolute;
     left: -10px;

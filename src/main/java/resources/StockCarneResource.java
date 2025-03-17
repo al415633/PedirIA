@@ -1,16 +1,23 @@
 package resources;
 
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import data.StockCarne;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import services.HistoricoStockCarneDAO;
 import services.StockCarneDAO;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 @Path("/carnes/stock")
 @Produces(MediaType.APPLICATION_JSON)
@@ -27,6 +34,20 @@ public class StockCarneResource {
     public List<StockCarne> obtenerTodos() {
         return stockCarneDAO.getAll();
     }
+
+    @GET
+    @Path("/prediccion")
+    public Response obtenerPrediccion() {
+        try {
+            String prediction = stockCarneDAO.getPrediction();
+            return Response.ok("{\"message\": " + prediction + "}").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity("{\"error\": \"No se pudo obtener la predicción\"}")
+                        .build();
+        }
+    }
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

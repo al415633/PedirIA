@@ -1,16 +1,18 @@
 package pythonAdapter.JSONPacker;
 
-import com.google.gson.Gson;
-import data.StockCarne;
-import org.json.simple.JSONObject;
-import pythonAdapter.JSONConverter.IJSONConverter;
-import pythonAdapter.JSONConverter.JSONCarneConverter;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+
+import org.json.simple.JSONObject;
+
+import com.google.gson.Gson;
+
+import data.StockCarne;
+import pythonAdapter.JSONConverter.IJSONConverter;
+import pythonAdapter.JSONConverter.JSONCarneConverter;
 
 public class JSONCarnePacker implements IJSONPacker<StockCarne> {
     File jsonFile;
@@ -45,8 +47,8 @@ public class JSONCarnePacker implements IJSONPacker<StockCarne> {
             String line;
             jsonFile.deleteOnExit();
             csvFile.deleteOnExit();
-            return "{\"csv\": \"" + csvFile.getPath() + "\", \"json\": \"" + jsonFile.getPath() + "\"}";
-    }catch(Exception e){
+            return "{\"csv\": \"" + csvFile.getAbsolutePath().replace("\\", "/") + "\", \"json\": \"" + jsonFile.getAbsolutePath().replace("\\", "/") + "\"}";
+        }catch(Exception e){
             System.out.println("es esto");
             e.printStackTrace();
             throw e;

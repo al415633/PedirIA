@@ -18,12 +18,9 @@
             height: 40px;
             margin-right: 10px;
         }
-
-
     </style>
 </head>
 <body>
-<!-- Encabezado verde con logo -->
 <header class="d-flex align-items-center px-4">
     <a href="menu_productos.html">
         <img src="./static/logo.png" alt="Logo Empresa">
@@ -42,8 +39,13 @@
                 <th>Restock Necesario</th>
             </tr>
         </thead>
-        <tbody id="data-table">
-            <!-- Aquí se llenarán los datos dinámicamente -->
+        <tbody>
+            <tr v-for="pred in predicciones" :key="pred.Producto">
+                <td>{{ pred.Producto }}</td>
+                <td>{{ pred['Stock Actual'] }}</td>
+                <td>{{ pred['Ventas previstas'] }}</td>
+                <td>{{ pred['Restock necesario'] }}</td>
+            </tr>
         </tbody>
     </table>
     <button class="btn btn-primary" onclick="window.history.back()">Volver</button>
@@ -57,34 +59,21 @@
             };
         },
         mounted() {
-            // Obtener los datos desde un archivo local o API
-            fetch("restock_data.json")
-                .then(response => response.json())
-                .then(data => {
-                    this.predicciones = data;
-                    this.updateTable();
-                })
-                .catch(error => console.error("Error al cargar los datos:", error));
+            this.cargarPredicciones();
         },
         methods: {
-            updateTable() {
-                const tableBody = document.getElementById("data-table");
-                tableBody.innerHTML = "";  // Limpiar la tabla antes de llenarla
-                this.predicciones.forEach(pred => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${pred.Producto}</td>
-                        <td>${pred["Stock Actual"]}</td>
-                        <td>${pred["Ventas previstas"]}</td>
-                        <td>${pred["Restock necesario"]}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+            async cargarPredicciones() {
+                try {
+                    const response = await axios.get("http://localhost:8080/api/carnes/stock/prediccion");
+                    this.predicciones = JSON.parse(response.data.message);
+                } catch (error) {
+                    console.error("Error al obtener predicciones:", error);
+                }
             }
         }
     });
+
     app.mount("#app");
 </script>
-
 </body>
 </html>

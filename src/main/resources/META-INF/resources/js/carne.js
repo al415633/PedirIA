@@ -9,6 +9,7 @@ const STOCK_RETRIEVE = "/carnes/stock/producto/";
 const STOCK_ADD = "/carnes/stock";
 const STOCK_UPDATE = "/carnes/stock/";
 const STOCK_DELETE = "/carnes/stock/";
+const STOCK_PREDICT = "/carnes/stock/predict";
 
 const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO", "VIVO"];
 
@@ -358,8 +359,10 @@ Vue.createApp({
         // Para pedir una prediccion
         async predecirStock() {
             try {
-                window.location.href = "prediction.html";
-                console.log("Predicción cargada.");
+                const response = await axios.get(STOCK_PREDICT);
+                this.stockPrediction = response.data;
+
+                console.log("Predicción cargada:", response.data);
             } catch (error) {
                 console.error("Error al obtener los datos:", error);
             }

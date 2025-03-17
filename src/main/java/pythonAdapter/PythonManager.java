@@ -150,8 +150,13 @@ public class PythonManager {
                 writer.write(csv);
             }
             String line;
-            String directionsJSON = "{\"csv\": \"" + csvFile.getPath() + "\", \"json\": \"" + jsonFile.getPath() + "\"}";
-            System.out.println("directionsJSON: " + directionsJSON);
+            // Usar replace("\\", "\\\\") para asegurar que las barras invertidas se escapen correctamente
+            String directionsJSON = "{\"csv\": \"" + csvFile.getPath().replace("\\", "\\\\") + "\", \"json\": \"" + jsonFile.getPath().replace("\\", "\\\\") + "\"}";
+
+            // Mostrar el JSON generado para comprobar el formato
+            System.out.println("JSON: " + directionsJSON);
+
+
             ProcessBuilder pb = new ProcessBuilder("python", pythonFilePath);
             pb.redirectErrorStream(true);
             Process process = pb.start();

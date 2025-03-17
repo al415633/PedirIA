@@ -1,5 +1,11 @@
 package services;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import org.json.simple.JSONObject;
+
 import data.HistoricoCarne;
 import data.StockCarne;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -7,14 +13,9 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
-import org.json.simple.JSONObject;
 import pythonAdapter.JSONPacker.IJSONPacker;
 import pythonAdapter.JSONPacker.JSONCarnePacker;
 import pythonAdapter.PythonManager;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 
 @ApplicationScoped
 public class StockCarneDAO {
@@ -63,14 +64,29 @@ public class StockCarneDAO {
         PythonManager pythonManager = new PythonManager();
         String JSONtoFiles;
         IJSONPacker<StockCarne> packer = new JSONCarnePacker();
-        try {
-            JSONtoFiles = packer.packageData(getAll());
-        }catch (Exception e){
-            return "No se pudo enviar información al servidor";
+    
+        List<StockCarne> stockList = getAll();
+        System.out.println("Stock obtenido: " + stockList);
+    
+        if (stockList == null || stockList.isEmpty()) {
+            return "{\"error\": \"No hay datos en el stock\"}";
         }
-        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/tests/test5.py", JSONtoFiles);
-        packer.closeFiles();
-        String stringValue =prediction.get("message").toString();
+    
+        try {
+            JSONtoFiles = packer.packageData(stockList);
+            System.out.println("JSON enviado a Python: " + JSONtoFiles);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{\"error\": \"Error en la serialización de datos\"}";
+        }
+    
+        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/predecir_carnes.py", JSONtoFiles);
+        
+        if (prediction == null) {
+            return "{\"error\": \"Python no devolvió respuesta\"}";
+        }
+    
+        String stringValue = prediction.get("message").toString();
         return stringValue;
     }
 

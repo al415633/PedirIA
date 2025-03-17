@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Modificar - Aprovechante</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+    <div class="header-box">
+        <div class="container">
+            <img src="images/logo.png" alt="PedirIA Logo" class="logo">
+            <div>
+                <p class="subtitle">Modificar aprovechante</p>
+            </div>
+        </div>
+    </div>
+</header>
+<main>
+    <div id="app">
+    <div class="login-container">
+        <form @submit.prevent="updateAprovechante">
+            <div class="registro">
+            <div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input readonly type="email" id="email" v-model="correo" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" v-model="password" required >
+                </div>
+
+            </div>
+
+            <div>
+                <div class="form-group">
+                    <label for="tipoComida">Tipo Comida</label>
+                    <select id="tipoComida" v-model="tipoAprovechante" required>
+                        <option value="fruta">Fruta</option>
+                        <option value="pescado">Pescado</option>
+                        <option value="carne">Carne</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="condiciones">Condiciones</label>
+                    <input type="text" id="condiciones" v-model="condiciones" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="condiciones2">Otras condiciones</label>
+                    <input type="text" id="condiciones2" v-model="condiciones2" required>
+                </div>
+            </div>
+            </div>
+            <button type="submit" class="btn register" id="registerButton" disabled>Modificar</button>
+
+        </form>
+    </div>
+    </div>
+</main>
+
+<script src="js/aprovechante.js"></script>
+</body>
+</html>

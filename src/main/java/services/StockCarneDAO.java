@@ -1,17 +1,15 @@
 package services;
 
-import com.google.gson.Gson;
-import data.StockCarne;
+import java.util.List;
 
+import org.json.simple.JSONObject;
+
+import data.StockCarne;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.json.simple.JSONObject;
-import pythonAdapter.JSONConverter;
 import pythonAdapter.PythonManager;
-
-import java.util.List;
 
 @ApplicationScoped
 public class StockCarneDAO {
@@ -63,7 +61,7 @@ public class StockCarneDAO {
 
     public String getPrediction() {
         PythonManager pythonManager = new PythonManager();
-        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/tests/test5.py", getAll());
+        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/predictor.py", getAll());
         String stringValue =prediction.get("message").toString();
         return stringValue;
     }

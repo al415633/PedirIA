@@ -6,7 +6,7 @@ from sklearn.metrics import mean_absolute_error
 import sys
 from io import StringIO
 
-# Configurar logs
+# Configurar logs para que no se muestren
 logger = logging.getLogger("cmdstanpy")
 logger.addHandler(logging.NullHandler())
 logger.propagate = False
@@ -27,7 +27,7 @@ df_historico = pd.read_csv(StringIO(data["historicos"]))
 # Convertir stock_actual en un DataFrame
 df_stock = pd.DataFrame(data["stock_actual"])
 df_stock = df_stock.rename(columns={"nombre": "producto", "cantidad": "unidades"})
-df_stock["unidades"] = pd.to_numeric(df_stock["unidades"])  # Asegurar valores numéricos
+df_stock["unidades"] = pd.to_numeric(df_stock["unidades"])
 
 # Convertir fechas en el histórico
 df_historico["fecha"] = pd.to_datetime(df_historico["fecha"])
@@ -128,10 +128,13 @@ for i, producto in enumerate(productos):
 
     print("\n" + "=" * 50)
 
-# Mostrar el resumen de restock necesario
-print("\nResumen de restock necesario:\n")
+# Generar los datos de predicción en formato JSON
 df_restock = pd.DataFrame(restock)
 
-# Mostrar solo las columnas relevantes
-print(df_restock.to_string(index=False))
-print("\n")
+# Guardar los datos en un archivo JSON
+with open("src/main/resources/datasets/restock_data.json", "w", encoding="utf-8") as f:
+    json.dump(df_restock.to_dict(orient="records"), f, ensure_ascii=False, indent=4)
+
+print(
+    "\nLos datos de restock han sido guardados en 'src/main/resources/datasets/restock_data.json'"
+)

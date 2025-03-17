@@ -4,72 +4,51 @@ import jakarta.persistence.*;
 
 import java.util.Arrays;
 
-@Entity
-@Table(name = "Pescado")
-@SqlResultSetMapping(
-        name = "PescadoMapping",
-        entities = {
-                @EntityResult(
-                        entityClass = Pescado.class,
-                        fields = {
-                                @FieldResult(name = "id", column = "id_pescado"),
-                                @FieldResult(name = "nombre", column = "nombre"),
-                                @FieldResult(name = "unidad", column = "unidad"),
-                                @FieldResult(name = "tipoConserva", column = "tipo_conserva"),
-                                @FieldResult(name = "idImg", column = "id_img")
-                        }
-                )
-        },
-        columns = {
-                @ColumnResult(name = "imagenNombre", type = String.class),
-                @ColumnResult(name = "imagenTipo", type = String.class),
-                @ColumnResult(name = "imagenDatos", type = byte[].class)
-        }
-)
-public class Pescado {
+@MappedSuperclass
+public abstract class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_pescado", columnDefinition = "serial")
-    private Long id;
+    @Column(name = "id", columnDefinition = "serial")
+    protected Long id;
 
     @Column(name = "nombre", nullable = false, length = 250)
-    private String nombre;
+    protected String nombre;
 
     @Column(name = "unidad", nullable = false, length = 20)
-    private String unidad;
+    protected String unidad;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_conserva", nullable = false, length = 50)
-    private TipoConserva tipoConserva;
+    protected TipoConserva tipoConserva;
 
     @Column(name = "id_img", nullable = false)
-    private Integer idImg;
+    protected Integer idImg;
 
     @Transient
-    private String imagenNombre;
+    protected String imagenNombre;
     @Transient
-    private String imagenTipo;
+    protected String imagenTipo;
     @Transient
-    private byte[] imagenDatos;
+    protected byte[] imagenDatos;
 
     public Long getId() {
         return id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public String getUnidad() {
-        return unidad;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
+    public String getNombre() {
+        return nombre;
+    }
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getUnidad() {
+        return unidad;
     }
 
     public void setUnidad(String unidad) {
@@ -118,7 +97,7 @@ public class Pescado {
 
     @Override
     public String toString() {
-        return "Pescado{" +
+        return getClass().getSimpleName() + "{" +
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
                 ", unidad='" + unidad + '\'' +

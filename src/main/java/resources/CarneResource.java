@@ -1,13 +1,12 @@
 package resources;
 
-import data.Carne;
+import data.carniceria.Carne;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import services.CarneDAO;
-import services.ComercioDAOJPA;
 import services.ComercioDao;
 
 import java.util.Collections;
@@ -118,7 +117,7 @@ public class CarneResource {
     @Path("/validar")
     @Produces(MediaType.APPLICATION_JSON)
     public Response validarCarne(@QueryParam("nombre") String nombre, @QueryParam("unidad") String unidad) {
-        boolean existe = daoCarne.existeCarne(nombre, unidad);
+        boolean existe = daoCarne.existeProducto(nombre, unidad);
         return Response.ok(Collections.singletonMap("existe", existe)).build();
     }
 

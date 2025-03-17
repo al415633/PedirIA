@@ -1,16 +1,14 @@
-package services;
+package services.carne;
 
-import data.HistoricoCarne;
-import data.StockCarne;
+import data.carniceria.HistoricoCarne;
+import data.carniceria.StockCarne;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
-import org.json.simple.JSONObject;
 import pythonAdapter.JSONConverter;
-import pythonAdapter.PythonManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

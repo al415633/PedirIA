@@ -1,13 +1,13 @@
 package resources;
 
 
-import data.StockCarne;
+import data.carniceria.StockCarne;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import services.HistoricoStockCarneDAO;
-import services.StockCarneDAO;
+import services.carne.HistoricoStockCarneDAO;
+import services.carne.StockCarneDAO;
 
 import java.math.BigDecimal;
 import java.util.List;

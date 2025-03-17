@@ -1,4 +1,4 @@
-package data;
+package data.pescaderia;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -7,12 +7,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "HistoricoCarne")
-public class HistoricoCarne {
-
+@Table(name = "HistoricoPescado")
+public class HistoricoPescado {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_historico_carne", columnDefinition = "serial")
+    @Column(name = "id_historico_pescado", columnDefinition = "serial")
     private Long id;
 
     @NotNull
@@ -32,8 +31,8 @@ public class HistoricoCarne {
     private LocalDate fechaVenta;
 
     @ManyToOne
-    @JoinColumn(name = "id_carne", nullable = false)
-    private Carne carne;
+    @JoinColumn(name = "id_pescado", nullable = false)
+    private Pescado pescado;
 
     public Long getId() {
         return id;
@@ -75,23 +74,23 @@ public class HistoricoCarne {
         this.fechaVenta = fechaVenta;
     }
 
-    public Carne getCarne() {
-        return carne;
+    public Pescado getPescado() {
+        return pescado;
     }
 
-    public void setCarne(Carne carne) {
-        this.carne = carne;
+    public void setPescado(Pescado pescado) {
+        this.pescado = pescado;
     }
 
     @Override
     public String toString() {
-        return "HistoricoCarne{" +
+        return "HistoricoPescado{" +
                 "id=" + id +
                 ", cantidad=" + cantidad +
                 ", fechaVencimiento=" + fechaVencimiento +
                 ", fechaIngreso=" + fechaIngreso +
                 ", fechaVenta=" + fechaVenta +
-                ", carne=" + carne +
+                ", pescado=" + pescado +
                 '}';
     }
 }

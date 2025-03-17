@@ -1,19 +1,18 @@
-package data;
+package data.carniceria;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "StockPescado")
-public class StockPescado {
+@Table(name = "StockCarne")
+public class StockCarne {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_stock_pescado", columnDefinition = "serial")
+    @Column(name = "id_stock_carne", columnDefinition = "serial")
     private Long id;
 
     @NotNull
@@ -30,17 +29,17 @@ public class StockPescado {
     private LocalDate fechaIngreso;
 
     @ManyToOne
-    @JoinColumn(name = "id_pescado", nullable = false)
-    private Pescado pescado;
+    @JoinColumn(name = "id_carne", nullable = false)
+    private Carne carne;
 
     // Constructores
-    public StockPescado() {}
+    public StockCarne() {}
 
-    public StockPescado(BigDecimal cantidad, LocalDate fechaVencimiento, LocalDate fechaIngreso, Pescado pescado) {
+    public StockCarne(BigDecimal cantidad, LocalDate fechaVencimiento, LocalDate fechaIngreso, Carne carne) {
         this.cantidad = cantidad;
         this.fechaVencimiento = fechaVencimiento;
         this.fechaIngreso = fechaIngreso;
-        this.pescado = pescado;
+        this.carne = carne;
     }
 
     // Getters y Setters
@@ -56,22 +55,17 @@ public class StockPescado {
     public LocalDate getFechaIngreso() { return fechaIngreso; }
     public void setFechaIngreso(LocalDate fechaIngreso) { this.fechaIngreso = fechaIngreso; }
 
-    public Pescado getPescado() {
-        return pescado;
-    }
-
-    public void setPescado(Pescado pescado) {
-        this.pescado = pescado;
-    }
+    public Carne getCarne() { return carne; }
+    public void setCarne(Carne carne) { this.carne = carne; }
 
     @Override
     public String toString() {
-        return "StockPescado{" +
+        return "StockCarne{" +
                 "id=" + id +
                 ", cantidad=" + cantidad +
                 ", fechaVencimiento=" + fechaVencimiento +
                 ", fechaIngreso=" + fechaIngreso +
-                ", pescado=" + pescado +
+                ", carne=" + carne +
                 '}';
     }
 }

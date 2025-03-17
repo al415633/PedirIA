@@ -1,7 +1,6 @@
 package services;
 
 import data.HortoFruticola;
-import data.Pescado;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -11,7 +10,6 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 @ApplicationScoped
 public class  HortoFruticolaDAOJPA {

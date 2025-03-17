@@ -1,14 +1,13 @@
 package resources;
 
-import data.Carne;
-import data.Pescado;
+import data.pescaderia.Pescado;
 import jakarta.persistence.PersistenceException;
 import services.ComercioDao;
-import services.PescadoDAO;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import services.PescadoDAO;
 
 import java.util.Collections;
 
@@ -17,11 +16,9 @@ public class PescadoResource {
 
     @Inject
     PescadoDAO daoPescado;
-
     @Inject
     ComercioDao daoComercio;
-    @Inject
-    PescadoDAO pescadoDAO;
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -119,7 +116,7 @@ public class PescadoResource {
     @Path("/validar")
     @Produces(MediaType.APPLICATION_JSON)
     public Response validarCarne(@QueryParam("nombre") String nombre, @QueryParam("unidad") String unidad) {
-        boolean existe = pescadoDAO.existePescado(nombre, unidad);
+        boolean existe = daoPescado.existeProducto(nombre, unidad);
         return Response.ok(Collections.singletonMap("existe", existe)).build();
     }
 

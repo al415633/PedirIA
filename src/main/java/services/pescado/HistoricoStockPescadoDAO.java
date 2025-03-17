@@ -1,7 +1,6 @@
-package services;
+package services.pescado;
 
-import data.HistoricoCarne;
-import data.HistoricoPescado;
+import data.pescaderia.HistoricoPescado;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;

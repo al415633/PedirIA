@@ -1,14 +1,16 @@
 package services;
 
-import data.HistoricoCarne;
-import data.HistoricoPescado;
-import data.StockCarne;
-import data.StockPescado;
+import data.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import org.json.simple.JSONObject;
+import pythonAdapter.JSONPacker.IJSONPacker;
+import pythonAdapter.JSONPacker.JSONHortoFruticolaPacker;
+import pythonAdapter.JSONPacker.JSONPescadoPacker;
+import pythonAdapter.PythonManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -55,6 +57,20 @@ public class StockPescadoDAO {
         List< StockPescado > result = em.createQuery("SELECT s FROM StockPescado s", StockPescado.class)
                 .getResultList();
         return result;
+    }
+    public String getPrediction() {
+        PythonManager pythonManager = new PythonManager();
+        String JSONtoFiles;
+        IJSONPacker<StockPescado> packer = new JSONPescadoPacker();
+        try {
+            JSONtoFiles = packer.packageData(getAll());
+        }catch (Exception e){
+            return "No se pudo enviar información al servidor";
+        }
+        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/tests/test5.py", JSONtoFiles);
+        packer.closeFiles();
+        String stringValue =prediction.get("message").toString();
+        return stringValue;
     }
 
     @Transactional

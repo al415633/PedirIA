@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>es.uji.belfern</groupId>
   <artifactId>contactlistjpa</artifactId>
@@ -69,13 +69,13 @@
       <artifactId>rest-assured</artifactId>
       <scope>test</scope>
     </dependency>
-<!--    Pruebas unitarias-->
+    <!--    Pruebas unitarias-->
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-suite</artifactId>
       <version>1.8.2</version>
     </dependency>
-<!--    Para legibilidad de pruebas unitarias-->
+    <!--    Para legibilidad de pruebas unitarias-->
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>java-hamcrest</artifactId>
@@ -93,28 +93,36 @@
       <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
-<!--    Webdriver-->
+
+    <dependency>
+      <groupId>jakarta.platform</groupId>
+      <artifactId>jakarta.jakartaee-api</artifactId>
+      <version>10.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--    Webdriver-->
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
       <version>4.17.0</version>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>org.jboss.logmanager</groupId>-->
-<!--      <artifactId>jboss-logmanager</artifactId>-->
-<!--      <version>3.0.2.Final</version>-->
-<!--    </dependency>-->
-<!--    <dependency>-->
-<!--      <groupId>org.jboss.logging</groupId>-->
-<!--      <artifactId>jboss-logging</artifactId>-->
-<!--      <version>3.3.1.Final</version>-->
-<!--    </dependency>-->
     <!--    <dependency>-->
-<!--      <groupId>org.junit.platform</groupId>-->
-<!--      <artifactId>junit-platform-suite-api</artifactId>-->
-<!--      <version>1.8.2</version>-->
-<!--      <scope>test</scope>-->
-<!--    </dependency>-->
+    <!--      <groupId>org.jboss.logmanager</groupId>-->
+    <!--      <artifactId>jboss-logmanager</artifactId>-->
+    <!--      <version>3.0.2.Final</version>-->
+    <!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>org.jboss.logging</groupId>-->
+    <!--      <artifactId>jboss-logging</artifactId>-->
+    <!--      <version>3.3.1.Final</version>-->
+    <!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>org.junit.platform</groupId>-->
+    <!--      <artifactId>junit-platform-suite-api</artifactId>-->
+    <!--      <version>1.8.2</version>-->
+    <!--      <scope>test</scope>-->
+    <!--    </dependency>-->
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-elytron-security</artifactId>
@@ -181,16 +189,16 @@
           </compilerArgs>
         </configuration>
       </plugin>
-<!--      <plugin>-->
-<!--        <artifactId>maven-surefire-plugin</artifactId>-->
-<!--        <version>${surefire-plugin.version}</version>-->
-<!--        <configuration>-->
-<!--          <systemPropertyVariables>-->
-<!--            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>-->
-<!--            <maven.home>${maven.home}</maven.home>-->
-<!--          </systemPropertyVariables>-->
-<!--        </configuration>-->
-<!--      </plugin>-->
+      <!--      <plugin>-->
+      <!--        <artifactId>maven-surefire-plugin</artifactId>-->
+      <!--        <version>${surefire-plugin.version}</version>-->
+      <!--        <configuration>-->
+      <!--          <systemPropertyVariables>-->
+      <!--            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>-->
+      <!--            <maven.home>${maven.home}</maven.home>-->
+      <!--          </systemPropertyVariables>-->
+      <!--        </configuration>-->
+      <!--      </plugin>-->
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>${surefire-plugin.version}</version>

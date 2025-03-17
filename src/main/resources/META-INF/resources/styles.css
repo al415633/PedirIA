@@ -24,11 +24,28 @@ header {
     margin: 20px auto; /* Centrarlo horizontalmente */
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
 }
+.navbar-box {
+    background-color: #5a7d4b;
+    border-radius: 15px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    /*max-width: 1200px;*/
+    padding: 10px 20px;
+    text-align: center;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
 
 .logo {
     height: 400px;
 }
-
 .container {
     display: flex;
     gap: 20px;
@@ -36,6 +53,65 @@ header {
     margin: auto;
     align-items: center;
 }
+
+.small_logo {
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.navbar_container {
+    display: flex;
+    gap: 0;
+    max-width: 1200px;
+    margin: auto;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.navbar_container .small_logo {
+    margin-right: 20px;
+}
+
+.navbar_container a {
+    position: relative;
+    padding: 0 20px;
+    flex-grow: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.navbar_container a:last-child {
+    margin-left: auto;
+}
+
+.navbar_container a:not(:first-child)::before {
+    content: "";
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 20px;
+    width: 2px;
+    background-color: black;
+}
+
+.navbar_container img {
+    display: block;
+}
+.message_content {
+    background-color: white;
+    padding: 20px;
+    margin: 100px auto;
+    width: 45%;
+    /*display: flex;*/
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+
+}
+
 .highlight {
     color: #a4e86f;
 }
@@ -72,6 +148,8 @@ header {
     cursor: pointer;
     border-radius: 5px;
     transition: background-color 0.3s;
+    text-decoration: none;
+
 }
 .btn:hover {
     background-color: #4c6b3d;
@@ -118,12 +196,16 @@ p {
 
 /* Contenedor del formulario */
 .login-container {
-    max-width: 400px; /* Controla el ancho del formulario */
+    max-width: 800px; /* Controla el ancho del formulario */
     margin: 0 auto; /* Centra el formulario horizontalmente */
     background: white;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.registro > div {
+    flex: 1; /* Cada columna ocupa el mismo ancho */
 }
 
 
@@ -146,6 +228,27 @@ input, select {
     border-radius: 5px;
     font-size: 1em;
     margin: 10px 0;
+}
+
+
+.error-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 50px auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.error-box h2 {
+    color: #d9534f;
+}
+.error-box p {
+    margin: 10px 0 20px;
 }
 
 @media (max-width: 768px) {

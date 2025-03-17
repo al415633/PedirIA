@@ -26,6 +26,10 @@ public class Usuario {
     @JsonIgnore
     private ComercioDetails negocio;
 
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private AprovechanteDetails aprovechante;
+
     @Override
     public String toString() {
         return "Usuario{" +
@@ -77,4 +81,11 @@ public class Usuario {
         this.negocio = negocio;
     }
 
+    public AprovechanteDetails getAprovechante() {
+        return aprovechante;
+    }
+
+    public void setAprovechante(AprovechanteDetails aprovechante) {
+        this.aprovechante = aprovechante;
+    }
 }

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PedirIA - Pescadería</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f0f8;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+      background-color: #6b8e23;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+    }
+    .navbar .logo {
+      height: 40px;
+    }
+    .content {
+      background-color: #c2d6a0;
+      margin: 20px;
+      padding: 20px;
+      min-height: 300px;
+      border-radius: 10px;
+    }
+    .message-box {
+      display: flex;
+      align-items: center;
+      background-color: #6b8e23;
+      color: white;
+      padding: 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      max-width: 300px;
+      margin-top: 10px;
+    }
+    .message-box:hover {
+      background-color: #5a7b1e;
+    }
+  </style>
+</head>
+<body>
+<div class="navbar">
+  <img src="src/main/resources/META-INF/resources/static/logo.png" alt="PEDIRIA" class="logo">
+  <a href="#">Mis datos</a>
+  <a href="#">Stock</a>
+  <a href="#">Modificar datos</a>
+  <a href="#">Generar informe</a>
+  <span>Pescadería Manolo Pérez</span>
+</div>
+<div class="content">
+</div>
+<div class="message-box">
+  📎 Haz click aquí para escribir un mensaje...
+</div>
+</body>
+</html>

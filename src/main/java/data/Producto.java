@@ -6,9 +6,9 @@ import java.util.Arrays;
 
 @MappedSuperclass
 public abstract class Producto {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "serial")
     protected Long id;
 
     @Column(name = "nombre", nullable = false, length = 250)
@@ -24,20 +24,15 @@ public abstract class Producto {
     @Column(name = "id_img", nullable = false)
     protected Integer idImg;
 
+    @Column(name = "id_negocio", nullable = false)
+    protected Integer idNegocio;
+
     @Transient
     protected String imagenNombre;
     @Transient
     protected String imagenTipo;
     @Transient
     protected byte[] imagenDatos;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getNombre() {
         return nombre;
@@ -95,9 +90,25 @@ public abstract class Producto {
         this.imagenDatos = imagenDatos;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getIdNegocio() {
+        return idNegocio;
+    }
+
+    public void setIdNegocio(Integer idNegocio) {
+        this.idNegocio = idNegocio;
+    }
+
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{" +
+        return "Producto{" +
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
                 ", unidad='" + unidad + '\'' +

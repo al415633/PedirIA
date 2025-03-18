@@ -1,9 +1,7 @@
-package services;
+package services.hortofruticola;
 
-import data.HistoricoCarne;
-import data.HistoricoHortofruticola;
-import data.StockCarne;
-import data.StockHortoFruticola;
+import data.hortofruticola.HistoricoHortofruticola;
+import data.hortofruticola.StockHortoFruticola;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -57,8 +55,6 @@ public class StockHortoFruticolaDAO {
     public List<StockHortoFruticola> getAll() {
         List<StockHortoFruticola> result = em.createQuery("SELECT s FROM StockHortoFruticola s", StockHortoFruticola.class)
                 .getResultList();
-        JSONConverter converter = new JSONConverter();
-        converter.preparePythonMessage(result); //TODO: JSONCONVERTER HECHO SOLO PARA CARNE (?)
         return result;
     }
 
@@ -108,13 +104,5 @@ public class StockHortoFruticolaDAO {
                 em.merge(stock);
             }
         }
-    }
-
-
-    public String getPrediction() {
-        JSONConverter converter = new JSONConverter();
-        JSONObject data = converter.preparePythonMessage(getAll()); //TODO: JSONCONVERTER HECHO SOLO PARA CARNE (?)
-        PythonManager pythonManager = new PythonManager();
-        return "result of prediction";
     }
 }

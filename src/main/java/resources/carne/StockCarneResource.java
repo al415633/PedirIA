@@ -1,4 +1,4 @@
-package resources;
+package resources.carne;
 
 
 import data.carniceria.StockCarne;

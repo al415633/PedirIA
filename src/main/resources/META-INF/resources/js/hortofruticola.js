@@ -1,7 +1,5 @@
-const RETRIEVE_ALL_HORTOFRUTICOLAS = "/hortofruticolas";
-const HORTOFRUTICOLAS_ADD = "/hortofruticolas";
-const DELETE = "/hortofruticolas/";
-const RETRIEVE_ONE_HORTOFRUTICOLA = "/hortofruticolas/";
+const API_HORTOFRUTICOLAS = "/hortofruticolas";
+const GET_HORTOFRUTICOLAS_PROPIAS = "/hortofruticolas/mis-productos";
 const VALIDAR_HORTOFRUTICOLA = "/hortofruticolas/validar";
 
 const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO"];
@@ -11,8 +9,8 @@ Vue.createApp({
         return {
             // Gestión de los hortofrutícolas
             hortofruticolas: [],
-            nombreHortoFruticola: "",
-            unidadHortoFruticola: "",
+            nombreHortofruticola: "",
+            unidadHortofruticola: "",
             tipoConserva: "",
             hortoFruticolaSeleccionado: {},
             imagenNombre: '',
@@ -23,10 +21,8 @@ Vue.createApp({
             currentPage: 1,
             itemsPerPage: 8, // 8 tarjetas por página (2 filas x 4 columnas)
 
-            // Validación de datos
-            nombreError: '',
-            unidadError: '',
-            isInvalid: false
+            // Errores
+            errores: { nombre: '', unidad: '', general: '' }
         };
     },
 
@@ -41,34 +37,30 @@ Vue.createApp({
         displayedHortofruticolas() {
             const start = (this.currentPage - 1) * this.itemsPerPage;
             return this.hortofruticolas.slice(start, start + this.itemsPerPage);
+        },
+        botonDeshabilitado() {
+            return this.errores.nombre.length > 0 || this.errores.unidad.length > 0;
         }
     },
 
     methods: {
-        // 📌 Validación de existencia del hortofruticola en base al nombre y la unidad
-        validateHortofruticola() {
-            if (!this.nombreHortoFruticola || !this.unidadHortoFruticola) {
-                this.nombreError = this.unidadError = '';
-                this.isInvalid = false;
+        async validateHortofruticola() {
+            if (!this.nombreHortofruticola || !this.unidadHortofruticola) {
+                this.errores.nombre = this.errores.unidad = '';
                 return;
             }
-
-            axios.get(`${VALIDAR_HORTOFRUTICOLA}?nombre=${this.nombreHortoFruticola}&unidad=${this.unidadHortoFruticola}`)
-                .then(response => {
-                    if (response.data.existe) {
-                        this.nombreError = "Ya existe un hortofrutícola con este nombre y unidad.";
-                        this.unidadError = "Por favor, elija un nombre o unidad diferente.";
-                        this.isInvalid = true;
-                    } else {
-                        this.nombreError = this.unidadError = '';
-                        this.isInvalid = false;
-                    }
-                })
-                .catch(error => {
-                    console.error("Error en la validación:", error);
-                    this.nombreError = "Error al validar el nombre.";
-                    this.isInvalid = true;
-                });
+            try {
+                const { data } = await axios.get(`${VALIDAR_HORTOFRUTICOLA}?nombre=${this.nombreHortofruticola}&unidad=${this.unidadHortofruticola}`);
+                if (data.existe) {
+                    this.errores.nombre = "Ya existe una hortofruticola con este nombre.";
+                    this.errores.unidad = "Por favor, elija otro nombre o unidad.";
+                } else {
+                    this.errores.nombre = this.errores.unidad = '';
+                }
+            } catch (error) {
+                console.error("Error en la validación:", error);
+                this.errores.nombre = "Error al validar.";
+            }
         },
 
         // Captura de imagen
@@ -81,7 +73,7 @@ Vue.createApp({
 
             const reader = new FileReader();
             reader.onload = (e) => {
-                this.imagenDatos = e.target.result;
+                this.imagenDatos = e.target.result.split(',')[1]; // Separa el encabezado de Base64
             };
             reader.readAsDataURL(file);
         },
@@ -97,71 +89,75 @@ Vue.createApp({
             this.currentPage = page;
         },
 
-        // Obtiene el listado de hortofrutícolas completo
-        async getAllHortoFruticolas() {
+        // Obtiene la lista de hortofruticolas del usuario
+        async getAllHortofruticolas() {
             try {
-                const response = await axios.get(RETRIEVE_ALL_HORTOFRUTICOLAS + "/mis-hortofruticolas");
-                this.carnes = response.data.map(hortofruticolaArray => {
-                    const hortofruticola = hortofruticolaArray[0];
+                const { data } = await axios.get(`${GET_HORTOFRUTICOLAS_PROPIAS}`);
+                this.hortofruticolas = data.map(hortofruticolaArray => {
+                    const hortofruticola = hortofruticolaArray[0]; // Extrae el objeto Hortofrutícola del array interno
                     return {
                         ...hortofruticola,
-                        imagenNombre: hortofruticolaArray[1],
-                        imagenDatos: hortofruticolaArray[3],
-                        imagenTipo: hortofruticolaArray[2]
+                        imagenNombre: hortofruticolaArray[1] || "",
+                        imagenTipo: hortofruticolaArray[2] || "",
+                        imagenDatos: hortofruticolaArray[3] || null
                     };
                 });
-
+                console.log(this.hortofruticolas)
                 this.hortofruticolas.sort((a, b) => a.nombre.localeCompare(b.nombre));
-                console.log("Hortofruticolas cargados:", this.hortofruticolas);
             } catch (error) {
-                console.error("Error al obtener los datos:", error);
+                console.error("Error al obtener hortofruticolas:", error);
             }
         },
 
-        // Para cargar los datos del hortofrutícola a modificar
-        async retrieveHortoFruticola(index) {
+        // Recuperar una hortofruticola específica
+        async retrieveHortofruticola(id) {
             try {
-                const hortofruticolaId = this.hortofruticolas[index].id;
-                const response = await axios.get(RETRIEVE_ONE_HORTOFRUTICOLA + hortofruticolaId);
-                this.hortoFruticolaSeleccionado = response.data;
+                const { data } = await axios.get(`${API_HORTOFRUTICOLAS}/${id}`);
+                this.hortoFruticolaSeleccionado = data;
             } catch (error) {
-                console.error("Error al recuperar el hortofruticola:", error);
+                console.error("Error al recuperar la hortofruticola:", error);
             }
         },
 
-        async createHortoFruticola() {
-            if (this.isInvalid) return; // Evita el envío si hay errores
+        // Crear una nueva hortofruticola
+        async createHortofruticola() {
+            if (this.errores.nombre || this.errores.unidad) return; // Evita si hay errores
 
             try {
-                let newHortofruticola = {
-                    nombre: this.nombreHortoFruticola,
-                    unidad: this.unidadHortoFruticola,
+                const newHortofruticola = {
+                    nombre: this.nombreHortofruticola,
+                    unidad: this.unidadHortofruticola,
                     tipoConserva: this.tipoConserva,
                     imagenNombre: this.imagenNombre,
                     imagenTipo: this.imagenTipo,
-                    imagenDatos: this.imagenDatos.split(',')[1]
+                    imagenDatos: this.imagenDatos
                 };
 
-                const response = await axios.post(HORTOFRUTICOLAS_ADD, newHortofruticola);
-                this.hortofruticolas.push(response.data);
+                const { data } = await axios.post(API_HORTOFRUTICOLAS, newHortofruticola);
+                this.hortofruticolas.push(data);
                 this.hortofruticolas.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
-                // Limpiar el formulario
-                this.nombreHortoFruticola = "";
-                this.unidadHortoFruticola = "";
-                this.tipoConserva = "";
-                this.imagenNombre = "";
-                this.imagenTipo = "";
-                this.imagenDatos = null;
-
-                // Mostrar mensaje de éxito
-                this.showToast('¡Hortofruticola añadido con éxito!', 'bg-success');
+                // Limpiar formulario
+                this.resetForm();
+                this.showToast('¡Hortofrutícola añadida con éxito!', 'bg-success');
             } catch (error) {
-                console.error("Error al crear Hortofruticola:", error);
-                this.showToast('Error al crear el Hortofruticola. Inténtalo de nuevo.', 'bg-danger');
+                console.error("Error al crear hortofrutícola:", error);
+                this.showToast('Error al crear la hortofrutícola.', 'bg-danger');
             }
         },
-        //  Mostrar notificaciones tipo Toast
+
+        // Reinicia los campos del formulario
+        resetForm() {
+            this.nombreHortofruticola = "";
+            this.unidadHortofruticola = "";
+            this.tipoConserva = "";
+            this.imagenNombre = "";
+            this.imagenTipo = "";
+            this.imagenDatos = null;
+            this.errores = { nombre: '', unidad: '', general: '' };
+        },
+
+        // Mostrar notificaciones tipo Toast
         showToast(message, colorClass) {
             const toastBody = document.getElementById('toast-body');
             toastBody.textContent = message;
@@ -174,6 +170,6 @@ Vue.createApp({
 
 
     mounted() {
-        this.getAllHortoFruticolas();
+        this.getAllHortofruticolas();
     }
 }).mount("#app");

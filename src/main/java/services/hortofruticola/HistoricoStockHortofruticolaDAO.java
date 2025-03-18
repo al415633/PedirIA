@@ -1,7 +1,6 @@
-package services;
+package services.hortofruticola;
 
-import data.HistoricoCarne;
-import data.HistoricoHortofruticola;
+import data.hortofruticola.HistoricoHortofruticola;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;

@@ -1,17 +1,20 @@
-package data.carniceria;
+package data.hortofruticola;
 
-import data.Producto;
+
 import jakarta.persistence.*;
 
+
+import data.Producto;
+
 @Entity
-@Table(name = "Carne")
+@Table(name = "HortoFruticola")
 @SqlResultSetMapping(
-        name = "CarneMapping",
+        name = "HortoFruticolaMapping",
         entities = {
                 @EntityResult(
-                        entityClass = Carne.class,
+                        entityClass = HortoFruticola.class,
                         fields = {
-                                @FieldResult(name = "id", column = "id_carne"),
+                                @FieldResult(name = "id", column = "id_hortofruticola"),
                                 @FieldResult(name = "nombre", column = "nombre"),
                                 @FieldResult(name = "unidad", column = "unidad"),
                                 @FieldResult(name = "tipoConserva", column = "tipo_conserva"),
@@ -25,15 +28,15 @@ import jakarta.persistence.*;
                 @ColumnResult(name = "imagenDatos", type = byte[].class)
         }
 )
-@AttributeOverride(name = "id", column = @Column(name = "id_carne"))
-public class Carne extends Producto {
-
+@AttributeOverride(name = "id", column = @Column(name = "id_hortofruticola"))
+public class HortoFruticola extends Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_carne")
+    @Column(name = "id_hortofruticola")
     private Long id;
 
     // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 }
+

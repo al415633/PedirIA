@@ -1,4 +1,4 @@
-package data;
+package data.hortofruticola;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -32,7 +32,7 @@ public class HistoricoHortofruticola {
     private LocalDate fechaVenta;
 
     @ManyToOne
-    @JoinColumn(name = "id_carne", nullable = false)
+    @JoinColumn(name = "id_hortofruticola", nullable = false)
     private HortoFruticola hortofruticola;
 
     public Long getId() {

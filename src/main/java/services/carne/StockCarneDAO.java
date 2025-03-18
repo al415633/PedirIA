@@ -8,7 +8,6 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
-import pythonAdapter.JSONConverter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -54,8 +53,6 @@ public class StockCarneDAO {
     public List<StockCarne> getAll() {
         List< StockCarne > result = em.createQuery("SELECT s FROM StockCarne s", StockCarne.class)
                 .getResultList();
-        JSONConverter converter = new JSONConverter();
-        converter.preparePythonMessage(result);
         return result;
     }
 

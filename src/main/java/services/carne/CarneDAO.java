@@ -1,7 +1,8 @@
-package services;
+package services.carne;
 
 import data.carniceria.Carne;
 import jakarta.enterprise.context.ApplicationScoped;
+import services.ProductoDAO;
 
 @ApplicationScoped
 public class CarneDAO extends ProductoDAO<Carne> {

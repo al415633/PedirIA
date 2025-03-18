@@ -116,13 +116,13 @@ public abstract class ProductoDAO<T extends Producto> {
     }
 
     public boolean existeProducto(String nombre, String unidad) {
-        Long count = em.createQuery(
-                        "SELECT COUNT(c) FROM " + entityType.getSimpleName() + " c " +
-                                "WHERE LOWER(c.nombre) = LOWER(:nombre) AND LOWER(c.unidad) = LOWER(:unidad)",
-                        Long.class)
-                .setParameter("nombre", nombre.trim().toLowerCase())
-                .setParameter("unidad", unidad.trim().toLowerCase())
-                .getSingleResult();
+        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE LOWER(nombre) = LOWER(?) AND LOWER(unidad) = LOWER(?)";
+
+        Query query = em.createNativeQuery(sql);
+        query.setParameter(1, nombre.trim().toLowerCase());
+        query.setParameter(2, unidad.trim().toLowerCase());
+
+        Long count = ((Number) query.getSingleResult()).longValue();
         return count > 0;
     }
 

@@ -1,13 +1,12 @@
-package resources;
+package resources.hortofruticola;
 
-import data.StockHortoFruticola;
+import data.hortofruticola.StockHortoFruticola;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import services.HistoricoStockCarneDAO;
-import services.HistoricoStockHortofruticolaDAO;
-import services.StockHortoFruticolaDAO;
+import services.hortofruticola.HistoricoStockHortofruticolaDAO;
+import services.hortofruticola.StockHortoFruticolaDAO;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -89,12 +88,12 @@ public class StockHortoFruticolaResource {
         return Response.ok(stockHortofruticolaHistoricoDAO.obtenerHistorialPorProducto(idHortofruticola)).build();
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/predict")
-    public Response obtenerPrediccion() {
-
-//        return stockPescadoDAO.getPrediction();
-        return Response.ok(stockHortoFruticolaDAO.getPrediction()).build();
-    }
+//    @GET
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @Path("/predict")
+//    public Response obtenerPrediccion() {
+//
+////        return stockPescadoDAO.getPrediction();
+//        return Response.ok(stockHortoFruticolaDAO.getPrediction()).build();
+//    }
 }

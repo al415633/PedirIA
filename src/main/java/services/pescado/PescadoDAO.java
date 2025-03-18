@@ -1,7 +1,8 @@
-package services;
+package services.pescado;
 
 import data.pescaderia.Pescado;
 import jakarta.enterprise.context.ApplicationScoped;
+import services.ProductoDAO;
 
 @ApplicationScoped
 public class PescadoDAO extends ProductoDAO<Pescado> {

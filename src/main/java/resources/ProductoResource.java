@@ -1,51 +1,53 @@
 package resources;
 
-import data.pescaderia.Pescado;
-import jakarta.persistence.PersistenceException;
-import services.ComercioDao;
+import data.Producto;
 import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import services.PescadoDAO;
+import services.ComercioDao;
+import services.ProductoDAO;
 
 import java.util.Collections;
 
-@Path("/pescados")
-public class PescadoResource {
+public abstract class ProductoResource<T extends Producto> {
 
     @Inject
-    PescadoDAO daoPescado;
-    @Inject
-    ComercioDao daoComercio;
+    protected ProductoDAO<T> daoProducto;
 
+    @Inject
+    protected ComercioDao daoComercio;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll() {
-        return Response.ok(daoPescado.getAll()).build();
+        return Response.ok(daoProducto.getAll()).build();
     }
 
     @GET
     @Path("/{id}")
-    public Response getPescado(@PathParam("id") Long id) {
-        Pescado pescado = daoPescado.retrieve(id);
-        if (pescado == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Pescado no encontrado").build();
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProducto(@PathParam("id") Long id) {
+        T producto = daoProducto.retrieve(id);
+        if (producto == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Producto no encontrado").build();
         }
-        return Response.ok(pescado).build();
+        return Response.ok(producto).build();
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createPescado(Pescado pescado) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createProducto(T producto, @CookieParam("usuario") String correo) {
+        Integer idNegocio = Math.toIntExact(daoComercio.getComercioPorCorreo(correo).getId_usuario());
+        producto.setIdNegocio(idNegocio);
         try {
-            Pescado pescadoCreado = daoPescado.create(pescado);
-            if (pescadoCreado == null) {
+            T productoCreado = daoProducto.create(producto);
+            if (productoCreado == null) {
                 return Response.status(Response.Status.CONFLICT).build();
             }
-            return Response.status(Response.Status.CREATED).entity(pescadoCreado).build();
+            return Response.status(Response.Status.CREATED).entity(productoCreado).build();
         } catch (PersistenceException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error de persistencia: " + e.getMessage())
@@ -60,14 +62,14 @@ public class PescadoResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updatePescado(Pescado pescado) {
-        int maxRetries = 3; // Número máximo de reintentos
-        int attempt = 0; // Contador de intentos
-        long delay = 1000; // Retraso en milisegundos entre intentos
+    public Response updateProducto(T producto) {
+        int maxRetries = 3;
+        int attempt = 0;
+        long delay = 1000;
 
         while (attempt < maxRetries) {
             try {
-                Pescado result = daoPescado.update(pescado);
+                T result = daoProducto.update(producto);
                 if (result == null) {
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
@@ -89,18 +91,17 @@ public class PescadoResource {
             }
         }
 
-        // Si se sale del bucle sin éxito, devolver un error
         return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                .entity("No se pudo actualizar el pescado después de varios intentos. Inténtelo de nuevo más tarde.")
+                .entity("No se pudo actualizar el producto después de varios intentos. Inténtelo de nuevo más tarde.")
                 .build();
     }
 
     @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Response delete(@PathParam("id") Long id) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteProducto(@PathParam("id") Long id) {
         try {
-            Pescado result = daoPescado.delete(id);
+            T result = daoProducto.delete(id);
             if (result == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
@@ -115,19 +116,19 @@ public class PescadoResource {
     @GET
     @Path("/validar")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response validarCarne(@QueryParam("nombre") String nombre, @QueryParam("unidad") String unidad) {
-        boolean existe = daoPescado.existeProducto(nombre, unidad);
+    public Response validarProducto(@QueryParam("nombre") String nombre, @QueryParam("unidad") String unidad) {
+        boolean existe = daoProducto.existeProducto(nombre, unidad);
         return Response.ok(Collections.singletonMap("existe", existe)).build();
     }
 
     @GET
-    @Path("/mis-pescados")
+    @Path("/mis-productos")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response obtenerCarnesDeUsuario(@CookieParam("usuario") String correo) {
+    public Response obtenerProductosDeUsuario(@CookieParam("usuario") String correo) {
         if (correo == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("No hay sesión activa").build();
         }
         Long idNegocio = daoComercio.getComercioPorCorreo(correo).getId_usuario();
-        return Response.ok(daoPescado.getAllByUsuario(idNegocio)).build();
+        return Response.ok(daoProducto.getAllByUsuario(idNegocio)).build();
     }
 }

@@ -1,27 +1,32 @@
 package services;
+
+import data.AprovechanteDetails;
 import data.Usuario;
-import data.ComercioDetails;
-import jakarta.enterprise.context.ApplicationScoped;
 import io.quarkus.elytron.security.common.BcryptUtil;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+
 import java.util.List;
 
 @ApplicationScoped
-public class ComercioDAOJPA implements ComercioDao{
+public class AprovechanteDAOJPA implements AprovechanteDao{
 
     @PersistenceContext
     EntityManager em;
 
+
     @Override
-    public List<Usuario> getComercios() {
-        return em.createQuery("SELECT u FROM Usuario u WHERE u.tipo = 'negocio'", Usuario.class).getResultList();
+    public List<Usuario> getAprovechantes() {
+        return em.createQuery("SELECT u FROM Usuario u WHERE u.tipo = 'aprovechante'", Usuario.class).getResultList();
+
     }
 
-    public Usuario getComercioPorCorreo(String correo) {
+    @Override
+    public Usuario getAprovechantePorCorreo(String correo) {
         try {
-            return em.createQuery("SELECT u FROM Usuario u WHERE u.correo = :correo AND u.tipo = 'negocio'", Usuario.class)
+            return em.createQuery("SELECT u FROM Usuario u WHERE u.correo = :correo AND u.tipo = 'aprovechante'", Usuario.class)
                     .setParameter("correo", correo)
                     .getSingleResult();
         } catch (Exception e) {
@@ -29,49 +34,50 @@ public class ComercioDAOJPA implements ComercioDao{
         }
     }
 
+    @Override
     public boolean existeCorreo(String correo) {
-        return getComercioPorCorreo(correo) != null;
+        return getAprovechantePorCorreo(correo) != null;
     }
 
     @Transactional
-    public Usuario crearNegocio(Usuario usuario, ComercioDetails negocio) {
+    public Usuario crearAprovechante(Usuario usuario, AprovechanteDetails aprovechante) {
         em.persist(usuario);
         em.flush(); // Asegura que el ID se genera antes de usarlo en el negocio
 
-        negocio.setIdNegocio(usuario.getId_usuario());
-        negocio.setUsuario(usuario);
+        aprovechante.setIdAprovechante(usuario.getId_usuario());
+        aprovechante.setUsuario(usuario);
 
-        em.persist(negocio);
-        negocio.setTipo_negocio(usuario.getTipo());
-        usuario.setTipo("negocio");
-        usuario.setNegocio(negocio);
+        em.persist(aprovechante);
+        aprovechante.setTipo_aprovechante(usuario.getTipo());
+        usuario.setTipo("aprovechante");
+        usuario.setAprovechante(aprovechante);
         return usuario;
     }
 
     @Transactional
-    public boolean actualizarNegocio(Usuario usuario, ComercioDetails negocio) {
-        Usuario usuarioExistente = getComercioPorCorreo(usuario.getCorreo());
+    public boolean actualizarAprovechante(Usuario usuario, AprovechanteDetails aprovechante) {
+        Usuario usuarioExistente = getAprovechantePorCorreo(usuario.getCorreo());
         if (usuarioExistente == null) return false;
 
         usuarioExistente.setPassword(usuario.getPassword());
         usuarioExistente.setTipo(usuario.getTipo());
 
-        ComercioDetails negocioExistente = usuarioExistente.getNegocio();
-        if (negocioExistente != null) {
-            negocioExistente.setNombre(negocio.getNombre());
-            negocioExistente.setDiaCompraDeStock(negocio.getDiaCompraDeStock());
+        AprovechanteDetails aprovechanteExistente = usuarioExistente.getAprovechante();
+        if (aprovechanteExistente != null) {
+            aprovechanteExistente.setCondiciones(aprovechante.getCondiciones());
+            aprovechanteExistente.setCondiciones2(aprovechante.getCondiciones2());
         } else {
-            negocio.setIdNegocio(usuarioExistente.getId_usuario());
-            negocio.setUsuario(usuarioExistente);
-            em.persist(negocio);
-            usuarioExistente.setNegocio(negocio);
+            aprovechanteExistente.setIdAprovechante(usuarioExistente.getId_usuario());
+            aprovechanteExistente.setUsuario(usuarioExistente);
+            em.persist(aprovechante);
+            usuarioExistente.setAprovechante(aprovechante);
         }
         return true;
     }
 
     @Transactional
-    public boolean eliminarNegocio(String correo) {
-        Usuario usuario = getComercioPorCorreo(correo);
+    public boolean eliminarAprovechante(String correo) {
+        Usuario usuario = getAprovechantePorCorreo(correo);
         if (usuario == null) return false;
 
         if (usuario.getNegocio() != null) {
@@ -81,7 +87,7 @@ public class ComercioDAOJPA implements ComercioDao{
         return true;
     }
 
-
+    @Override
     public Usuario verificarCredenciales(String correo, String password) {
         try {
             List<Usuario> usuarios = em.createQuery(
@@ -109,5 +115,4 @@ public class ComercioDAOJPA implements ComercioDao{
             return null;
         }
     }
-
 }

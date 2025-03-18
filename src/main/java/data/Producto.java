@@ -4,74 +4,46 @@ import jakarta.persistence.*;
 
 import java.util.Arrays;
 
-@Entity
-@Table(name = "Carne")
-@SqlResultSetMapping(
-        name = "CarneMapping",
-        entities = {
-                @EntityResult(
-                        entityClass = Carne.class,
-                        fields = {
-                                @FieldResult(name = "id", column = "id_carne"),
-                                @FieldResult(name = "nombre", column = "nombre"),
-                                @FieldResult(name = "unidad", column = "unidad"),
-                                @FieldResult(name = "tipoConserva", column = "tipo_conserva"),
-                                @FieldResult(name = "idImg", column = "id_img")
-                        }
-                )
-        },
-        columns = {
-                @ColumnResult(name = "imagenNombre", type = String.class),
-                @ColumnResult(name = "imagenTipo", type = String.class),
-                @ColumnResult(name = "imagenDatos", type = byte[].class)
-        }
-)
-public class Carne {
+@MappedSuperclass
+public abstract class Producto {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_carne", columnDefinition = "serial")
-    private Long id;
+    protected Long id;
 
-    @Column(name = "nombre", nullable = false, length = 100)
-    private String nombre;
+    @Column(name = "nombre", nullable = false, length = 250)
+    protected String nombre;
 
     @Column(name = "unidad", nullable = false, length = 20)
-    private String unidad;
+    protected String unidad;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_conserva", nullable = false, length = 50)
-    private TipoConserva tipoConserva;
+    protected TipoConserva tipoConserva;
 
     @Column(name = "id_img", nullable = false)
-    private Integer idImg;
+    protected Integer idImg;
 
-    // Estos campos no se persisten en la tabla Carne, sino que se cargan a través de JOIN en el DAO
-    @Transient
-    private String imagenNombre;
-    @Transient
-    private String imagenTipo;
-    @Transient
-    private byte[] imagenDatos;
+    @Column(name = "id_negocio", nullable = false)
+    protected Integer idNegocio;
 
-
-    public Long getId() {
-        return id;
-    }
+    @Transient
+    protected String imagenNombre;
+    @Transient
+    protected String imagenTipo;
+    @Transient
+    protected byte[] imagenDatos;
 
     public String getNombre() {
         return nombre;
     }
 
-    public String getUnidad() {
-        return unidad;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getUnidad() {
+        return unidad;
     }
 
     public void setUnidad(String unidad) {
@@ -118,9 +90,25 @@ public class Carne {
         this.imagenDatos = imagenDatos;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getIdNegocio() {
+        return idNegocio;
+    }
+
+    public void setIdNegocio(Integer idNegocio) {
+        this.idNegocio = idNegocio;
+    }
+
     @Override
     public String toString() {
-        return "Carne{" +
+        return "Producto{" +
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
                 ", unidad='" + unidad + '\'' +
@@ -132,6 +120,3 @@ public class Carne {
                 '}';
     }
 }
-
-
-

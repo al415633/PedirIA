@@ -1,7 +1,5 @@
-const RETRIEVE_ALL_CARNES = "/carnes";
-const CARNE_ADD = "/carnes";
-const DELETE = "/carnes/";
-const RETRIEVE_ONE_CARNE = "/carnes/";
+const API_CARNES = "/carnes";
+const GET_CARNES_PROPIAS = "/carnes/mis-productos";
 const VALIDAR_CARNE = "/carnes/validar";
 
 const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO"];
@@ -9,24 +7,21 @@ const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO"];
 Vue.createApp({
     data() {
         return {
-            // Gestión de las carnes
             carnes: [],
             nombreCarne: "",
             unidadCarne: "",
             tipoConserva: "",
-            carneSeleccionada: {},
+            carneSeleccionada: null,
             imagenNombre: '',
             imagenTipo: '',
             imagenDatos: null,
 
-            // Paginación de carnes
+            // Paginación
             currentPage: 1,
-            itemsPerPage: 8, // 8 tarjetas por página (2 filas x 4 columnas)
+            itemsPerPage: 8, // 8 tarjetas por página
 
-            // Validación de datos
-            nombreError: '',
-            unidadError: '',
-            isInvalid: false
+            // Errores
+            errores: { nombre: '', unidad: '', general: '' }
         };
     },
 
@@ -40,37 +35,34 @@ Vue.createApp({
         displayedCarnes() {
             const start = (this.currentPage - 1) * this.itemsPerPage;
             return this.carnes.slice(start, start + this.itemsPerPage);
+        },
+        botonDeshabilitado() {
+            return this.errores.nombre.length > 0 || this.errores.unidad.length > 0;
         }
     },
 
     methods: {
-        // 📌 Validación de existencia de la carne en base al nombre y la unidad
-        validateCarne() {
+        // Validación de existencia de la carne por nombre y unidad
+        async validateCarne() {
             if (!this.nombreCarne || !this.unidadCarne) {
-                this.nombreError = this.unidadError = '';
-                this.isInvalid = false;
+                this.errores.nombre = this.errores.unidad = '';
                 return;
             }
-
-            axios.get(`${VALIDAR_CARNE}?nombre=${this.nombreCarne}&unidad=${this.unidadCarne}`)
-                .then(response => {
-                    if (response.data.existe) {
-                        this.nombreError = "Ya existe una carne con este nombre y unidad.";
-                        this.unidadError = "Por favor, elija un nombre o unidad diferente.";
-                        this.isInvalid = true;
-                    } else {
-                        this.nombreError = this.unidadError = '';
-                        this.isInvalid = false;
-                    }
-                })
-                .catch(error => {
-                    console.error("Error en la validación:", error);
-                    this.nombreError = "Error al validar el nombre.";
-                    this.isInvalid = true;
-                });
+            try {
+                const { data } = await axios.get(`${VALIDAR_CARNE}?nombre=${this.nombreCarne}&unidad=${this.unidadCarne}`);
+                if (data.existe) {
+                    this.errores.nombre = "Ya existe una carne con este nombre.";
+                    this.errores.unidad = "Por favor, elija otro nombre o unidad.";
+                } else {
+                    this.errores.nombre = this.errores.unidad = '';
+                }
+            } catch (error) {
+                console.error("Error en la validación:", error);
+                this.errores.nombre = "Error al validar.";
+            }
         },
 
-        // Captura de imagen
+        // Manejo de archivo de imagen
         onFileChange(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -80,12 +72,12 @@ Vue.createApp({
 
             const reader = new FileReader();
             reader.onload = (e) => {
-                this.imagenDatos = e.target.result;
+                this.imagenDatos = e.target.result.split(',')[1]; // Separa el encabezado de Base64
             };
             reader.readAsDataURL(file);
         },
 
-        // Métodos para paginación
+        // Métodos de paginación
         prevPage() {
             if (this.currentPage > 1) this.currentPage--;
         },
@@ -96,73 +88,89 @@ Vue.createApp({
             this.currentPage = page;
         },
 
-        // Obtiene el listado de carnes completo
+        // Obtiene la lista de carnes del usuario
         async getAllCarnes() {
             try {
-                const response = await axios.get(RETRIEVE_ALL_CARNES + "/mis-carnes");
-                this.carnes = response.data.map(carneArray => {
-                    const carne = carneArray[0];
+                const { data } = await axios.get(`${GET_CARNES_PROPIAS}`);
+                this.carnes = data.map(carneArray => {
+                    const carne = carneArray[0]; // Extrae el objeto carne del array interno
                     return {
                         ...carne,
-                        imagenNombre: carneArray[1],
-                        imagenDatos: carneArray[3],
-                        imagenTipo: carneArray[2]
+                        imagenNombre: carneArray[1] || "",
+                        imagenTipo: carneArray[2] || "",
+                        imagenDatos: carneArray[3] || null
                     };
                 });
-
+                console.log(this.carnes)
                 this.carnes.sort((a, b) => a.nombre.localeCompare(b.nombre));
-                console.log("Carnes cargadas:", this.carnes);
             } catch (error) {
-                console.error("Error al obtener los datos:", error);
+                console.error("Error al obtener carnes:", error);
             }
         },
 
         // Recuperar una carne específica
-        async retrieveCarne(index) {
+        async retrieveCarne(id) {
             try {
-                const carneId = this.carnes[index].id;
-                const response = await axios.get(RETRIEVE_ONE_CARNE + carneId);
-                this.carneSeleccionada = response.data;
+                const { data } = await axios.get(`${API_CARNES}/${id}`);
+                this.carneSeleccionada = data;
             } catch (error) {
-                console.error("Error al recuperar la Carne:", error);
+                console.error("Error al recuperar la carne:", error);
             }
         },
 
-        //  Crear una nueva carne
+        // Crear una nueva carne
         async createCarne() {
-            if (this.isInvalid) return; // Evita el envío si hay errores
+            if (this.errores.nombre || this.errores.unidad) return; // Evita si hay errores
 
             try {
-                let newCarne = {
+                const newCarne = {
                     nombre: this.nombreCarne,
                     unidad: this.unidadCarne,
                     tipoConserva: this.tipoConserva,
                     imagenNombre: this.imagenNombre,
                     imagenTipo: this.imagenTipo,
-                    imagenDatos: this.imagenDatos.split(',')[1]
+                    imagenDatos: this.imagenDatos
                 };
 
-                const response = await axios.post(CARNE_ADD, newCarne);
-                this.carnes.push(response.data);
+                const { data } = await axios.post(API_CARNES, newCarne);
+                this.carnes.push(data);
                 this.carnes.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
-                // Limpiar el formulario
-                this.nombreCarne = "";
-                this.unidadCarne = "";
-                this.tipoConserva = "";
-                this.imagenNombre = "";
-                this.imagenTipo = "";
-                this.imagenDatos = null;
-
-                // Mostrar mensaje de éxito
+                // Limpiar formulario
+                this.resetForm();
                 this.showToast('¡Carne añadida con éxito!', 'bg-success');
             } catch (error) {
                 console.error("Error al crear Carne:", error);
-                this.showToast('Error al crear la carne. Inténtalo de nuevo.', 'bg-danger');
+                this.showToast('Error al crear la carne.', 'bg-danger');
             }
         },
 
-        //  Mostrar notificaciones tipo Toast
+        // Eliminar carne
+        async deleteCarne(id) {
+            if (!confirm("¿Estás seguro de que quieres eliminar esta carne?")) return;
+
+            try {
+                await axios.delete(`${API_CARNES}/${id}`);
+                this.carnes = this.carnes.filter(carne => carne.id !== id);
+                this.showToast('Carne eliminada correctamente.', 'bg-success');
+            } catch (error) {
+                console.error("Error al eliminar carne:", error);
+                this.showToast('Error al eliminar la carne.', 'bg-danger');
+            }
+        },
+
+        // Reinicia los campos del formulario
+        resetForm() {
+            this.nombreCarne = "";
+            this.unidadCarne = "";
+            this.tipoConserva = "";
+            this.imagenNombre = "";
+            this.imagenTipo = "";
+            this.imagenDatos = null;
+            this.errores = { nombre: '', unidad: '', general: '' };
+        },
+
+        // Mostrar notificaciones tipo Toast
         showToast(message, colorClass) {
             const toastBody = document.getElementById('toast-body');
             toastBody.textContent = message;

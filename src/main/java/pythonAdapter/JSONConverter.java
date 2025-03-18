@@ -1,7 +1,7 @@
 package pythonAdapter;
 
 import com.google.gson.Gson;
-import data.StockCarne;
+import data.carniceria.StockCarne;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.json.simple.JSONObject;
 

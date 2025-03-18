@@ -1,23 +1,20 @@
-package data;
+package data.pescaderia;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "StockPescado")
-public class StockPescado {
-
+@Table(name = "HistoricoPescado")
+public class HistoricoPescado {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_stock_pescado", columnDefinition = "serial")
+    @Column(name = "id_historico_pescado", columnDefinition = "serial")
     private Long id;
 
     @NotNull
-    @Min(0)
     @Column(name = "cantidad", nullable = false, precision = 10, scale = 3)
     private BigDecimal cantidad;
 
@@ -29,32 +26,53 @@ public class StockPescado {
     @Column(name = "fecha_ingreso", nullable = false)
     private LocalDate fechaIngreso;
 
+    @NotNull
+    @Column(name = "fecha_venta", nullable = false)
+    private LocalDate fechaVenta;
+
     @ManyToOne
     @JoinColumn(name = "id_pescado", nullable = false)
     private Pescado pescado;
 
-    // Constructores
-    public StockPescado() {}
-
-    public StockPescado(BigDecimal cantidad, LocalDate fechaVencimiento, LocalDate fechaIngreso, Pescado pescado) {
-        this.cantidad = cantidad;
-        this.fechaVencimiento = fechaVencimiento;
-        this.fechaIngreso = fechaIngreso;
-        this.pescado = pescado;
+    public Long getId() {
+        return id;
     }
 
-    // Getters y Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public BigDecimal getCantidad() { return cantidad; }
-    public void setCantidad(BigDecimal cantidad) { this.cantidad = cantidad; }
+    public BigDecimal getCantidad() {
+        return cantidad;
+    }
 
-    public LocalDate getFechaVencimiento() { return fechaVencimiento; }
-    public void setFechaVencimiento(LocalDate fechaVencimiento) { this.fechaVencimiento = fechaVencimiento; }
+    public void setCantidad(BigDecimal cantidad) {
+        this.cantidad = cantidad;
+    }
 
-    public LocalDate getFechaIngreso() { return fechaIngreso; }
-    public void setFechaIngreso(LocalDate fechaIngreso) { this.fechaIngreso = fechaIngreso; }
+    public LocalDate getFechaVencimiento() {
+        return fechaVencimiento;
+    }
+
+    public void setFechaVencimiento(LocalDate fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
+    }
+
+    public LocalDate getFechaIngreso() {
+        return fechaIngreso;
+    }
+
+    public void setFechaIngreso(LocalDate fechaIngreso) {
+        this.fechaIngreso = fechaIngreso;
+    }
+
+    public LocalDate getFechaVenta() {
+        return fechaVenta;
+    }
+
+    public void setFechaVenta(LocalDate fechaVenta) {
+        this.fechaVenta = fechaVenta;
+    }
 
     public Pescado getPescado() {
         return pescado;
@@ -66,11 +84,12 @@ public class StockPescado {
 
     @Override
     public String toString() {
-        return "StockPescado{" +
+        return "HistoricoPescado{" +
                 "id=" + id +
                 ", cantidad=" + cantidad +
                 ", fechaVencimiento=" + fechaVencimiento +
                 ", fechaIngreso=" + fechaIngreso +
+                ", fechaVenta=" + fechaVenta +
                 ", pescado=" + pescado +
                 '}';
     }

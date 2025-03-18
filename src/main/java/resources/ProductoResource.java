@@ -1,53 +1,53 @@
 package resources;
 
-import data.Carne;
+import data.Producto;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import services.CarneDAO;
-import services.ComercioDAOJPA;
+import services.ComercioDao;
+import services.ProductoDAO;
 
 import java.util.Collections;
 
-@Path("/carnes")
-public class CarneResource {
+public abstract class ProductoResource<T extends Producto> {
 
     @Inject
-    CarneDAO daoCarne;
+    protected ProductoDAO<T> daoProducto;
 
     @Inject
-    ComercioDAOJPA daoComercio;
+    protected ComercioDao daoComercio;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll() {
-        return Response.ok(daoCarne.getAll()).build();
+        return Response.ok(daoProducto.getAll()).build();
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Response getCarne(@PathParam("id") Long id) {
-        Carne carne = daoCarne.retrieve(id);
-        if (carne == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProducto(@PathParam("id") Long id) {
+        T producto = daoProducto.retrieve(id);
+        if (producto == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Producto no encontrado").build();
         }
-        return Response.ok(carne).build();
+        return Response.ok(producto).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createCarne(Carne carne) {
+    public Response createProducto(T producto, @CookieParam("usuario") String correo) {
+        Integer idNegocio = Math.toIntExact(daoComercio.getComercioPorCorreo(correo).getId_usuario());
+        producto.setIdNegocio(idNegocio);
         try {
-            // El objeto 'carne' incluirá los datos de imagen (por ejemplo, imagenNombre, imagenTipo y imagenDatos)
-            Carne carneCreada = daoCarne.create(carne);
-            if (carneCreada == null) {
+            T productoCreado = daoProducto.create(producto);
+            if (productoCreado == null) {
                 return Response.status(Response.Status.CONFLICT).build();
             }
-            return Response.status(Response.Status.CREATED).entity(carneCreada).build();
+            return Response.status(Response.Status.CREATED).entity(productoCreado).build();
         } catch (PersistenceException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error de persistencia: " + e.getMessage())
@@ -62,15 +62,14 @@ public class CarneResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateCarne(Carne carne) {
+    public Response updateProducto(T producto) {
         int maxRetries = 3;
         int attempt = 0;
         long delay = 1000;
 
         while (attempt < maxRetries) {
             try {
-                // Si en el objeto 'carne' se han incluido nuevos datos de imagen, el DAO actualizará ambas tablas.
-                Carne result = daoCarne.update(carne);
+                T result = daoProducto.update(producto);
                 if (result == null) {
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
@@ -82,26 +81,27 @@ public class CarneResource {
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                            .entity("Error en el sistema, inténtelo de nuevo.")
+                            .entity("Ocurrió un error inesperado. Por favor, inténtelo de nuevo.")
                             .build();
                 }
             } catch (Exception e) {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .entity("Ocurrió un error inesperado: " + e.getMessage())
+                        .entity("Ocurrió un error inesperado. Por favor, inténtelo de nuevo.")
                         .build();
             }
         }
+
         return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                .entity("No se pudo actualizar la carne después de varios intentos. Inténtelo de nuevo más tarde.")
+                .entity("No se pudo actualizar el producto después de varios intentos. Inténtelo de nuevo más tarde.")
                 .build();
     }
 
     @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Response deleteCarne(@PathParam("id") Long id) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteProducto(@PathParam("id") Long id) {
         try {
-            Carne result = daoCarne.delete(id);
+            T result = daoProducto.delete(id);
             if (result == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
@@ -116,20 +116,19 @@ public class CarneResource {
     @GET
     @Path("/validar")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response validarCarne(@QueryParam("nombre") String nombre, @QueryParam("unidad") String unidad) {
-        boolean existe = daoCarne.existeCarne(nombre, unidad);
+    public Response validarProducto(@QueryParam("nombre") String nombre, @QueryParam("unidad") String unidad) {
+        boolean existe = daoProducto.existeProducto(nombre, unidad);
         return Response.ok(Collections.singletonMap("existe", existe)).build();
     }
 
     @GET
-    @Path("/mis-carnes")
+    @Path("/mis-productos")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response obtenerCarnesDeUsuario(@CookieParam("usuario") String correo) {
+    public Response obtenerProductosDeUsuario(@CookieParam("usuario") String correo) {
         if (correo == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("No hay sesión activa").build();
         }
         Long idNegocio = daoComercio.getComercioPorCorreo(correo).getId_usuario();
-        return Response.ok(daoCarne.getAllByUsuario(idNegocio)).build();
+        return Response.ok(daoProducto.getAllByUsuario(idNegocio)).build();
     }
-
 }

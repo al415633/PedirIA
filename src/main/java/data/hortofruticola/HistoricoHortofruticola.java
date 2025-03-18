@@ -1,4 +1,4 @@
-package data;
+package data.hortofruticola;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -7,12 +7,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "HistoricoCarne")
-public class HistoricoCarne {
+@Table(name = "HistoricoHortofruticola")
+public class HistoricoHortofruticola {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_historico_carne", columnDefinition = "serial")
+    @Column(name = "id_historico_hortofruticola", columnDefinition = "serial")
     private Long id;
 
     @NotNull
@@ -32,8 +32,8 @@ public class HistoricoCarne {
     private LocalDate fechaVenta;
 
     @ManyToOne
-    @JoinColumn(name = "id_carne", nullable = false)
-    private Carne carne;
+    @JoinColumn(name = "id_hortofruticola", nullable = false)
+    private HortoFruticola hortofruticola;
 
     public Long getId() {
         return id;
@@ -75,23 +75,23 @@ public class HistoricoCarne {
         this.fechaVenta = fechaVenta;
     }
 
-    public Carne getCarne() {
-        return carne;
+    public HortoFruticola getHortofruticola() {
+        return hortofruticola;
     }
 
-    public void setCarne(Carne carne) {
-        this.carne = carne;
+    public void setHortofruticola(HortoFruticola hortofruticola) {
+        this.hortofruticola = hortofruticola;
     }
 
     @Override
     public String toString() {
-        return "HistoricoCarne{" +
+        return "HistoricoHortofruticola{" +
                 "id=" + id +
                 ", cantidad=" + cantidad +
                 ", fechaVencimiento=" + fechaVencimiento +
                 ", fechaIngreso=" + fechaIngreso +
                 ", fechaVenta=" + fechaVenta +
-                ", carne=" + carne +
+                ", hortofruticola=" + hortofruticola +
                 '}';
     }
 }

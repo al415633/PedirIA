@@ -29,7 +29,7 @@ public class StockPescadoDAO {
     }
 
     public List<StockPescado> retrieveByPescado(Long idPescado) {
-        return em.createQuery("SELECT s FROM StockPescado s WHERE s.pescado.id = :idPescado", StockPescado.class)
+        return em.createQuery("SELECT s FROM StockPescado s WHERE s.producto.id = :idPescado", StockPescado.class)
                 .setParameter("idPescado", idPescado)
                 .getResultList();
     }
@@ -68,7 +68,7 @@ public class StockPescadoDAO {
                             "AND h.fechaVenta = :fechaVenta AND h.fechaIngreso = :fechaIngreso AND h.fechaVencimiento = :fechaVencimiento",
                     HistoricoPescado.class
             );
-            query.setParameter("idPescado", stock.getPescado().getId());
+            query.setParameter("idPescado", stock.getProducto().getId());
             query.setParameter("fechaVenta", today);
             query.setParameter("fechaIngreso", stock.getFechaIngreso());
             query.setParameter("fechaVencimiento", stock.getFechaVencimiento());
@@ -87,7 +87,7 @@ public class StockPescadoDAO {
                 historico.setFechaIngreso(stock.getFechaIngreso());
                 historico.setFechaVencimiento(stock.getFechaVencimiento());
                 historico.setFechaVenta(today);
-                historico.setPescado(stock.getPescado());
+                historico.setPescado(stock.getProducto());
                 em.persist(historico);
             }
 

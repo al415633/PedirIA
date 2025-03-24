@@ -95,14 +95,19 @@ public abstract class ProductoDAO<T extends Producto> {
         if (existing == null) {
             return null;
         }
-        em.remove(existing);
 
+        // Desasociar el producto del negocio
+        existing.setIdNegocio(null);
+        em.merge(existing);
+
+        // Borrar la imagen si aplica
         Query q = em.createNativeQuery("DELETE FROM " + imageTableName + " WHERE id_img = ?");
         q.setParameter(1, existing.getIdImg());
         q.executeUpdate();
 
         return existing;
     }
+
 
     public Collection<T> getAll() {
         Query q = em.createNativeQuery(
@@ -115,12 +120,13 @@ public abstract class ProductoDAO<T extends Producto> {
         return q.getResultList();
     }
 
-    public boolean existeProducto(String nombre, String unidad) {
-        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE LOWER(nombre) = LOWER(?) AND LOWER(unidad) = LOWER(?)";
+    public boolean existeProducto(String nombre, String unidad, Integer idNegocio) {
+        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE LOWER(nombre) = LOWER(?) AND LOWER(unidad) = LOWER(?) AND id_negocio = ?";
 
         Query query = em.createNativeQuery(sql);
         query.setParameter(1, nombre.trim().toLowerCase());
         query.setParameter(2, unidad.trim().toLowerCase());
+        query.setParameter(3, idNegocio);
 
         Long count = ((Number) query.getSingleResult()).longValue();
         return count > 0;

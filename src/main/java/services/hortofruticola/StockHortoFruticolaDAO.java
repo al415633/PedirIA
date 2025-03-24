@@ -33,7 +33,7 @@ public class StockHortoFruticolaDAO {
     }
 
     public List<StockHortoFruticola> retrieveByHortoFruticola(Long idHortoFruticola) {
-        return em.createQuery("SELECT s FROM StockHortoFruticola s WHERE s.hortoFruticola.id = :idHortoFruticola", StockHortoFruticola.class)
+        return em.createQuery("SELECT s FROM StockHortoFruticola s WHERE s.producto.id = :idHortoFruticola", StockHortoFruticola.class)
                 .setParameter("idHortoFruticola", idHortoFruticola)
                 .getResultList();
     }
@@ -71,7 +71,7 @@ public class StockHortoFruticolaDAO {
                             "AND h.fechaVenta = :fechaVenta AND h.fechaIngreso = :fechaIngreso AND h.fechaVencimiento = :fechaVencimiento",
                     HistoricoHortofruticola.class
             );
-            query.setParameter("idHortofruticola", stock.getHortoFruticola().getId());
+            query.setParameter("idHortofruticola", stock.getProducto().getId());
             query.setParameter("fechaVenta", today);
             query.setParameter("fechaIngreso", stock.getFechaIngreso());
             query.setParameter("fechaVencimiento", stock.getFechaVencimiento());
@@ -90,7 +90,7 @@ public class StockHortoFruticolaDAO {
                 historico.setFechaIngreso(stock.getFechaIngreso());
                 historico.setFechaVencimiento(stock.getFechaVencimiento());
                 historico.setFechaVenta(today);
-                historico.setHortofruticola(stock.getHortoFruticola());
+                historico.setHortofruticola(stock.getProducto());
                 em.persist(historico);
             }
 

@@ -116,8 +116,9 @@ public abstract class ProductoResource<T extends Producto> {
     @GET
     @Path("/validar")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response validarProducto(@QueryParam("nombre") String nombre, @QueryParam("unidad") String unidad) {
-        boolean existe = daoProducto.existeProducto(nombre, unidad);
+    public Response validarProducto(@QueryParam("nombre") String nombre, @QueryParam("unidad") String unidad, @CookieParam("usuario") String correo) {
+        Integer idNegocio = Math.toIntExact(daoComercio.getComercioPorCorreo(correo).getId_usuario());
+        boolean existe = daoProducto.existeProducto(nombre, unidad, idNegocio);
         return Response.ok(Collections.singletonMap("existe", existe)).build();
     }
 

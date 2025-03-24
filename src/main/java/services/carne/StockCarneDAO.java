@@ -30,10 +30,11 @@ public class StockCarneDAO {
     }
 
     public List<StockCarne> retrieveByCarne(Long idCarne) {
-        return em.createQuery("SELECT s FROM StockCarne s WHERE s.carne.id = :idCarne", StockCarne.class)
+        return em.createQuery("SELECT s FROM StockCarne s WHERE s.producto.id = :idCarne", StockCarne.class)
                 .setParameter("idCarne", idCarne)
                 .getResultList();
     }
+
 
 
     @Transactional
@@ -69,7 +70,7 @@ public class StockCarneDAO {
                             "AND h.fechaVenta = :fechaVenta AND h.fechaIngreso = :fechaIngreso AND h.fechaVencimiento = :fechaVencimiento",
                     HistoricoCarne.class
             );
-            query.setParameter("idCarne", stock.getCarne().getId());
+            query.setParameter("idCarne", stock.getProducto().getId());
             query.setParameter("fechaVenta", today);
             query.setParameter("fechaIngreso", stock.getFechaIngreso());
             query.setParameter("fechaVencimiento", stock.getFechaVencimiento());
@@ -88,7 +89,7 @@ public class StockCarneDAO {
                 historico.setFechaIngreso(stock.getFechaIngreso());
                 historico.setFechaVencimiento(stock.getFechaVencimiento());
                 historico.setFechaVenta(today);
-                historico.setCarne(stock.getCarne());
+                historico.setCarne(stock.getProducto());
                 em.persist(historico);
             }
 

@@ -7,6 +7,8 @@ const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO"];
 Vue.createApp({
     data() {
         return {
+            busquedaNombre: '',
+
             carnes: [],
             nombreCarne: "",
             unidadCarne: "",
@@ -29,15 +31,30 @@ Vue.createApp({
         tiposConserva() {
             return TIPOS_CONSERVA;
         },
-        totalPages() {
-            return Math.ceil(this.carnes.length / this.itemsPerPage);
-        },
         displayedCarnes() {
+            const filtro = this.busquedaNombre.trim().toLowerCase();
+            const carnesFiltradas = this.carnes.filter(carne =>
+                carne.nombre.toLowerCase().includes(filtro)
+            );
+
             const start = (this.currentPage - 1) * this.itemsPerPage;
-            return this.carnes.slice(start, start + this.itemsPerPage);
+            return carnesFiltradas.slice(start, start + this.itemsPerPage);
+        },
+        totalPages() {
+            const filtro = this.busquedaNombre.trim().toLowerCase();
+            const carnesFiltradas = this.carnes.filter(carne =>
+                carne.nombre.toLowerCase().includes(filtro)
+            );
+            return Math.ceil(carnesFiltradas.length / this.itemsPerPage);
         },
         botonDeshabilitado() {
             return this.errores.nombre.length > 0 || this.errores.unidad.length > 0;
+        }
+    },
+
+    watch: {
+        busquedaNombre() {
+            this.currentPage = 1;
         }
     },
 

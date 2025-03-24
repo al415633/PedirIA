@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gestión de Pescado</title>
+    <title>Gestión de Hortofrutícola</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -11,7 +11,7 @@
 
     <style>
         header {
-            background-color: #2848a7; /* Color verde */
+            background-color: #2cbf0c; /* Color verde */
             color: white;
             padding: 10px 0;
         }
@@ -58,25 +58,25 @@
     <a href="../menu_productos.html">
         <img src="/static/logo.png" alt="Logo PedirIA">
     </a>
-    <h1>Gestión de Pescado</h1>
+    <h1>Gestión de Hortofrutícola</h1>
 </header>
 
 <div id="app" class="container mt-4">
 
     <!-- Formulario para agregar producto -->
     <div class="card p-3 mb-4">
-        <h4>Agregar Nuevo Pescado</h4>
-        <form class="row g-3" @submit.prevent="createPescado">
+        <h4>Agregar Nueva Hortofrutícola</h4>
+        <form class="row g-3" @submit.prevent="createHortofruticola">
             <div class="col-md-4">
-                <label for="nombrePescado" class="form-label">Nombre del Pescado</label>
-                <input v-model="nombrePescado" type="text" id="nombrePescado" class="form-control"
-                       placeholder="Nombre" @input="validatePescado">
+                <label for="nombreHortofruticola" class="form-label">Nombre de la Hortofrutícola</label>
+                <input v-model="nombreHortofruticola" type="text" id="nombreHortofruticola" class="form-control"
+                       placeholder="Nombre" @input="validateHortofruticola">
                 <small v-if="errores.nombre" class="text-danger">{{ errores.nombre }}</small>
             </div>
             <div class="col-md-2">
-                <label for="unidadPescado" class="form-label">Unidad</label>
-                <input v-model="unidadPescado" type="text" id="unidadPescado" class="form-control"
-                       placeholder="Unidad" @input="validatePescado">
+                <label for="unidadHortofruticola" class="form-label">Unidad</label>
+                <input v-model="unidadHortofruticola" type="text" id="unidadHortofruticola" class="form-control"
+                       placeholder="Unidad" @input="validateHortofruticola">
                 <small v-if="errores.unidad" class="text-danger">{{ errores.unidad }}</small>
             </div>
             <div class="col-md-3">
@@ -87,31 +87,31 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label for="imagenPescado" class="form-label">Imagen del Pescado</label>
-                <input type="file" id="imagenPescado" class="form-control" @change="onFileChange">
+                <label for="imagenHortofruticola" class="form-label">Imagen de la Hortofrutícola</label>
+                <input type="file" id="imagenHortofruticola" class="form-control" @change="onFileChange">
             </div>
             <div class="col-12 text-end">
                 <button type="submit" class="btn btn-primary" :disabled="botonDeshabilitado">
-                    Agregar Pescado
+                    Agregar Hortofrutícola
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- Listado de pescados en formato cards -->
+    <!-- Listado de Hortofruticolas en formato cards -->
     <div class="row">
-        <template v-for="(pescado, index) in displayedPescados" :key="pescado.id">
+        <template v-for="(hortofruticola, index) in displayedHortofruticolas" :key="hortofruticola.id">
             <div class="col-md-3 mb-4">
-                <a :href="'StockPescado.html?id=' + pescado.id" class="text-decoration-none">
+                <a :href="'StockHortofruticola.html?id=' + hortofruticola.id" class="text-decoration-none">
                     <div class="card h-100 clickable">
-                        <img v-if="pescado.imagenDatos" :src="'data:image/jpeg;base64,' + pescado.imagenDatos"
-                             :alt="pescado.nombre" class="card-img-top"/>
+                        <img v-if="hortofruticola.imagenDatos" :src="'data:image/jpeg;base64,' + hortofruticola.imagenDatos"
+                             :alt="hortofruticola.nombre" class="card-img-top"/>
                         <img v-else src="/static/default-image.jpg" alt="Sin imagen" class="card-img-top"/>
                         <div class="card-body">
-                            <h5 class="card-title">{{ pescado.nombre }}</h5>
+                            <h5 class="card-title">{{ hortofruticola.nombre }}</h5>
                             <p class="card-text">
-                                <strong>Unidad:</strong> {{ pescado.unidad }}<br>
-                                <strong>Tipo de Conserva:</strong> {{ pescado.tipoConserva }}
+                                <strong>Unidad:</strong> {{ hortofruticola.unidad }}<br>
+                                <strong>Tipo de Conserva:</strong> {{ hortofruticola.tipoConserva }}
                             </p>
                         </div>
                     </div>
@@ -136,7 +136,7 @@
     </nav>
 
     <!-- Toast para notificaciones -->
-    <div id="toastPescado" class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true"
+    <div id="toastHortofruticola" class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true"
          style="position: absolute; top: 20px; right: 20px; z-index: 1050;">
         <div class="toast-header">
             <strong class="me-auto">Notificación</strong>
@@ -149,7 +149,7 @@
 
 </div>
 
-<script src="../js/pescado.js"></script>
+<script src="../js/hortofruticola.js"></script>
 
 </body>
 </html>

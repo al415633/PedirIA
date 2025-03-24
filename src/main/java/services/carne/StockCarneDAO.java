@@ -1,4 +1,4 @@
-package services;
+package services.carne;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -6,8 +6,10 @@ import java.util.List;
 
 import org.json.simple.JSONObject;
 
-import data.HistoricoCarne;
-import data.StockCarne;
+
+import data.carniceria.HistoricoCarne;
+import data.carniceria.StockCarne;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;

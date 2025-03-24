@@ -6,40 +6,39 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "StockHortoFruticola")
-public class StockHortoFruticola {
+@MappedSuperclass
+public abstract class StockProducto<T extends Producto> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_stock_hortofruticola", columnDefinition = "serial")
-    private Long id;
+    @Column(name = "id_stock", columnDefinition = "serial")
+    protected Long id;
 
     @NotNull
     @Min(0)
     @Column(name = "cantidad", nullable = false, precision = 10, scale = 3)
-    private BigDecimal cantidad;
+    protected BigDecimal cantidad;
 
     @NotNull
     @Column(name = "fecha_vencimiento", nullable = false)
-    private LocalDate fechaVencimiento;
+    protected LocalDate fechaVencimiento;
 
     @NotNull
     @Column(name = "fecha_ingreso", nullable = false)
-    private LocalDate fechaIngreso;
+    protected LocalDate fechaIngreso;
 
     @ManyToOne
-    @JoinColumn(name = "id_hortofruticola", nullable = false)
-    private HortoFruticola hortoFruticola;
+    @JoinColumn(name = "id_producto", nullable = false)
+    protected T producto;
 
     // Constructores
-    public StockHortoFruticola() {}
+    public StockProducto() {}
 
-    public StockHortoFruticola(BigDecimal cantidad, LocalDate fechaVencimiento, LocalDate fechaIngreso, HortoFruticola hortoFruticola) {
+    public StockProducto(BigDecimal cantidad, LocalDate fechaVencimiento, LocalDate fechaIngreso, T producto) {
         this.cantidad = cantidad;
         this.fechaVencimiento = fechaVencimiento;
         this.fechaIngreso = fechaIngreso;
-        this.hortoFruticola = hortoFruticola;
+        this.producto = producto;
     }
 
     // Getters y Setters
@@ -55,17 +54,17 @@ public class StockHortoFruticola {
     public LocalDate getFechaIngreso() { return fechaIngreso; }
     public void setFechaIngreso(LocalDate fechaIngreso) { this.fechaIngreso = fechaIngreso; }
 
-    public HortoFruticola getHortoFruticola() { return hortoFruticola; }
-    public void setHortoFruticola(HortoFruticola hortoFruticola) { this.hortoFruticola = hortoFruticola; }
+    public T getProducto() { return producto; }
+    public void setProducto(T producto) { this.producto = producto; }
 
     @Override
     public String toString() {
-        return "StockHortoFruticola{" +
+        return this.getClass().getSimpleName() + "{" +
                 "id=" + id +
                 ", cantidad=" + cantidad +
                 ", fechaVencimiento=" + fechaVencimiento +
                 ", fechaIngreso=" + fechaIngreso +
-                ", hortoFruticola=" + hortoFruticola +
+                ", producto=" + producto +
                 '}';
     }
 }

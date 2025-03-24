@@ -1,14 +1,13 @@
-package resources;
+package resources.pescado;
 
 
-import data.StockPescado;
+import data.pescaderia.StockPescado;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import services.HistoricoStockCarneDAO;
-import services.HistoricoStockPescadoDAO;
-import services.StockPescadoDAO;
+import services.pescado.HistoricoStockPescadoDAO;
+import services.pescado.StockPescadoDAO;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -1,10 +1,10 @@
-package resources;
+package resources.carne;
 
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import data.StockCarne;
+import data.carniceria.StockCarne;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -16,8 +16,8 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import services.HistoricoStockCarneDAO;
-import services.StockCarneDAO;
+import services.carne.HistoricoStockCarneDAO;
+import services.carne.StockCarneDAO;
 
 @Path("/carnes/stock")
 @Produces(MediaType.APPLICATION_JSON)

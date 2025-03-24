@@ -11,7 +11,7 @@
 
     <style>
         header {
-            background-color: #28a745; /* Color verde */
+            background-color: #da0909; /* Color verde */
             color: white;
             padding: 10px 0;
         }
@@ -21,7 +21,7 @@
             margin-right: 10px;
         }
 
-        /* Clase para que la tarjeta se vea como botón */
+        /* Tarjetas clickeables */
         .clickable {
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -40,19 +40,17 @@
             color: inherit;
         }
 
-        /* Fijamos el tamaño de la imagen de la tarjeta */
+        /* Imágenes de las tarjetas */
         .card-img-top {
-            height: 200px; /* Altura fija para todas las imágenes */
-            object-fit: cover; /* Se recorta y centra la imagen para ajustarse */
+            height: 200px;
+            object-fit: cover;
         }
 
-        /* Forzamos que todas las tarjetas tengan la misma altura */
+        /* Fijar altura de las tarjetas */
         .card {
             height: 100%;
         }
     </style>
-
-
 </head>
 <body>
 
@@ -71,13 +69,15 @@
         <form class="row g-3" @submit.prevent="createCarne">
             <div class="col-md-4">
                 <label for="nombreCarne" class="form-label">Nombre de la Carne</label>
-                <input v-model="nombreCarne" type="text" id="nombreCarne" class="form-control" placeholder="Nombre" @input="validateCarne">
-                <small v-if="nombreError" class="text-danger">{{ nombreError }}</small>
+                <input v-model="nombreCarne" type="text" id="nombreCarne" class="form-control"
+                       placeholder="Nombre" @input="validateCarne">
+                <small v-if="errores.nombre" class="text-danger">{{ errores.nombre }}</small>
             </div>
             <div class="col-md-2">
                 <label for="unidadCarne" class="form-label">Unidad</label>
-                <input v-model="unidadCarne" type="text" id="unidadCarne" class="form-control" placeholder="Unidad" @input="validateCarne">
-                <small v-if="unidadError" class="text-danger">{{ unidadError }}</small>
+                <input v-model="unidadCarne" type="text" id="unidadCarne" class="form-control"
+                       placeholder="Unidad" @input="validateCarne">
+                <small v-if="errores.unidad" class="text-danger">{{ errores.unidad }}</small>
             </div>
             <div class="col-md-3">
                 <label for="tipoConserva" class="form-label">Tipo de Conserva</label>
@@ -91,22 +91,22 @@
                 <input type="file" id="imagenCarne" class="form-control" @change="onFileChange">
             </div>
             <div class="col-12 text-end">
-                <button type="submit" class="btn btn-primary" :disabled="isInvalid">Agregar Carne</button>
+                <button type="submit" class="btn btn-primary" :disabled="botonDeshabilitado">
+                    Agregar Carne
+                </button>
             </div>
         </form>
     </div>
 
-
     <!-- Listado de carnes en formato cards -->
     <div class="row">
-        <!-- Se muestran las tarjetas de la página actual -->
         <template v-for="(carne, index) in displayedCarnes" :key="carne.id">
             <div class="col-md-3 mb-4">
                 <a :href="'StockCarne.html?id=' + carne.id" class="text-decoration-none">
-                <div class="card h-100 clickable">
-                        <!-- Si 'imagenDatos' es una cadena base64, se muestra la imagen -->
-                        <img :src="'data:image/jpeg;base64,' + carne.imagenDatos" :alt="carne.nombre"
-                             class="card-img-top"/>
+                    <div class="card h-100 clickable">
+                        <img v-if="carne.imagenDatos" :src="'data:image/jpeg;base64,' + carne.imagenDatos"
+                             :alt="carne.nombre" class="card-img-top"/>
+                        <img v-else src="/static/default-image.jpg" alt="Sin imagen" class="card-img-top"/>
                         <div class="card-body">
                             <h5 class="card-title">{{ carne.nombre }}</h5>
                             <p class="card-text">
@@ -135,20 +135,21 @@
         </ul>
     </nav>
 
-    <!-- Toast para mensajes Feedback usuario -->
-    <div id="toastCarne" class="toast" role="alert" aria-live="assertive" aria-atomic="true"
+    <!-- Toast para notificaciones -->
+    <div id="toastCarne" class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true"
          style="position: absolute; top: 20px; right: 20px; z-index: 1050;">
         <div class="toast-header">
             <strong class="me-auto">Notificación</strong>
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body" id="toast-body">
-            ¡Carne algo con éxito!
+            Mensaje de notificación aquí.
         </div>
     </div>
 
 </div>
 
 <script src="../js/carne.js"></script>
+
 </body>
 </html>

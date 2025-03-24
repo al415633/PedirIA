@@ -1,4 +1,4 @@
-package data;
+package data.carniceria;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

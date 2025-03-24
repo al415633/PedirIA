@@ -1,9 +1,6 @@
-const RETRIEVE_ALL_PESCADOS = "/pescados";
-const PESCADO_ADD = "/pescados";
-const DELETE = "/pescados/";
-const RETRIEVE_ONE_PESCADO = "/pescados/";
-const VALIDAR = "/pescados/validar";
-
+const API_PESCADOS = "/pescados";
+const GET_PESCADOS_PROPIOS = "/pescados/mis-productos";
+const VALIDAR_PESCADO = "/pescados/validar";
 
 const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "VIVO"];
 
@@ -13,9 +10,8 @@ Vue.createApp({
         return {
             // Gestión de los pescados
             pescados: [],
-            nombre: "",
-            categoria: "",
-            unidad: "",
+            nombrePescado: "",
+            unidadPescado: "",
             tipoConserva: "",
             pescadoSeleccionado: {},
             imagenNombre: '',
@@ -26,11 +22,8 @@ Vue.createApp({
             currentPage: 1,
             itemsPerPage: 8,
 
-            // Validación de datos
-            nombreError: '',
-            unidadError: '',
-            isInvalid: false
-
+            // Errores
+            errores: { nombre: '', unidad: '', general: '' }
         };
     },
     // Permite hacer visible la enumeración constante    
@@ -41,39 +34,36 @@ Vue.createApp({
         totalPages() {
             return Math.ceil(this.pescados.length / this.itemsPerPage);
         },
-        displayedItems() {
+        displayedPescados() {
             const start = (this.currentPage - 1) * this.itemsPerPage;
             return this.pescados.slice(start, start + this.itemsPerPage);
+        },
+        botonDeshabilitado() {
+            return this.errores.nombre.length > 0 || this.errores.unidad.length > 0;
         }
     },
     methods: {
         // Validación de existencia del producto basándonos en el nombre y la unidad, al crear
-        validate() {
-            if (!this.nombreCarne || !this.unidadCarne) {
-                this.nombreError = this.unidadError = '';
-                this.isInvalid = false;
+        async validatePescado() {
+            if (!this.nombrePescado || !this.unidadPescado) {
+                this.errores.nombre = this.errores.unidad = '';
                 return;
             }
-
-            axios.get(`${VALIDAR_CARNE}?nombre=${this.nombreCarne}&unidad=${this.unidadCarne}`)
-                .then(response => {
-                    if (response.data.existe) {
-                        this.nombreError = "Ya existe una carne con este nombre y unidad.";
-                        this.unidadError = "Por favor, elija un nombre o unidad diferente.";
-                        this.isInvalid = true;
-                    } else {
-                        this.nombreError = this.unidadError = '';
-                        this.isInvalid = false;
-                    }
-                })
-                .catch(error => {
-                    console.error("Error en la validación:", error);
-                    this.nombreError = "Error al validar el nombre.";
-                    this.isInvalid = true;
-                });
+            try {
+                const { data } = await axios.get(`${VALIDAR_PESCADO}?nombre=${this.nombrePescado}&unidad=${this.unidadPescado}`);
+                if (data.existe) {
+                    this.errores.nombre = "Ya existe un pescado con este nombre.";
+                    this.errores.unidad = "Por favor, elija otro nombre o unidad.";
+                } else {
+                    this.errores.nombre = this.errores.unidad = '';
+                }
+            } catch (error) {
+                console.error("Error en la validación:", error);
+                this.errores.nombre = "Error al validar.";
+            }
         },
 
-        // Captura de imagen
+        // Manejo de archivo de imagen
         onFileChange(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -83,7 +73,7 @@ Vue.createApp({
 
             const reader = new FileReader();
             reader.onload = (e) => {
-                this.imagenDatos = e.target.result;
+                this.imagenDatos = e.target.result.split(',')[1]; // Separa el encabezado de Base64
             };
             reader.readAsDataURL(file);
         },
@@ -99,91 +89,85 @@ Vue.createApp({
             this.currentPage = page;
         },
 
-        // Obtiene el listado de pescados completo
-        async getAll() {
+        async getAllPescados() {
             try {
-                const response = await axios.get(RETRIEVE_ALL_PESCADOS + "/mis-pescados");
-                this.pescados = response.data.map(pescadoArray => {
-                    const pescado = pescadoArray[0];
+                const { data } = await axios.get(`${GET_PESCADOS_PROPIOS}`);
+                this.pescados = data.map(pescadoArray => {
+                    const pescado = pescadoArray[0]; // Extrae el objeto pescado del array interno
                     return {
                         ...pescado,
-                        imagenNombre: pescadoArray[1],
-                        imagenDatos: pescadoArray[3],
-                        imagenTipo: pescadoArray[2]
+                        imagenNombre: pescadoArray[1] || "",
+                        imagenTipo: pescadoArray[2] || "",
+                        imagenDatos: pescadoArray[3] || null
                     };
                 });
-
-                // Ordenar los pescados
-                this.pescados.sort((a, b) => {
-                    if (a.nombre < b.nombre) return -1;
-                    if (a.nombre > b.nombre) return 1;
-                    return 0;
-                });
-
-                console.log("Pescados cargados:", response.data);
+                console.log(this.pescados)
+                this.pescados.sort((a, b) => a.nombre.localeCompare(b.nombre));
             } catch (error) {
-                console.error("Error al obtener los datos:", error);
+                console.error("Error al obtener pescados:", error);
             }
         },
 
-        async create() {
-            if (this.isInvalid) return;
+        // Recuperar una pescado específico
+        async retrievePescado(id) {
+            try {
+                const { data } = await axios.get(`${API_PESCADOS}/${id}`);
+                this.pescadoSeleccionado = data;
+            } catch (error) {
+                console.error("Error al recuperar el pescado:", error);
+            }
+        },
+
+        // Crear un nuevo pescado
+        async createPescado() {
+            if (this.errores.nombre || this.errores.unidad) return; // Evita si hay errores
 
             try {
-                let newPescado = {
-                    nombre: this.nombre,
-                    categoria: this.categoria,
-                    unidad: this.unidad,
+                const newPescado = {
+                    nombre: this.nombrePescado,
+                    unidad: this.unidadPescado,
                     tipoConserva: this.tipoConserva,
                     imagenNombre: this.imagenNombre,
                     imagenTipo: this.imagenTipo,
-                    imagenDatos: this.imagenDatos.split(',')[1]
+                    imagenDatos: this.imagenDatos
                 };
 
-                const response = await axios.post(PESCADO_ADD, newPescado);
-                this.pescados.push(response.data);
+                const { data } = await axios.post(API_PESCADOS, newPescado);
+                this.pescados.push(data);
                 this.pescados.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
-                // Ordenar los pescados
-                this.pescados.sort((a, b) => {
-                    if (a.nombre < b.nombre) return -1;
-                    if (a.nombre > b.nombre) return 1;
-                    return 0;
-                });
-
-                // Limpiar el formulario
-                this.nombre = "";
-                this.unidad = "";
-                this.tipoConserva = "";
-                this.imagenNombre = "";
-                this.imagenTipo = "";
-                this.imagenDatos = null;
-
-                // Mostrar el toast de éxito
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = '¡Pescado añadido con éxito!'; // Mensaje de éxito
-                const toastEl = document.getElementById('toastPescado');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-
+                // Limpiar formulario
+                this.resetForm();
+                this.showToast('¡Pescado añadido con éxito!', 'bg-success');
             } catch (error) {
                 console.error("Error al crear Pescado:", error);
-                this.showToast('Error al crear el pescado. Inténtalo de nuevo.', 'bg-danger');
+                this.showToast('Error al crear el pescado.', 'bg-danger');
             }
         },
 
-        //  Mostrar notificaciones tipo Toast
+
+        // Reinicia los campos del formulario
+        resetForm() {
+            this.nombrePescado = "";
+            this.unidadPescado = "";
+            this.tipoConserva = "";
+            this.imagenNombre = "";
+            this.imagenTipo = "";
+            this.imagenDatos = null;
+            this.errores = { nombre: '', unidad: '', general: '' };
+        },
+
+        // Mostrar notificaciones tipo Toast
         showToast(message, colorClass) {
             const toastBody = document.getElementById('toast-body');
             toastBody.textContent = message;
-            const toastEl = document.getElementById('toast');
+            const toastEl = document.getElementById('toastPescado');
             toastEl.classList.add(colorClass);
             const toast = new bootstrap.Toast(toastEl);
             toast.show();
         }
     },
-
     mounted() {
-        this.getAll();
+        this.getAllPescados();
     }
 }).mount("#app");

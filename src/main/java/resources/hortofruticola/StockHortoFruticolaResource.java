@@ -1,12 +1,14 @@
-package resources;
+package resources.hortofruticola;
 
-import data.StockHortoFruticola;
+import data.hortofruticola.StockHortoFruticola;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import services.StockHortoFruticolaDAO;
+import services.hortofruticola.HistoricoStockHortofruticolaDAO;
+import services.hortofruticola.StockHortoFruticolaDAO;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Path("/hortofruticolas/stock")
@@ -17,12 +19,16 @@ public class StockHortoFruticolaResource {
     @Inject
     StockHortoFruticolaDAO stockHortoFruticolaDAO;
 
+    @Inject
+    HistoricoStockHortofruticolaDAO stockHortofruticolaHistoricoDAO;
+
     @GET
     public List<StockHortoFruticola> obtenerTodos() {
         return stockHortoFruticolaDAO.getAll();
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/retrieve/{id}")
     public Response obtenerPorId(@PathParam("id") Long id) {
         StockHortoFruticola stockHortoFruticola = stockHortoFruticolaDAO.retrieve(id);
@@ -66,4 +72,28 @@ public class StockHortoFruticolaResource {
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }
+
+    @POST
+    @Path("/vender/{idStock}/{cantidad}")
+    public Response venderStock(@PathParam("idStock") Long idStock, @PathParam("cantidad") BigDecimal cantidadVendida) {
+        stockHortoFruticolaDAO.venderStock(idStock, cantidadVendida);
+        System.out.println("Hola");
+        return Response.ok().build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/historico/{idHortofruticola}")
+    public Response getAllHistoricoStockCarne(@PathParam("idHortofruticola") Long idHortofruticola) {
+        return Response.ok(stockHortofruticolaHistoricoDAO.obtenerHistorialPorProducto(idHortofruticola)).build();
+    }
+
+//    @GET
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @Path("/predict")
+//    public Response obtenerPrediccion() {
+//
+////        return stockPescadoDAO.getPrediction();
+//        return Response.ok(stockHortoFruticolaDAO.getPrediction()).build();
+//    }
 }

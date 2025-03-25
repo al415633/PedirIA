@@ -4,10 +4,10 @@ import data.carniceria.HistoricoCarne;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import services.HistoricoBaseDAO;
+import services.HistoricoProductoDAO;
 
 @ApplicationScoped
-public class HistoricoStockCarneDAO extends HistoricoBaseDAO<HistoricoCarne> {
+public class HistoricoStockCarneDAO extends HistoricoProductoDAO<HistoricoCarne> {
 
     @Inject
     private EntityManager em;

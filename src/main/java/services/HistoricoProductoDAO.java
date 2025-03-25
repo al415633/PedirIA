@@ -5,7 +5,7 @@ import jakarta.persistence.TypedQuery;
 import java.time.LocalDate;
 import java.util.List;
 
-public abstract class HistoricoBaseDAO<T> {
+public abstract class HistoricoProductoDAO<T> {
 
     public abstract EntityManager getEntityManager();
 

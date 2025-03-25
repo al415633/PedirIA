@@ -4,10 +4,10 @@ import data.pescaderia.HistoricoPescado;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import services.HistoricoBaseDAO;
+import services.HistoricoProductoDAO;
 
 @ApplicationScoped
-public class HistoricoStockPescadoDAO extends HistoricoBaseDAO<HistoricoPescado> {
+public class HistoricoStockPescadoDAO extends HistoricoProductoDAO<HistoricoPescado> {
 
     @Inject
     private EntityManager em;

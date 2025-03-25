@@ -7,6 +7,8 @@ const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO"];
 Vue.createApp({
     data() {
         return {
+            busquedaNombre: '',
+
             // Gestión de los hortofrutícolas
             hortofruticolas: [],
             nombreHortofruticola: "",
@@ -31,12 +33,21 @@ Vue.createApp({
         tiposConserva() {
             return TIPOS_CONSERVA;
         },
-        totalPages() {
-            return Math.ceil(this.hortofruticolas.length / this.itemsPerPage);
-        },
         displayedHortofruticolas() {
+            const filtro = this.busquedaNombre.trim().toLowerCase();
+            const hfFiltradas = this.hortofruticolas.filter(hf =>
+                hf.nombre.toLowerCase().includes(filtro)
+            );
+
             const start = (this.currentPage - 1) * this.itemsPerPage;
-            return this.hortofruticolas.slice(start, start + this.itemsPerPage);
+            return hfFiltradas.slice(start, start + this.itemsPerPage);
+        },
+        totalPages() {
+            const filtro = this.busquedaNombre.trim().toLowerCase();
+            const hfFiltradas = this.hortofruticolas.filter(hf =>
+                hf.nombre.toLowerCase().includes(filtro)
+            );
+            return Math.ceil(hfFiltradas.length / this.itemsPerPage);
         },
         botonDeshabilitado() {
             return this.errores.nombre.length > 0 || this.errores.unidad.length > 0;

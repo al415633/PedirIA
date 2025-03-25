@@ -98,6 +98,13 @@
         </form>
     </div>
 
+    <!-- Barra de búsqueda -->
+    <div class="row mb-3">
+        <div class="col-md-6 offset-md-3">
+            <input v-model="busquedaNombre" type="text" class="form-control" placeholder="Buscar por nombre de carne">
+        </div>
+    </div>
+
     <!-- Listado de carnes en formato cards -->
     <div class="row">
         <template v-for="(carne, index) in displayedCarnes" :key="carne.id">
@@ -116,6 +123,7 @@
                         </div>
                     </div>
                 </a>
+
             </div>
         </template>
     </div>

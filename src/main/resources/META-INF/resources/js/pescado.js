@@ -8,6 +8,8 @@ const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "VIVO"];
 Vue.createApp({
     data() {
         return {
+            busquedaNombre: '',
+
             // Gestión de los pescados
             pescados: [],
             nombrePescado: "",
@@ -31,12 +33,21 @@ Vue.createApp({
         tiposConserva() {
             return TIPOS_CONSERVA;
         },
-        totalPages() {
-            return Math.ceil(this.pescados.length / this.itemsPerPage);
-        },
         displayedPescados() {
+            const filtro = this.busquedaNombre.trim().toLowerCase();
+            const pescadosFiltradas = this.pescados.filter(pescado =>
+                pescado.nombre.toLowerCase().includes(filtro)
+            );
+
             const start = (this.currentPage - 1) * this.itemsPerPage;
-            return this.pescados.slice(start, start + this.itemsPerPage);
+            return pescadosFiltradas.slice(start, start + this.itemsPerPage);
+        },
+        totalPages() {
+            const filtro = this.busquedaNombre.trim().toLowerCase();
+            const pescadosFiltradas = this.pescados.filter(pescado =>
+                pescado.nombre.toLowerCase().includes(filtro)
+            );
+            return Math.ceil(pescadosFiltradas.length / this.itemsPerPage);
         },
         botonDeshabilitado() {
             return this.errores.nombre.length > 0 || this.errores.unidad.length > 0;

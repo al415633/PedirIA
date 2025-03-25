@@ -50,6 +50,7 @@ public abstract class StockProductoResource<T extends StockProducto, H> {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response agregarStock(T stock) {
+        System.out.println("Agregando stock: " + stock);
         T nuevoStock = stockDAO.agregarStock(stock);
         return Response.status(Response.Status.CREATED).entity(nuevoStock).build();
     }

@@ -9,7 +9,6 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "StockCarne")
 @AttributeOverride(name = "id", column = @Column(name = "id_stock_carne"))
-
 public class StockCarne extends StockProducto {
     @ManyToOne
     @JoinColumn(name = "id_carne", nullable = false)

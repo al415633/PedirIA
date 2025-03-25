@@ -7,11 +7,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "StockPescado")
+@Table(name = "StockHortofruticola")
 @AttributeOverride(name = "id", column = @Column(name = "id_stock_hortofruticola"))
 public class StockHortoFruticola extends StockProducto {
     @ManyToOne
-    @JoinColumn(name = "id_carne", nullable = false)
+    @JoinColumn(name = "id_hortofruticola", nullable = false)
     private HortoFruticola producto;
 
     public StockHortoFruticola() {

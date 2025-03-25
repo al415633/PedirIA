@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @AttributeOverride(name = "id", column = @Column(name = "id_stock_pescado"))
 public class StockPescado extends StockProducto {
     @ManyToOne
-    @JoinColumn(name = "id_carne", nullable = false)
+    @JoinColumn(name = "id_pescado", nullable = false)
     private Pescado producto;
 
     public StockPescado() {

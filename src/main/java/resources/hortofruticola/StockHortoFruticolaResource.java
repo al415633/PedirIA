@@ -41,7 +41,7 @@ public class StockHortoFruticolaResource {
     @GET
     @Path("/producto/{idHortoFruticola}")
     public List<StockHortoFruticola> obtenerPorIdHortoFruticola(@PathParam("idHortoFruticola") Long idHortoFruticola) {
-        return stockHortoFruticolaDAO.retrieveByHortoFruticola(idHortoFruticola);
+        return stockHortoFruticolaDAO.retrieveByProducto(idHortoFruticola);
     }
 
     @POST
@@ -85,15 +85,7 @@ public class StockHortoFruticolaResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/historico/{idHortofruticola}")
     public Response getAllHistoricoStockCarne(@PathParam("idHortofruticola") Long idHortofruticola) {
-        return Response.ok(stockHortofruticolaHistoricoDAO.obtenerHistorialPorProducto(idHortofruticola)).build();
+        return Response.ok(stockHortofruticolaHistoricoDAO.obtenerHistorialPorProducto(idHortofruticola, "HistoricoHortofruticola")).build();
     }
 
-//    @GET
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Path("/predict")
-//    public Response obtenerPrediccion() {
-//
-////        return stockPescadoDAO.getPrediction();
-//        return Response.ok(stockHortoFruticolaDAO.getPrediction()).build();
-//    }
 }

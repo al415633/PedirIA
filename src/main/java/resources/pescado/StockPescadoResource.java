@@ -42,7 +42,7 @@ public class StockPescadoResource {
     @GET
     @Path("/producto/{idPescado}")
     public List<StockPescado> obtenerPorIdCarne(@PathParam("idPescado") Long idPescado) {
-        return stockPescadoDAO.retrieveByPescado(idPescado);
+        return stockPescadoDAO.retrieveByProducto(idPescado);
     }
 
     @POST
@@ -84,7 +84,7 @@ public class StockPescadoResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/historico/{idPescado}")
     public Response getAllHistoricoStockCarne(@PathParam("idPescado") Long idPescado) {
-        return Response.ok(historicoStockPescadoDAO.obtenerHistorialPorProducto(idPescado)).build();
+        return Response.ok(historicoStockPescadoDAO.obtenerHistorialPorProducto(idPescado, "HistoricoPescado")).build();
     }
 
 }

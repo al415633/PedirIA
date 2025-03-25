@@ -4,49 +4,21 @@ import data.pescaderia.HistoricoPescado;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
-
-import java.time.LocalDate;
-import java.util.List;
+import services.HistoricoBaseDAO;
 
 @ApplicationScoped
-public class HistoricoStockPescadoDAO {
+public class HistoricoStockPescadoDAO extends HistoricoBaseDAO<HistoricoPescado> {
 
     @Inject
-    EntityManager em;
+    private EntityManager em;
 
-    /**
-     * Obtener todas las ventas históricas de un producto específico.
-     */
-    public List<HistoricoPescado> obtenerHistorialPorProducto(Long idPescado) {
-        return em.createQuery(
-                "SELECT h FROM HistoricoPescado h WHERE h.pescado.id = :idPescado ORDER BY h.fechaVenta DESC",
-                HistoricoPescado.class)
-                .setParameter("idPescado", idPescado)
-                .getResultList();
+    @Override
+    public EntityManager getEntityManager() {
+        return em;
     }
 
-    /**
-     * Obtener ventas históricas de un producto en un rango de fechas.
-     */
-    public List<HistoricoPescado> obtenerHistorialPorProductoYRangoFechas(Long idPescado, LocalDate fechaInicio, LocalDate fechaFin) {
-        TypedQuery<HistoricoPescado> query = em.createQuery(
-                "SELECT h FROM HistoricoPescado h WHERE h.pescado.id = :idPescado " +
-                "AND h.fechaVenta BETWEEN :fechaInicio AND :fechaFin ORDER BY h.fechaVenta DESC",
-                HistoricoPescado.class);
-        query.setParameter("idPescado", idPescado);
-        query.setParameter("fechaInicio", fechaInicio);
-        query.setParameter("fechaFin", fechaFin);
-        return query.getResultList();
-    }
-
-    /**
-     * Obtener todas las ventas históricas sin filtro.
-     */
-    public List<HistoricoPescado> obtenerTodosLosHistoriales() {
-        return em.createQuery(
-                "SELECT h FROM HistoricoPescado h ORDER BY h.fechaVenta DESC",
-                HistoricoPescado.class)
-                .getResultList();
+    @Override
+    protected Class<HistoricoPescado> getEntityClass() {
+        return HistoricoPescado.class;
     }
 }

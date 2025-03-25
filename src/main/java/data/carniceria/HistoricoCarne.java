@@ -10,18 +10,18 @@ public class HistoricoCarne extends HistoricoProducto {
 
     @ManyToOne
     @JoinColumn(name = "id_carne", nullable = false)
-    private Carne carne;
+    private Carne producto;
 
     public Carne getCarne() {
-        return carne;
+        return producto;
     }
 
     public void setCarne(Carne carne) {
-        this.carne = carne;
+        this.producto = carne;
     }
 
     @Override
     public String toString() {
-        return super.toString() + ", carne=" + carne;
+        return super.toString() + ", carne=" + producto;
     }
 }

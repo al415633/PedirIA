@@ -10,19 +10,19 @@ public class HistoricoPescado extends HistoricoProducto {
 
     @ManyToOne
     @JoinColumn(name = "id_pescado", nullable = false)
-    private Pescado pescado;
+    private Pescado producto;
 
     public Pescado getPescado() {
-        return pescado;
+        return producto;
     }
 
     public void setPescado(Pescado pescado) {
-        this.pescado = pescado;
+        this.producto = pescado;
     }
 
     @Override
     public String toString() {
-        return super.toString() + ", pescado=" + pescado;
+        return super.toString() + ", pescado=" + producto;
     }
 }
 

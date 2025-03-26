@@ -10,8 +10,6 @@ import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.json.simple.JSONObject;
 import pythonAdapter.JSONPacker.IJSONPacker;
-import pythonAdapter.JSONPacker.JSONHortoFruticolaPacker;
-import pythonAdapter.JSONPacker.JSONPescadoPacker;
 import pythonAdapter.PythonManager;
 
 import java.math.BigDecimal;
@@ -61,18 +59,19 @@ public class StockPescadoDAO {
         return result;
     }
     public String getPrediction() {
-        PythonManager pythonManager = new PythonManager();
-        String JSONtoFiles;
-        IJSONPacker<StockPescado> packer = new JSONPescadoPacker();
-        try {
-            JSONtoFiles = packer.packageData(getAll());
-        }catch (Exception e){
-            return "No se pudo enviar información al servidor";
-        }
-        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/tests/test5.py", JSONtoFiles);
-        packer.closeFiles();
-        String stringValue =prediction.get("message").toString();
-        return stringValue;
+//        PythonManager pythonManager = new PythonManager();
+//        String JSONtoFiles;
+//        IJSONPacker<StockPescado> packer = new JSONPescadoPacker();
+//        try {
+//            JSONtoFiles = packer.packageData(getAll());
+//        }catch (Exception e){
+//            return "No se pudo enviar información al servidor";
+//        }
+//        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/tests/test5.py", JSONtoFiles);
+//        packer.closeFiles();
+//        String stringValue =prediction.get("message").toString();
+//        return stringValue;
+        return "";
     }
 
     @Transactional

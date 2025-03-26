@@ -1,10 +1,10 @@
 package pythonAdapter.JSONPacker;
 
 import com.google.gson.Gson;
-import data.StockPescado;
+import data.StockProducto;
 import org.json.simple.JSONObject;
 import pythonAdapter.JSONConverter.IJSONConverter;
-import pythonAdapter.JSONConverter.JSONPescadoConverter;
+import pythonAdapter.JSONConverter.JSONGenericConverter;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,13 +12,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class JSONPescadoPacker implements IJSONPacker<StockPescado> {
+public class JSONGenericPacker implements IJSONPacker {
     File jsonFile;
     File csvFile;
 
     @Override
-    public String packageData(List<StockPescado> datos) throws IOException {
-        IJSONConverter<StockPescado> converter = new JSONPescadoConverter();
+    public String packageData(List<StockProducto> datos) throws IOException {
+        IJSONConverter converter = new JSONGenericConverter();
 
         String currentStock = converter.extractCurrentStock(datos);
 
@@ -43,8 +43,10 @@ public class JSONPescadoPacker implements IJSONPacker<StockPescado> {
                 writer.write(csv);
             }
             String line;
-            return "{\"csv\": \"" + csvFile.getPath() + "\", \"json\": \"" + jsonFile.getPath() + "\"}";
-    }catch(Exception e){
+            jsonFile.deleteOnExit();
+            csvFile.deleteOnExit();
+            return "{\"csv\": \"" + csvFile.getAbsolutePath().replace("\\", "/") + "\", \"json\": \"" + jsonFile.getAbsolutePath().replace("\\", "/") + "\"}";
+        }catch(Exception e){
             System.out.println("es esto");
             e.printStackTrace();
             throw e;

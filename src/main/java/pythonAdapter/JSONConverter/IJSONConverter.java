@@ -1,12 +1,13 @@
 package pythonAdapter.JSONConverter;
 
-import data.StockCarne;
+import data.Producto;
+import data.StockProducto;
 
 import java.util.List;
 
-public interface IJSONConverter<T> {
-    String extractHistoricStock(List<T> listaStock);
-    String extractCurrentStock(List<T> listaStock);
+public interface IJSONConverter {
+    String extractHistoricStock(List<StockProducto> listaStock);
+    String extractCurrentStock(List<StockProducto> listaStock);
 
 
 }

@@ -8,9 +8,6 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
-import org.json.simple.JSONObject;
-import pythonAdapter.JSONConverter;
-import pythonAdapter.PythonManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

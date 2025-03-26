@@ -1,5 +1,6 @@
 package resources;
 
+import data.HistoricoProducto;
 import data.StockProducto;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -11,7 +12,7 @@ import services.StockProductoDAO;
 import java.math.BigDecimal;
 import java.util.List;
 
-public abstract class StockProductoResource<T extends StockProducto, H> {
+public abstract class StockProductoResource<T extends StockProducto, H extends HistoricoProducto> {
 
     @Inject
     private StockProductoDAO<T> stockDAO;

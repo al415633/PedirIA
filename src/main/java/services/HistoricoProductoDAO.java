@@ -1,11 +1,13 @@
 package services;
 
+import data.HistoricoProducto;
+import data.Producto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import java.time.LocalDate;
 import java.util.List;
 
-public abstract class HistoricoProductoDAO<T> {
+public abstract class HistoricoProductoDAO<T extends HistoricoProducto> {
 
     public abstract EntityManager getEntityManager();
 

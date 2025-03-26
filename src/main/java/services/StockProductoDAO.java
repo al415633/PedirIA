@@ -1,12 +1,9 @@
 package services;
 
-import data.HistoricoProducto;
 import data.StockProducto;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 public abstract class StockProductoDAO<T extends StockProducto> {
@@ -54,16 +51,35 @@ public abstract class StockProductoDAO<T extends StockProducto> {
         return stock;
     }
 
-    // Método genérico para vender un producto del stock
+    // Métod0 genérico para vender un producto del stock
     @Transactional
     public void venderStock(Long idStock, BigDecimal cantidadVendida) {
-        // TODO
+        // Buscar el stock con el ID proporcionado
+        T stock = getEntityManager().find(getEntityClass(), idStock);
+
+        if (stock == null) {
+            throw new IllegalArgumentException("El stock con ID " + idStock + " no existe.");
+        }
+
+        // Verificar que la cantidad vendida sea menor o igual que la cantidad disponible
+        if (stock.getCantidad().compareTo(cantidadVendida) < 0) {
+            throw new IllegalArgumentException("Cantidad vendida mayor que la cantidad disponible en el stock.");
+        }
+
+        // Reducir la cantidad del stock
+        stock.setCantidad(stock.getCantidad().subtract(cantidadVendida));
+
+        // Si la cantidad llega a cero o menos, podemos eliminar el stock (opcional)
+        if (stock.getCantidad().compareTo(BigDecimal.ZERO) <= 0) {
+            getEntityManager().remove(stock);
+        } else {
+            // Si no se eliminó, actualizar el stock
+            getEntityManager().merge(stock);
+        }
     }
 
 
-
-
-    // Método abstracto para obtener la clase de la entidades específica
+    // Métod0 abstracto para obtener la clase de las entidades específica
     protected abstract Class<T> getEntityClass();
-    protected abstract Class<T> getHistoricoEntityClass();
+
 }

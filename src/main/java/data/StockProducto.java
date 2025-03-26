@@ -7,11 +7,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @MappedSuperclass
-public abstract class StockProducto<T extends Producto> {
+public abstract class StockProducto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_stock", columnDefinition = "serial")
     protected Long id;
 
     @NotNull
@@ -27,18 +26,14 @@ public abstract class StockProducto<T extends Producto> {
     @Column(name = "fecha_ingreso", nullable = false)
     protected LocalDate fechaIngreso;
 
-    @ManyToOne
-    @JoinColumn(name = "id_producto", nullable = false)
-    protected T producto;
 
     // Constructores
     public StockProducto() {}
 
-    public StockProducto(BigDecimal cantidad, LocalDate fechaVencimiento, LocalDate fechaIngreso, T producto) {
+    public StockProducto(BigDecimal cantidad, LocalDate fechaVencimiento, LocalDate fechaIngreso) {
         this.cantidad = cantidad;
         this.fechaVencimiento = fechaVencimiento;
         this.fechaIngreso = fechaIngreso;
-        this.producto = producto;
     }
 
     // Getters y Setters
@@ -54,8 +49,6 @@ public abstract class StockProducto<T extends Producto> {
     public LocalDate getFechaIngreso() { return fechaIngreso; }
     public void setFechaIngreso(LocalDate fechaIngreso) { this.fechaIngreso = fechaIngreso; }
 
-    public T getProducto() { return producto; }
-    public void setProducto(T producto) { this.producto = producto; }
 
     @Override
     public String toString() {
@@ -64,7 +57,6 @@ public abstract class StockProducto<T extends Producto> {
                 ", cantidad=" + cantidad +
                 ", fechaVencimiento=" + fechaVencimiento +
                 ", fechaIngreso=" + fechaIngreso +
-                ", producto=" + producto +
                 '}';
     }
 }

@@ -63,6 +63,8 @@
 
 <div id="app" class="container mt-4">
 
+
+
     <!-- Formulario para agregar producto -->
     <div class="card p-3 mb-4">
         <h4>Agregar Nuevo Pescado</h4>
@@ -96,6 +98,13 @@
                 </button>
             </div>
         </form>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="row mb-3">
+        <div class="col-md-6 offset-md-3">
+            <input v-model="busquedaNombre" type="text" class="form-control" placeholder="Buscar por nombre de carne">
+        </div>
     </div>
 
     <!-- Listado de pescados en formato cards -->

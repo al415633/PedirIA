@@ -22,6 +22,7 @@ public class StockHortoFruticola extends StockProducto {
         this.producto = producto;
     }
 
+    @Override
     public HortoFruticola getProducto() {
         return producto;
     }

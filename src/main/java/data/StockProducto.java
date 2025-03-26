@@ -1,5 +1,6 @@
 package data;
 
+import data.carniceria.Carne;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -49,6 +50,7 @@ public abstract class StockProducto {
     public LocalDate getFechaIngreso() { return fechaIngreso; }
     public void setFechaIngreso(LocalDate fechaIngreso) { this.fechaIngreso = fechaIngreso; }
 
+    public abstract Producto getProducto();
 
     @Override
     public String toString() {

@@ -22,6 +22,7 @@ public class StockCarne extends StockProducto {
         this.producto = producto;
     }
 
+    @Override
     public Carne getProducto() {
         return producto;
     }

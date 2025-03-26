@@ -22,6 +22,7 @@ public class StockPescado extends StockProducto {
         this.producto = producto;
     }
 
+    @Override
     public Pescado getProducto() {
         return producto;
     }

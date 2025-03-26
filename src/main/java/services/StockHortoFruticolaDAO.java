@@ -1,19 +1,17 @@
 package services;
 
-import data.StockCarne;
-import data.StockHortoFruticola;
+import java.util.List;
 
+import org.json.simple.JSONObject;
+
+import data.StockHortoFruticola;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.json.simple.JSONObject;
 import pythonAdapter.JSONPacker.IJSONPacker;
-import pythonAdapter.JSONPacker.JSONCarnePacker;
 import pythonAdapter.JSONPacker.JSONHortoFruticolaPacker;
 import pythonAdapter.PythonManager;
-
-import java.util.List;
 
 @ApplicationScoped
 public class StockHortoFruticolaDAO {
@@ -55,18 +53,34 @@ public class StockHortoFruticolaDAO {
         return em.createQuery("SELECT s FROM StockHortoFruticola s", StockHortoFruticola.class)
                 .getResultList();
     }
+
     public String getPrediction() {
         PythonManager pythonManager = new PythonManager();
         String JSONtoFiles;
         IJSONPacker<StockHortoFruticola> packer = new JSONHortoFruticolaPacker();
-        try {
-            JSONtoFiles = packer.packageData(getAll());
-        }catch (Exception e){
-            return "No se pudo enviar información al servidor";
+    
+        List<StockHortoFruticola> stockList = getAll();
+        System.out.println("Stock obtenido: " + stockList);
+    
+        if (stockList == null || stockList.isEmpty()) {
+            return "{\"error\": \"No hay datos en el stock\"}";
         }
-        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/tests/test5.py", JSONtoFiles);
-        packer.closeFiles();
-        String stringValue =prediction.get("message").toString();
+    
+        try {
+            JSONtoFiles = packer.packageData(stockList);
+            System.out.println("JSON enviado a Python: " + JSONtoFiles);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{\"error\": \"Error en la serialización de datos\"}";
+        }
+    
+        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/predictor.py", JSONtoFiles);
+        
+        if (prediction == null) {
+            return "{\"error\": \"Python no devolvió respuesta\"}";
+        }
+    
+        String stringValue = prediction.get("message").toString();
         return stringValue;
     }
 }

@@ -1,13 +1,20 @@
 package resources;
 
+import java.util.List;
+
 import data.StockHortoFruticola;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import services.StockHortoFruticolaDAO;
-
-import java.util.List;
 
 @Path("/hortofruticolas/stock")
 @Produces(MediaType.APPLICATION_JSON)
@@ -22,6 +29,19 @@ public class StockHortoFruticolaResource {
         return stockHortoFruticolaDAO.getAll();
     }
 
+    @GET
+    @Path("/prediccion")
+    public Response obtenerPrediccion() {
+        try {
+            String prediction = stockHortoFruticolaDAO.getPrediction();
+            return Response.ok("{\"message\": " + prediction + "}").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity("{\"error\": \"No se pudo obtener la predicción\"}")
+                        .build();
+        }
+    }
+    
     @GET
     @Path("/retrieve/{id}")
     public Response obtenerPorId(@PathParam("id") Long id) {

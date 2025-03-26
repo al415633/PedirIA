@@ -80,7 +80,7 @@ public class StockCarneDAO {
             return "{\"error\": \"Error en la serialización de datos\"}";
         }
     
-        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/predecir_carnes.py", JSONtoFiles);
+        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/predictor.py", JSONtoFiles);
         
         if (prediction == null) {
             return "{\"error\": \"Python no devolvió respuesta\"}";

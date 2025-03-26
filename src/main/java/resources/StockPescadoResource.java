@@ -1,17 +1,23 @@
 package resources;
 
 
-import data.StockPescado;
-import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import services.HistoricoStockCarneDAO;
-import services.HistoricoStockPescadoDAO;
-import services.StockPescadoDAO;
-
 import java.math.BigDecimal;
 import java.util.List;
+
+import data.StockPescado;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import services.HistoricoStockPescadoDAO;
+import services.StockPescadoDAO;
 
 @Path("/pescados/stock")
 @Produces(MediaType.APPLICATION_JSON)
@@ -29,6 +35,19 @@ public class StockPescadoResource {
         return stockPescadoDAO.getAll();
     }
 
+    @GET
+    @Path("/prediccion")
+    public Response obtenerPrediccion() {
+        try {
+            String prediction = stockPescadoDAO.getPrediction();
+            return Response.ok("{\"message\": " + prediction + "}").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity("{\"error\": \"No se pudo obtener la predicción\"}")
+                        .build();
+        }
+    }
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/retrieve/{id}")

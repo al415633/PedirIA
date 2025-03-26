@@ -22,7 +22,7 @@
 </head>
 <body>
 <header class="d-flex align-items-center px-4">
-    <a href="principal_mensajeria.html">
+    <a href="menu_productos.html">
         <img src="./static/logo.png" alt="Logo Empresa">
     </a>
     <h1>Predicción de Stock a Futuro</h1>
@@ -64,7 +64,7 @@
         methods: {
             async cargarPredicciones() {
                 try {
-                    const response = await axios.get("http://localhost:8080/api/carnes/stock/prediccion");
+                    const response = await axios.get("http://localhost:8080/api/pescados/stock/prediccion");
                     this.predicciones = JSON.parse(response.data.message);
                 } catch (error) {
                     console.error("Error al obtener predicciones:", error);

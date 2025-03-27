@@ -1,10 +1,10 @@
-package pythonAdapter.JSONPacker;
+package pythonAdapter.jsonPacker;
 
 import com.google.gson.Gson;
 import data.StockProducto;
 import org.json.simple.JSONObject;
-import pythonAdapter.JSONConverter.IJSONConverter;
-import pythonAdapter.JSONConverter.JSONGenericConverter;
+import pythonAdapter.jsonConverter.AbstractJSONConverter;
+import pythonAdapter.jsonConverter.JSONCarneConverter;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,13 +12,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class JSONGenericPacker implements IJSONPacker {
+public abstract class AbstractJSONPacker<T extends StockProducto> {
+    AbstractJSONConverter<T> converter;
     File jsonFile;
     File csvFile;
 
-    @Override
-    public String packageData(List<StockProducto> datos) throws IOException {
-        IJSONConverter converter = new JSONGenericConverter();
+    public String packageData(List<T> datos) throws IOException {
+//        AbstractJSONConverter<T> converter = new JSONCarneConverter();
 
         String currentStock = converter.extractCurrentStock(datos);
 
@@ -53,11 +53,11 @@ public class JSONGenericPacker implements IJSONPacker {
         }
     }
 
-    @Override
     public void closeFiles() {
         if (!jsonFile.delete())
             jsonFile.deleteOnExit();
         if (!csvFile.delete())
             csvFile.deleteOnExit();
     }
+
 }

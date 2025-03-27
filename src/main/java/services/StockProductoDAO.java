@@ -1,17 +1,20 @@
 package services;
 
-import data.HistoricoProducto;
 import data.StockProducto;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import org.json.simple.JSONObject;
+import pythonAdapter.PythonManager;
+import pythonAdapter.jsonPacker.AbstractJSONPacker;
+import pythonAdapter.jsonPacker.JSONCarnePacker;
+
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 public abstract class StockProductoDAO<T extends StockProducto> {
 
     public abstract EntityManager getEntityManager();
+    public AbstractJSONPacker<T> packer;
 
     // Agregar un nuevo stock
     @Transactional
@@ -59,11 +62,37 @@ public abstract class StockProductoDAO<T extends StockProducto> {
     public void venderStock(Long idStock, BigDecimal cantidadVendida) {
         // TODO
     }
-
-
-
-
     // Método abstracto para obtener la clase de la entidades específica
     protected abstract Class<T> getEntityClass();
     protected abstract Class<T> getHistoricoEntityClass();
+
+    public String getPrediction() {
+        PythonManager pythonManager = new PythonManager();
+        String JSONtoFiles;
+
+        List<T> stockList = getAll();
+        System.out.println("Stock obtenido: " + stockList);
+
+        if (stockList == null || stockList.isEmpty()) {
+            return "{\"error\": \"No hay datos en el stock\"}";
+        }
+
+        try {
+            JSONtoFiles = packer.packageData(stockList);
+            System.out.println("JSON enviado a Python: " + JSONtoFiles);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{\"error\": \"Error en la serialización de datos\"}";
+        }
+
+        JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/predictor.py", JSONtoFiles);
+        packer.closeFiles();
+        if (prediction == null) {
+            return "{\"error\": \"Python no devolvió respuesta\"}";
+        }
+
+        String stringValue = prediction.get("message").toString();
+
+        return stringValue;
+    }
 }

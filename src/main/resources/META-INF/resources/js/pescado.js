@@ -1,14 +1,6 @@
-const RETRIEVE_ALL_PESCADOS = "/pescados";
-const POST = "/pescados/create";
-const DELETE = "/pescados/delete/";
-const RETRIEVE_ONE_PESCADO = "/pescados/retrieve/";
-const UPDATE = "/pescados/update";
-
-const STOCK_RETRIEVE_ONE = "/pescados/stock/retrieve/";
-const STOCK_RETRIEVE = "/pescados/stock/producto/";
-const STOCK_ADD = "/pescados/stock";
-const STOCK_UPDATE = "/pescados/stock/";
-const STOCK_DELETE = "/pescados/stock/";
+const API_PESCADOS = "/pescados";
+const GET_PESCADOS_PROPIOS = "/pescados/mis-productos";
+const VALIDAR_PESCADO = "/pescados/validar";
 
 const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "VIVO"];
 
@@ -16,294 +8,176 @@ const TIPOS_CONSERVA = ["REFRIGERADO", "FRESCO", "CONGELADO", "VIVO"];
 Vue.createApp({
     data() {
         return {
+            busquedaNombre: '',
 
             // Gestión de los pescados
             pescados: [],
             nombrePescado: "",
-            categoriaPescado: "",
             unidadPescado: "",
             tipoConserva: "",
             pescadoSeleccionado: {},
+            imagenNombre: '',
+            imagenTipo: '',
+            imagenDatos: null,
 
-            // Gestión stock
-            stocks: [],
-            cantidadStock: 0,
-            fechaIngresoStock: '',
-            fechaVencimientoStock: '',
-            mostrarStock: false,
-            stockSeleccionado: {},
+            // Paginación ¡
+            currentPage: 1,
+            itemsPerPage: 8,
+
+            // Errores
+            errores: { nombre: '', unidad: '', general: '' }
         };
     },
-
     // Permite hacer visible la enumeración constante    
     computed: {
         tiposConserva() {
             return TIPOS_CONSERVA;
+        },
+        displayedPescados() {
+            const filtro = this.busquedaNombre.trim().toLowerCase();
+            const pescadosFiltradas = this.pescados.filter(pescado =>
+                pescado.nombre.toLowerCase().includes(filtro)
+            );
+
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            return pescadosFiltradas.slice(start, start + this.itemsPerPage);
+        },
+        totalPages() {
+            const filtro = this.busquedaNombre.trim().toLowerCase();
+            const pescadosFiltradas = this.pescados.filter(pescado =>
+                pescado.nombre.toLowerCase().includes(filtro)
+            );
+            return Math.ceil(pescadosFiltradas.length / this.itemsPerPage);
+        },
+        botonDeshabilitado() {
+            return this.errores.nombre.length > 0 || this.errores.unidad.length > 0;
         }
     },
-
     methods: {
-
-        // Obtiene el listado de pescados completo
-        async getAllPescados() {
+        // Validación de existencia del producto basándonos en el nombre y la unidad, al crear
+        async validatePescado() {
+            if (!this.nombrePescado || !this.unidadPescado) {
+                this.errores.nombre = this.errores.unidad = '';
+                return;
+            }
             try {
-                const response = await axios.get(RETRIEVE_ALL_PESCADOS);
-                this.pescados = response.data;
-
-                // Ordenar los pescados
-                this.pescados.sort((a, b) => {
-                    if (a.nombre < b.nombre) return -1;
-                    if (a.nombre > b.nombre) return 1;
-                    return 0;
-                });
-
-                console.log("Pescados cargados:", response.data);
+                const { data } = await axios.get(`${VALIDAR_PESCADO}?nombre=${this.nombrePescado}&unidad=${this.unidadPescado}`);
+                if (data.existe) {
+                    this.errores.nombre = "Ya existe un pescado con este nombre.";
+                    this.errores.unidad = "Por favor, elija otro nombre o unidad.";
+                } else {
+                    this.errores.nombre = this.errores.unidad = '';
+                }
             } catch (error) {
-                console.error("Error al obtener los datos:", error);
+                console.error("Error en la validación:", error);
+                this.errores.nombre = "Error al validar.";
             }
         },
 
-        // Para cargar los datos del pescado a modificar
-        async retrievePescado(index) {
+        // Manejo de archivo de imagen
+        onFileChange(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            this.imagenNombre = file.name;
+            this.imagenTipo = file.type;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.imagenDatos = e.target.result.split(',')[1]; // Separa el encabezado de Base64
+            };
+            reader.readAsDataURL(file);
+        },
+
+        // Métodos para paginación
+        prevPage() {
+            if (this.currentPage > 1) this.currentPage--;
+        },
+        nextPage() {
+            if (this.currentPage < this.totalPages) this.currentPage++;
+        },
+        goToPage(page) {
+            this.currentPage = page;
+        },
+
+        async getAllPescados() {
             try {
-                const pescadoId = this.pescados[index].id;
-                console.log("Recuperando Pescado con ID:", pescadoId);
-                const response = await axios.get(RETRIEVE_ONE_PESCADO + pescadoId);
-                this.pescadoSeleccionado = response.data;
+                const { data } = await axios.get(`${GET_PESCADOS_PROPIOS}`);
+                this.pescados = data.map(pescadoArray => {
+                    const pescado = pescadoArray[0]; // Extrae el objeto pescado del array interno
+                    return {
+                        ...pescado,
+                        imagenNombre: pescadoArray[1] || "",
+                        imagenTipo: pescadoArray[2] || "",
+                        imagenDatos: pescadoArray[3] || null
+                    };
+                });
+                console.log(this.pescados)
+                this.pescados.sort((a, b) => a.nombre.localeCompare(b.nombre));
+            } catch (error) {
+                console.error("Error al obtener pescados:", error);
+            }
+        },
+
+        // Recuperar una pescado específico
+        async retrievePescado(id) {
+            try {
+                const { data } = await axios.get(`${API_PESCADOS}/${id}`);
+                this.pescadoSeleccionado = data;
             } catch (error) {
                 console.error("Error al recuperar el pescado:", error);
             }
         },
 
+        // Crear un nuevo pescado
         async createPescado() {
+            if (this.errores.nombre || this.errores.unidad) return; // Evita si hay errores
+
             try {
-                let newPescado = {
+                const newPescado = {
                     nombre: this.nombrePescado,
-                    categoria: this.categoriaPescado,
                     unidad: this.unidadPescado,
-                    tipoConserva: this.tipoConserva
+                    tipoConserva: this.tipoConserva,
+                    imagenNombre: this.imagenNombre,
+                    imagenTipo: this.imagenTipo,
+                    imagenDatos: this.imagenDatos
                 };
 
-                const response = await axios.post(POST, newPescado);
-                console.log("Pescado creado:", newPescado);
+                const { data } = await axios.post(API_PESCADOS, newPescado);
+                this.pescados.push(data);
+                this.pescados.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
-                // Agregar el nuevo pescado al listado localmente
-                console.log("Pescado devuelto por API:", response.data);
-                this.pescados.push(response.data); // Suponiendo que la respuesta contiene el objeto creado
-
-                // Ordenar los pescados
-                this.pescados.sort((a, b) => {
-                    if (a.nombre < b.nombre) return -1;
-                    if (a.nombre > b.nombre) return 1;
-                    return 0;
-                });
-
-                // Limpiar los campos después de crear
-                this.nombrePescado = "";
-                this.categoriaPescado = "";
-                this.unidadPescado = "";
-                this.tipoConserva = "";
-
-                // Mostrar el toast de éxito
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = '¡Pescado añadido con éxito!'; // Mensaje de éxito
-                const toastEl = document.getElementById('toastPescado');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-
+                // Limpiar formulario
+                this.resetForm();
+                this.showToast('¡Pescado añadido con éxito!', 'bg-success');
             } catch (error) {
                 console.error("Error al crear Pescado:", error);
+                this.showToast('Error al crear el pescado.', 'bg-danger');
             }
         },
 
-        // Se llama una vez se pulsa guardar en el modal de edición
-        async updatePescado() {
-            try {
-                if (!this.pescadoSeleccionado.id) {
-                    console.error("Error: ID de pescado no definido.");
-                    return;
-                }
-                console.log("Actualizando Pescado:", this.pescadoSeleccionado);
 
-                // Mostrar un mensaje de carga
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = 'Actualizando pescado...'; // Mensaje de carga
-                const toastEl = document.getElementById('toastPescado');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-
-                // Realizar la solicitud de actualización
-                const response = await axios.put(UPDATE, this.pescadoSeleccionado);
-
-                // Verificar si la respuesta es exitosa
-                if (response.status === 204) { // 204 No Content indica éxito, lógica en el resource
-                    // Actualizar el listado de pescados localmente
-                    const index = this.pescados.findIndex(pescado => pescado.id === this.pescadoSeleccionado.id);
-                    if (index !== -1) {
-                        this.pescados.splice(index, 1, { ...this.pescadoSeleccionado }); // Reemplaza el elemento modificado
-                    }
-
-                    // Ordenar los pescados después de la actualización
-                    this.pescados.sort((a, b) => a.nombre.localeCompare(b.nombre));
-
-                    // Cerrar el modal manualmente
-                    let modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-                    if (modal) {
-                        modal.hide();
-                    }
-
-                    // Mostrar el toast de éxito
-                    toastBody.textContent = '¡Pescado actualizada con éxito!'; // Mensaje de éxito
-                    toastEl.classList.add('bg-success'); // Cambiar el color de fondo a verde
-                    toast.show();
-                } else {
-                    // Lanzar una excepción si la respuesta no es 204
-                    throw new Error('Error inesperado al actualizar el pescado. Código de estado: ' + response.status);
-                }
-            } catch (error) {
-                console.error("Error al actualizar el pescado:", error);
-                // Mostrar el toast de error
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = 'Ocurrió un error al actualizar el pescado. Por favor, intenta nuevamente.';
-                const toastEl = document.getElementById('toastPescado');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-            }
-        },
-        // Llama al modal para confirmar el borrado
-        async deletePescado(index) {
-            // Mostrar el modal de confirmación
-            const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
-            modal.show();
-
-            // Asignar el índice a un atributo del modal para usarlo en la confirmación
-            const confirmButton = document.getElementById('confirmDeleteButton');
-            confirmButton.onclick = () => {
-                // Cerrar el modal aquí para evitar problemas
-                modal.hide();
-                this.confirmDelete(index);
-            };
+        // Reinicia los campos del formulario
+        resetForm() {
+            this.nombrePescado = "";
+            this.unidadPescado = "";
+            this.tipoConserva = "";
+            this.imagenNombre = "";
+            this.imagenTipo = "";
+            this.imagenDatos = null;
+            this.errores = { nombre: '', unidad: '', general: '' };
         },
 
-        // Se encarga de comunicar con backend y eliminar el pescado
-        async confirmDelete(index) {
-            // Verificar que el índice sea válido
-            if (index < 0 || index >= this.pescados.length) {
-                console.error("Índice de pescado no válido:", index);
-                return;
-            }
-
-            try {
-                const pescadoId = this.pescados[index].id;
-                console.log("Eliminando Pescado con ID:", pescadoId);
-                await axios.delete(DELETE + pescadoId);
-
-                // Añadir comprobación de que se borra correctamente
-
-                // Eliminar del listado localmente
-                this.pescados.splice(index, 1);
-
-                // Mostrar el toast de éxito
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = '¡Pescado eliminada con éxito!'; // Mensaje de éxito
-                const toastEl = document.getElementById('toastPescado');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-
-            } catch (error) {
-                console.error("Error al eliminar Pescado:", error);
-                // Mostrar el toast de error
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = 'Ocurrió un error al eliminar el pescado. Por favor, intenta nuevamente.';
-                const toastEl = document.getElementById('toastPescado');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-            }
-        },
-
-        // Métodos de gestión del stock
-
-        // Obtiene el listado de stock para la carne seleccionada
-        async getStockByProduct(productId) {
-            try {
-                const response = await axios.get(STOCK_RETRIEVE + productId);
-                this.stocks = response.data;
-            } catch (error) {
-                console.error("Error al obtener el stock:", error);
-            }
-        },
-
-        // Para seleccionar una carne y cargar su stock
-        async retrieveStockandProduct(index) {
-            try {
-                const productID = this.pescados[index].id;
-                const response = await axios.get(RETRIEVE_ONE_PESCADO + productID);
-                this.pescadoSeleccionado = response.data;
-                console.log("Pescado obtenido: ", response.data)
-
-                await this.getStockByProduct(productID);
-                this.mostrarStock = true;
-
-            } catch (error) {
-                console.error("Error al cargar el producto el stock:", error);
-                this.mostrarStock = false;
-            }
-        },
-
-        // Se emplea para agregar stock
-        async agregarStock() {
-            try {
-                console.log("Pescado seleccionado: ", this.pescadoSeleccionado)
-
-                const nuevoStock = {
-                    cantidad: this.cantidadStock,
-                    fechaIngreso: this.fechaIngresoStock,
-                    fechaVencimiento: this.fechaVencimientoStock,
-                    pescado: this.pescadoSeleccionado
-                };
-
-                const response = await axios.post(STOCK_ADD, nuevoStock);
-
-                this.stocks.push(response.data);
-
-                // Ordenar con algún criterio
-
-                this.cantidadStock = 0;
-                this.fechaIngresoStock = '';
-                this.fechaVencimientoStock = '';
-
-                // Mostrar mensaje de éxito
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = '¡Stock agregado con éxito!';
-                const toastEl = document.getElementById('toastPescado');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-
-            } catch (error) {
-                console.error("Error al agregar stock:", error);
-            }
-        },
-
-        // Para eliminar stock
-        async eliminarStock(index) {
-            const stockId = this.stocks[index].id;
-            try {
-                await axios.delete(STOCK_DELETE + stockId);
-                this.stocks.splice(index, 1);
-
-                // Mostrar mensaje de éxito
-                const toastBody = document.getElementById('toast-body');
-                toastBody.textContent = '¡Stock eliminado con éxito!';
-                const toastEl = document.getElementById('toastPescado');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-
-            } catch (error) {
-                console.error("Error al eliminar stock:", error);
-            }
-        },
+        // Mostrar notificaciones tipo Toast
+        showToast(message, colorClass) {
+            const toastBody = document.getElementById('toast-body');
+            toastBody.textContent = message;
+            const toastEl = document.getElementById('toastPescado');
+            toastEl.classList.add(colorClass);
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
     },
-
     mounted() {
         this.getAllPescados();
     }

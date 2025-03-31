@@ -1,7 +1,7 @@
 package pythonAdapter;
 
 import com.google.gson.Gson;
-import data.StockCarne;
+import data.carniceria.StockCarne;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.json.simple.JSONObject;
 
@@ -20,7 +20,7 @@ public class JSONConverter {
             stringBuilder
                     .append(stock.getFechaIngreso().toString())
                     .append(", ")
-                    .append(stock.getCarne().getNombre())
+                    .append(stock.getProducto().getNombre())
                     .append(", ")
                     .append(stock.getCantidad())
                     .append("\n");
@@ -35,7 +35,7 @@ public class JSONConverter {
 
         for (StockCarne stock : listaStock){
             if (stock.getFechaIngreso().isBefore(LocalDate.now()) && stock.getFechaVencimiento().isAfter(LocalDate.now()))
-                carneMap.compute(stock.getCarne().getNombre(),(key, old)-> (old == null) ? stock.getCantidad() : old.add(stock.getCantidad()));
+                carneMap.compute(stock.getProducto().getNombre(),(key, old)-> (old == null) ? stock.getCantidad() : old.add(stock.getCantidad()));
         }
 
 //        for (Map.Entry<String,BigDecimal> par: carneMap.entrySet()){
@@ -62,7 +62,7 @@ public class JSONConverter {
 
         for (StockCarne stock : listaStock){
             if (stock.getFechaIngreso().isBefore(LocalDate.now()) && stock.getFechaVencimiento().isAfter(LocalDate.now()))
-                carneMap.compute(stock.getCarne().getNombre(),(key, old)-> (old == null) ? stock.getCantidad() : old.add(stock.getCantidad()));
+                carneMap.compute(stock.getProducto().getNombre(),(key, old)-> (old == null) ? stock.getCantidad() : old.add(stock.getCantidad()));
         }
         for (Map.Entry<String,BigDecimal> par: carneMap.entrySet()){
             stringBuilder

@@ -1,5 +1,6 @@
 package data;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import data.Usuario;
 import jakarta.persistence.*;
@@ -23,10 +24,17 @@ public class ComercioDetails {
     @Column(name = "tipo_negocio")
     private String tipo_negocio;
 
-    @OneToOne
+/*    @OneToOne
     @MapsId // Indica que usa el mismo ID que Usuario
     @JoinColumn(name = "id_negocio")
     @JsonIgnore
+    private Usuario usuario;*/
+
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id_negocio")
+    @JsonBackReference
     private Usuario usuario;
 
     @Override

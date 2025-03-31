@@ -162,20 +162,6 @@ Vue.createApp({
             }
         },
 
-        // Eliminar carne
-        async deleteCarne(id) {
-            if (!confirm("¿Estás seguro de que quieres eliminar esta carne?")) return;
-
-            try {
-                await axios.delete(`${API_CARNES}/${id}`);
-                this.carnes = this.carnes.filter(carne => carne.id !== id);
-                this.showToast('Carne eliminada correctamente.', 'bg-success');
-            } catch (error) {
-                console.error("Error al eliminar carne:", error);
-                this.showToast('Error al eliminar la carne.', 'bg-danger');
-            }
-        },
-
         // Reinicia los campos del formulario
         resetForm() {
             this.nombreCarne = "";

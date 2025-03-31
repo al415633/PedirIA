@@ -84,8 +84,15 @@ public abstract class StockProductoResource<T extends StockProducto, H extends H
     @POST
     @Path("/vender/{idStock}/{cantidad}")
     public Response venderStock(@PathParam("idStock") Long idStock, @PathParam("cantidad") BigDecimal cantidadVendida) {
-        stockDAO.venderStock(idStock, cantidadVendida);
-        return Response.ok().build();
+        try {
+            stockDAO.venderStock(idStock, cantidadVendida);
+            StockProducto stockProducto = stockDAO.retrieve(idStock);
+            historicoDAO.addHistorico(stockProducto, cantidadVendida);
+            return Response.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // Obtener historial de ventas por producto

@@ -82,7 +82,10 @@
 
             <!-- Botón para abrir el modal de edición -->
             <button class="btn btn-warning w-100" @click="openEditHortofruticolaModal"> Editar Hortofruticola</button>
+            <button class="btn btn-danger w-100 mt-2" @click="openDeleteModal">Eliminar Hortofrutícola</button>
+
         </div>
+
 
         <!--  Modal para editar Hortofruticola -->
         <div class="modal fade" id="editHortofruticolaModal" tabindex="-1" aria-hidden="true">
@@ -162,7 +165,7 @@
                     </thead>
                     <tbody>
                     <tr v-for="stock in sortedCurrentStock" :key="stock.id">
-                        <td>{{ stock.cantidad }}</td>
+                        <td>{{ stock.cantidadFormateada }}</td>
                         <td>{{ formatDate(stock.fechaIngreso) }}</td>
                         <td>{{ formatDate(stock.fechaVencimiento) }}</td>
                         <td>
@@ -187,8 +190,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="venta in historicoStock" :key="venta.id">
-                        <td>{{ venta.cantidad }}</td>
+                    <tr v-for="venta in sortedCurrentHistorico" :key="venta.id">
+                        <td>{{ venta.cantidadFormateada }}</td>
                         <td>{{ formatDate(venta.fechaVenta) }}</td>
                         <td>{{ formatDate(venta.fechaIngreso) }}</td>
                         <td>{{ formatDate(venta.fechaVencimiento) }}</td>
@@ -212,7 +215,7 @@
                     <form @submit.prevent="updateStock">
                         <div class="mb-3">
                             <label class="form-label">Cantidad</label>
-                            <input type="number" class="form-control" v-model="editingStock.cantidad" required min="0" step="0.001">
+                            <input type="number" class="form-control" v-model="editingStock.cantidad" readonly required min="0" step="0.001">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Fecha de Ingreso</label>
@@ -275,9 +278,28 @@
         </div>
     </div>
 
+    <!-- Modal de confirmación de eliminación -->
+    <div class="modal fade" id="deleteHortofruticolaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea eliminar este producto?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" @click="deleteHortofruticola">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<script src="../js/hf.js"></script>
+<script src="../js/stockHortofruticola.js"></script>
 
 
 </body>

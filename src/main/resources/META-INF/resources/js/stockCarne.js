@@ -117,6 +117,7 @@ createApp({
         },
         editStock(stock) {
             this.editingStock = JSON.parse(JSON.stringify(stock));
+            console.log(this.editingStock)
             new bootstrap.Modal(document.getElementById("editStockModal")).show();
         },
         updateStock() {

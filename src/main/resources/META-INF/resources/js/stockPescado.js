@@ -35,8 +35,18 @@ createApp({
                 .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
                 .map(stock => ({
                     ...stock,
-                    cantidad: this.formatNumber(stock.cantidad) + " " + (this.product.unidad || "")
+                    cantidadFormateada: this.formatNumber(stock.cantidad) + " " + (this.product.unidad || "")
                 }));
+        },
+        sortedCurrentHistorico() {
+            return [...this.historicoStock]
+                .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
+                .map(historico => {
+                    return {
+                        ...historico,
+                        cantidadFormateada: this.formatNumber(historico.cantidad) + " " + (this.product.unidad || "")
+                    };
+                });
         }
     },
     methods: {
@@ -104,7 +114,8 @@ createApp({
                 .catch(error => console.error("Error al cargar el historial:", error));
         },
         editStock(stock) {
-            this.editingStock = JSON.parse(JSON.stringify(stock)); // Evita modificar el original directamente
+            this.editingStock = JSON.parse(JSON.stringify(stock));
+            console.log(this.editingStock)
             new bootstrap.Modal(document.getElementById("editStockModal")).show();
         },
         updateStock() {

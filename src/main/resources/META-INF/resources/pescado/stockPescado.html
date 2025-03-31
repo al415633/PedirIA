@@ -176,7 +176,7 @@
                     </thead>
                     <tbody>
                     <tr v-for="stock in sortedCurrentStock" :key="stock.id">
-                        <td>{{ stock.cantidad }}</td>
+                        <td>{{ stock.cantidadFormateada }}</td>
                         <td>{{ formatDate(stock.fechaIngreso) }}</td>
                         <td>{{ formatDate(stock.fechaVencimiento) }}</td>
                         <td>
@@ -203,8 +203,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="venta in historicoStock" :key="venta.id">
-                        <td>{{ venta.cantidad }}</td>
+                    <tr v-for="venta in sortedCurrentHistorico" :key="venta.id">
+                        <td>{{ venta.cantidadFormateada }}</td>
                         <td>{{ formatDate(venta.fechaVenta) }}</td>
                         <td>{{ formatDate(venta.fechaIngreso) }}</td>
                         <td>{{ formatDate(venta.fechaVencimiento) }}</td>
@@ -229,7 +229,7 @@
                                 <label class="form-label">Cantidad</label>
                                 <input type="number" class="form-control" v-model="editingStock.cantidad" required
                                        min="0"
-                                       step="0.001">
+                                       step="0.001" readonly>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Fecha de Ingreso</label>

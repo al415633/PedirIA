@@ -29,6 +29,16 @@ public class ComercioDAOJPA implements ComercioDao{
         }
     }
 
+    public ComercioDetails getComercioPorId(Long idNegocio) {
+        try {
+            return em.createQuery("SELECT n FROM Negocio n WHERE n.idNegocio = :idNegocio", ComercioDetails.class)
+                    .setParameter("idNegocio", idNegocio)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public boolean existeCorreo(String correo) {
         return getComercioPorCorreo(correo) != null;
     }

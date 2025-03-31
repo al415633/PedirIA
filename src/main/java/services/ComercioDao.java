@@ -11,6 +11,7 @@ public interface ComercioDao {
     List<Usuario> getComercios();
 
     Usuario getComercioPorCorreo(String correo);
+    public ComercioDetails getComercioPorId(Long idNegocio);
 
     boolean existeCorreo(String correo);
 

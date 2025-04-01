@@ -13,7 +13,7 @@ public interface OfertaDao {
 
     Oferta getOfertaPorId(Long id_oferta);
 
-    boolean existeId(Long id_oferta);
+    boolean existeOferta(Long id_oferta);
 
     Oferta crearOferta(Oferta oferta);
 

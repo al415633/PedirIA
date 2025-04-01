@@ -33,10 +33,6 @@ public class OfertaDAOJPA implements OfertaDao {
     }
 
     @Override
-    public boolean existeId(Long id_oferta) {
-        return getOfertaPorId(id_oferta) != null;
-    }
-
     public boolean existeOferta(Long id_oferta) {
         return getOfertaPorId(id_oferta) != null;
     }
@@ -46,12 +42,17 @@ public class OfertaDAOJPA implements OfertaDao {
         em.persist(oferta);
         em.flush();
 
+
+
         return oferta;
     }
 
     @Transactional
     public boolean actualizarOferta(Oferta oferta) {
         Oferta ofertaExistente = getOfertaPorId(oferta.getId_oferta());
+        if (ofertaExistente == null) {
+            return false;
+        }
 
         ofertaExistente.setLugar(oferta.getLugar());
         ofertaExistente.setId_aprovechante(oferta.getId_aprovechante());
@@ -65,6 +66,7 @@ public class OfertaDAOJPA implements OfertaDao {
 
         return true;
     }
+
 
     @Transactional
     public boolean eliminarOferta(Long id_oferta) {

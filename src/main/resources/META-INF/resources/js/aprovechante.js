@@ -173,7 +173,7 @@ Vue.createApp({
                         this.correo = aprovechante.correo;
                         this.tipoAprovechante = aprovechante.aprovechante.tipo_aprovechante; // Tipo de comercio
                         this.condiciones = aprovechante.aprovechante.condiciones; // condiciones
-                        this.condiciones2 = aprovechante.aproovechante.condiciones2; // condiciones2
+                        this.condiciones2 = aprovechante.aprovechante.condiciones2; // condiciones2
                         this.password = aprovechante.password;
 
                     })

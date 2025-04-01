@@ -3,6 +3,7 @@ const POST = "/aprovechante/create";
 const DELETE = "/aprovechante/delete/";
 const RETRIEVE_ONE = "/aprovechante/login";
 const UPDATE = "/aprovechante/update";
+const LOGOUT = "/aprovechante/logout";
 
 
 
@@ -148,6 +149,47 @@ Vue.createApp({
             return null;
         }
         ,
+
+        async deletAprovechante(correo) {
+            // Construimos la URL para el DELETE con el correo como parámetro
+            const url = `${DELETE}${correo}`;
+
+            try {
+                // Realizamos la solicitud DELETE al backend
+                const response = await axios.delete(url);
+
+                // Verificamos si la eliminación fue exitosa
+                if (response.status === 204) {
+                    alert("Aprovechante eliminado con éxito");
+                    window.location.href = "index.html"; // Redirigir a otra página si es necesario
+                } else {
+                    throw new Error("Error en la eliminación");
+                }
+            } catch (error) {
+                console.error("Error al eliminar aprovechante:", error);
+                alert("Hubo un problema con la eliminación del aprovechante.");
+                window.location.href = "registroError.html"; // Redirigir en caso de error
+            }
+        }
+        ,
+        async logoutAprovechante() {
+            try {
+                // Realizamos la solicitud POST al backend para cerrar sesión
+                const response = await axios.post(LOGOUT);
+
+                // Verificamos si la respuesta fue exitosa
+                if (response.status === 200) {
+                    alert("Sesión cerrada con éxito");
+                    window.location.href = "login.html"; // Redirigir al login o a la página deseada
+                } else {
+                    throw new Error("Error al cerrar sesión");
+                }
+            } catch (error) {
+                console.error("Error al cerrar sesión:", error);
+                alert("Hubo un problema al cerrar sesión.");
+                window.location.href = "registroError.html"; // Redirigir en caso de error
+            }
+        }
     },
     mounted() {
         // Solo ejecutar si estás en la página de modificar

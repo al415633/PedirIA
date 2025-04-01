@@ -31,8 +31,8 @@ public class Usuario {
     @JsonManagedReference
     private ComercioDetails negocio;
 
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private AprovechanteDetails aprovechante;
 
     @Override

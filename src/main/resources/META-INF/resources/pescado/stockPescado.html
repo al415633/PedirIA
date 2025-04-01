@@ -41,6 +41,10 @@
             align-items: center;
             width: 300px;
         }
+        .clickable {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
     </style>
 </head>
 <body>
@@ -119,11 +123,11 @@
         <div class="col-md-8">
             <!-- Navbar de selección -->
             <ul class="nav nav-tabs">
-                <li class="nav-item">
+                <li class="nav-item clickable">
                     <a class="nav-link" :class="{ active: activeTab === 'stock' }" @click="activeTab = 'stock'">Stock Actual</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" :class="{ active: activeTab === 'historico' }" @click="loadHistorico">Histórico de Ventas</a>
+                    <a class="nav-link clickable" :class="{ active: activeTab === 'historico' }" @click="loadHistorico">Histórico de Ventas</a>
                 </li>
             </ul>
 

@@ -47,7 +47,8 @@ public abstract class ProductoDAO<T extends Producto> {
     public T retrieve(Long id) {
         Query q = em.createNativeQuery(
                 "SELECT c." + idColumn + ", c.nombre, c.unidad, c.tipo_conserva, c.id_img, " +
-                        "i.nombre AS imagenNombre, i.tipo AS imagenTipo, i.datos AS imagenDatos " +
+                        "i.nombre AS imagenNombre, i.tipo AS imagenTipo, i.datos AS imagenDatos, " +
+                        "c.id_negocio " +
                         "FROM " + tableName + " c " +
                         "JOIN " + imageTableName + " i ON c.id_img = i.id_img " +
                         "WHERE c." + idColumn + " = ?",
@@ -91,19 +92,30 @@ public abstract class ProductoDAO<T extends Producto> {
 
     @Transactional
     public T delete(Long id) {
-        T existing = em.find(entityType, id);
+        T existing = retrieve(id);
         if (existing == null) {
             return null;
         }
 
         // Desasociar el producto del negocio
-        existing.setIdNegocio(null);
-        em.merge(existing);
+        Query q1 = em.createNativeQuery("UPDATE " + tableName + " SET id_negocio = NULL WHERE " + idColumn + " = ?");
+        q1.setParameter(1, existing.getId());
+        q1.executeUpdate();
+
+        // Desasociar la imagen del producto en la tabla Carne (si es necesario)
+        // Asegúrate de que no hay productos que mantengan la referencia a esta imagen
+        if (existing.getIdImg() != null) {
+            Query q = em.createNativeQuery("UPDATE " + tableName + " SET id_img = NULL WHERE id_img = ?");
+            q.setParameter(1, existing.getIdImg());
+            q.executeUpdate();
+        }
 
         // Borrar la imagen si aplica
-        Query q = em.createNativeQuery("DELETE FROM " + imageTableName + " WHERE id_img = ?");
-        q.setParameter(1, existing.getIdImg());
-        q.executeUpdate();
+        if (existing.getIdImg() != null) {
+            Query q = em.createNativeQuery("DELETE FROM " + imageTableName + " WHERE id_img = ?");
+            q.setParameter(1, existing.getIdImg());
+            q.executeUpdate();
+        }
 
         return existing;
     }
@@ -113,6 +125,7 @@ public abstract class ProductoDAO<T extends Producto> {
         Query q = em.createNativeQuery(
                 "SELECT c." + idColumn + ", c.nombre, c.unidad, c.tipo_conserva, c.id_img, " +
                         "i.nombre AS imagenNombre, i.tipo AS imagenTipo, i.datos AS imagenDatos " +
+                        "c.id_negocio " +
                         "FROM " + tableName + " c " +
                         "JOIN " + imageTableName + " i ON c.id_img = i.id_img",
                 mappingName
@@ -135,10 +148,11 @@ public abstract class ProductoDAO<T extends Producto> {
     public Collection<T> getAllByUsuario(Long idNegocio) {
         Query q = em.createNativeQuery(
                 "SELECT c." + idColumn + ", c.nombre, c.unidad, c.tipo_conserva, c.id_img, " +
-                        "i.nombre AS imagenNombre, i.tipo AS imagenTipo, i.datos AS imagenDatos " +
+                        "i.nombre AS imagenNombre, i.tipo AS imagenTipo, i.datos AS imagenDatos, " +
+                        "c.id_negocio " +  // Aquí agregamos el id_negocio que queremos obtener
                         "FROM " + tableName + " c " +
                         "JOIN " + imageTableName + " i ON c.id_img = i.id_img " +
-                        "WHERE c.id_negocio = ?",
+                        "WHERE c.id_negocio = ?", // Filtramos con el id_negocio de la tabla producto
                 mappingName
         );
         q.setParameter(1, idNegocio);

@@ -103,6 +103,18 @@ public abstract class StockProductoResource<T extends StockProducto, H extends H
         List<H> historial = historicoDAO.obtenerHistorialPorProducto(idProducto, getHistoricoEntityName());
         return Response.ok(historial).build();
     }
+    @GET
+    @Path("/prediccion")
+    public Response obtenerPrediccion() {
+        try {
+            String prediction = stockDAO.getPrediction();
+            return Response.ok("{\"message\": " + prediction + "}").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\": \"No se pudo obtener la predicción\"}")
+                    .build();
+        }
+    }
 
     // Método abstracto para obtener el nombre de la entidad de historial (subclase específica)
     protected abstract String getHistoricoEntityName();

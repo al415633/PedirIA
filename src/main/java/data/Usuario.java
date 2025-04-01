@@ -1,6 +1,7 @@
 package data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -22,8 +23,12 @@ public class Usuario {
     @Column(nullable = false)
     private String tipo; //Valores: Negocio o Aprovechante
 
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+/*    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     @JsonIgnore
+    private ComercioDetails negocio;*/
+
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private ComercioDetails negocio;
 
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)

@@ -94,12 +94,61 @@ public class ComercioResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/update")
-    public Response updateComercio(Usuario usuario, ComercioDetails negocio) {
-        boolean actualizado = dao.actualizarNegocio(usuario, negocio);
-        if (!actualizado) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+    public Response updateComercio(   @QueryParam("correo") String correo,
+                                      @QueryParam("password") String password,
+                                      @QueryParam("nombre") String nombre,
+                                      @QueryParam("diaCompraDeStock") String diaCompraDeStock) {
+        try {
+            // Verificar que el correo y los datos del comercio no sean nulos
+            if (correo == null) {
+                System.out.println("correo = " + correo);
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Datos incompletos para la actualización")
+                        .build();
+            }
+
+            // Buscar el usuario por su correo
+            Usuario usuarioExistente = dao.getComercioPorCorreo(correo);
+            if (usuarioExistente == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("Usuario no encontrado")
+                        .build();
+            }
+
+            // Actualizar los datos del usuario
+            //TODO: NO SE SI DEBERIA DE ENCRIPTAR AQUI LA CONTRASEÑA
+            String encr_pass = BcryptUtil.bcryptHash(password);
+            usuarioExistente.setPassword(encr_pass); // Actualizar la contraseña
+
+            // Actualizar los datos del comercio (negocio)
+            ComercioDetails negocioExistente = usuarioExistente.getNegocio();
+            if (negocioExistente != null) {
+                negocioExistente.setNombre(nombre);
+                negocioExistente.setDiaCompraDeStock(diaCompraDeStock);
+            } else {
+                // Si el negocio no existe, podemos crear uno nuevo y asociarlo
+                negocioExistente = new ComercioDetails();
+                negocioExistente.setUsuario(usuarioExistente);
+                negocioExistente.setNombre(nombre);
+                negocioExistente.setDiaCompraDeStock(diaCompraDeStock);
+                usuarioExistente.setNegocio(negocioExistente);
+            }
+
+            // Guardar los cambios en la base de datos
+            boolean actualizado = dao.actualizarNegocio(usuarioExistente, negocioExistente);
+            if (!actualizado) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity("Error al actualizar el comercio")
+                        .build();
+            }
+
+            return Response.noContent().build(); // Retorna un código 204 cuando la actualización fue exitosa
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Ocurrió un error inesperado")
+                    .build();
         }
-        return Response.noContent().build();
     }
 
     @DELETE

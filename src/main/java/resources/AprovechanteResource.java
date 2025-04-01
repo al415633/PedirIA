@@ -1,6 +1,7 @@
 package resources;
 
 import data.AprovechanteDetails;
+import data.ComercioDetails;
 import jakarta.annotation.security.RolesAllowed;
 import data.Usuario;
 import io.quarkus.elytron.security.common.BcryptUtil;
@@ -34,6 +35,8 @@ public class AprovechanteResource {
         if (usuario == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+        System.out.println(usuario);
+        System.out.println(usuario.getAprovechante());
         return Response.ok(usuario).build();
     }
 
@@ -94,12 +97,59 @@ public class AprovechanteResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/update")
-    public Response updateAprovechante(Usuario usuario, AprovechanteDetails aprovechante) {
-        boolean actualizado = dao.actualizarAprovechante(usuario, aprovechante);
-        if (!actualizado) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+    public Response updateAprovechante(@QueryParam("correo") String correo,
+                                       @QueryParam("password") String password,
+                                       @QueryParam("condiciones") String condiciones,
+                                       @QueryParam("condiciones2") String condiciones2) {
+        try {
+            // Verificar que el correo y los datos del comercio no sean nulos
+            if (correo == null) {
+                System.out.println("correo = " + correo);
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Datos incompletos para la actualización")
+                        .build();
+            }
+
+            // Buscar el usuario por su correo
+            Usuario usuarioExistente = dao.getAprovechantePorCorreo(correo);
+            if (usuarioExistente == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("Usuario no encontrado")
+                        .build();
+            }
+
+            // Actualizar los datos del usuario
+            //TODO: NO SE SI DEBERIA DE ENCRIPTAR AQUI LA CONTRASEÑA
+            String encr_pass = BcryptUtil.bcryptHash(password);
+            usuarioExistente.setPassword(encr_pass); // Actualizar la contraseña
+
+            // Actualizar los datos del comercio (negocio)
+            AprovechanteDetails aprovechanteExistente = usuarioExistente.getAprovechante();
+            if (aprovechanteExistente != null) {
+                aprovechanteExistente.setCondiciones(condiciones);
+                aprovechanteExistente.setCondiciones2(condiciones2);
+            } else {
+                // Si el negocio no existe, podemos crear uno nuevo y asociarlo
+                aprovechanteExistente = new AprovechanteDetails();
+                aprovechanteExistente.setUsuario(usuarioExistente);
+                usuarioExistente.setAprovechante(aprovechanteExistente);
+            }
+
+            // Guardar los cambios en la base de datos
+            boolean actualizado = dao.actualizarAprovechante(usuarioExistente, aprovechanteExistente);
+            if (!actualizado) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity("Error al actualizar el comercio")
+                        .build();
+            }
+
+            return Response.noContent().build(); // Retorna un código 204 cuando la actualización fue exitosa
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Ocurrió un error inesperado")
+                    .build();
         }
-        return Response.noContent().build();
     }
 
     @DELETE

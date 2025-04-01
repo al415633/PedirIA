@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @MappedSuperclass
-public abstract class HistoricoProducto {
+public abstract class HistoricoProducto<T extends Producto> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +27,10 @@ public abstract class HistoricoProducto {
     @NotNull
     @Column(name = "fecha_venta", nullable = false)
     private LocalDate fechaVenta;
+
+    @ManyToOne
+    // No se especifica la columna aquí, se hará en la subclase
+    protected T producto;
 
     // Métodos getters y setters
     public Long getId() {
@@ -67,6 +71,14 @@ public abstract class HistoricoProducto {
 
     public void setFechaVenta(LocalDate fechaVenta) {
         this.fechaVenta = fechaVenta;
+    }
+
+    public T getProducto() {
+        return producto;
+    }
+
+    public void setProducto(T producto) {
+        this.producto = producto;
     }
 
     @Override

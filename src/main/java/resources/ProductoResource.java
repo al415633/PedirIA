@@ -107,6 +107,7 @@ public abstract class ProductoResource<T extends Producto> {
             }
             return Response.noContent().build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Ocurrió un error al eliminar: " + e.getMessage())
                     .build();

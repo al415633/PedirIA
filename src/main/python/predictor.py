@@ -16,7 +16,6 @@ logger.setLevel(logging.CRITICAL)
 def main():
     # Leer entrada estándar
     input_data = sys.stdin.read()
-    print("DEBUG - Entrada JSON:", input_data)  # Verificar qué datos llegan
 
     data = json.loads(input_data)
 
@@ -27,7 +26,6 @@ def main():
         return
 
     df_historico = pd.read_csv(csv_path)
-    print("HISTÓRICO LEÍDO:", df_historico)
 
     # Leer JSON desde la ruta proporcionada
     json_path = data["json"]
@@ -40,10 +38,9 @@ def main():
 
     # Extraer datos de stock
     df_stock = pd.DataFrame(json_data["stock_actual"])
+
     df_stock = df_stock.rename(columns={"nombre": "producto", "cantidad": "unidades"})
     df_stock["unidades"] = pd.to_numeric(df_stock["unidades"])
-
-    print("STOCK LEÍDO:", df_stock)
 
     # Convertir fechas en el histórico
     df_historico["ds"] = pd.to_datetime(df_historico["ds"])
@@ -57,6 +54,11 @@ def main():
     for producto in productos:
         # Filtrar el DataFrame por producto
         df_producto = df_historico[df_historico["producto"] == producto][["ds", "y"]]
+        print(df_producto)
+        # Verificar si hay al menos 2 registros no nulos
+        if df_producto.dropna().shape[0] < 2:
+            print(f"Producto {producto} omitido: menos de 2 registros válidos.")
+            continue
 
         # Crear el conjunto de entrenamiento y prueba
         df_train = df_producto.iloc[:-dias_prediccion].copy()
@@ -91,9 +93,6 @@ def main():
         df_test = df_test.rename(columns={"ds": "Fecha"})
         resultados = df_test.merge(forecast_test, on="Fecha")
         resultados["Ventas"] = resultados["Ventas"].round().astype(int)
-
-        # Calcular el error MAE
-        mae = mean_absolute_error(resultados["y"], resultados["Ventas"])
 
         # Calcular el restock necesario
         total_predicho = resultados["Ventas"].sum()

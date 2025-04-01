@@ -326,3 +326,74 @@ input, select {
         flex-direction: column;
     }
 }
+
+/* Estilo para el Footer */
+footer {
+    background-color: #5a7d4b; /* Verde */
+    color: white;
+    padding: 40px 0;
+    margin-top: 50px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    align-items: center; /* Centrar el contenido verticalmente */
+    justify-content: space-between; /* Espacio entre el logo y el texto */
+    padding: 20px;
+}
+
+.footer-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.footer-logo {
+    width: 300px; /* Aumentamos el tamaño del logo */
+    margin-right: 20px; /* Separación entre logo y texto */
+}
+
+.footer-info {
+    flex-grow: 1; /* Hace que el texto se expanda y ocupe el espacio disponible */
+    text-align: left; /* Alineamos el texto a la izquierda */
+}
+
+.footer-info h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.footer-info ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    text-align: left;
+}
+
+.footer-info ul li {
+    font-size: 1em;
+    margin: 5px 0;
+}
+
+.footer-text {
+    font-size: 1em;
+    margin-top: 20px;
+    color: white;
+}
+
+/* Asegurar que en móviles el footer se vea bien */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column; /* Colocamos el contenido en columna para móviles */
+        text-align: center;
+    }
+    .footer-info {
+        text-align: center;
+    }
+    .footer-info ul {
+        padding-left: 0;
+    }
+}

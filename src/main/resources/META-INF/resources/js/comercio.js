@@ -49,10 +49,10 @@ Vue.createApp({
 
                     // PEQUEÑO RETRASO para asegurar que la cookie se guarda
                     setTimeout(() => {
-                        window.location.href = "./comercioUPDATE.html";
+                        window.location.href = "menu_productos.html";
                     }, 200); // 200ms suficiente
 
-                    window.location.href = "./comercioUPDATE.html"; // Página correcta
+                    window.location.href = "menu_productos.html"; // Página correcta
                 } else {
                     throw new Error("Error en la autenticación");
                 }

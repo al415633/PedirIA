@@ -46,7 +46,7 @@ Vue.createApp({
 
                 if (response.status === 200) {
                     alert("Inicio de sesión exitoso");
-                    window.location.href = "aprovechanteUPDATE.html"; // Página correcta
+                    window.location.href = "menu_productos.html"; // Página correcta
                 } else {
                     throw new Error("Error en la autenticación");
                 }

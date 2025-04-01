@@ -35,8 +35,18 @@ createApp({
                 .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
                 .map(stock => ({
                     ...stock,
-                    cantidad: this.formatNumber(stock.cantidad) // 📌 Formatea la cantidad
+                    cantidadFormateada: this.formatNumber(stock.cantidad) + " " + (this.product.unidad || "")
                 }));
+        },
+        sortedCurrentHistorico() {
+            return [...this.historicoStock]
+                .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
+                .map(historico => {
+                    return {
+                        ...historico,
+                        cantidadFormateada: this.formatNumber(historico.cantidad) + " " + (this.product.unidad || "")
+                    };
+                });
         }
     },
     methods: {
@@ -57,6 +67,12 @@ createApp({
 
             if (!idPescado) {
                 this.showToast("Error: Producto no encontrado", "bg-danger");
+                return;
+            }
+
+            // Valida que la fecha de ingreso sea menor que la fecha de vencimiento.
+            if (new Date(this.newStock.fechaIngreso) >= new Date(this.newStock.fechaVencimiento)) {
+                this.showToast("Error: La fecha de ingreso debe ser anterior a la fecha de vencimiento", "bg-danger");
                 return;
             }
 
@@ -98,7 +114,8 @@ createApp({
                 .catch(error => console.error("Error al cargar el historial:", error));
         },
         editStock(stock) {
-            this.editingStock = JSON.parse(JSON.stringify(stock)); // Evita modificar el original directamente
+            this.editingStock = JSON.parse(JSON.stringify(stock));
+            console.log(this.editingStock)
             new bootstrap.Modal(document.getElementById("editStockModal")).show();
         },
         updateStock() {
@@ -114,18 +131,33 @@ createApp({
             new bootstrap.Modal(document.getElementById("sellStockModal")).show();
         },
         sellStock() {
+            const cantidadAVender = parseFloat(this.sellStockData.cantidad);
+            const disponible = parseFloat(this.sellStockData.disponible);
+            if (cantidadAVender > disponible) {
+                this.showToast("Error: La cantidad a vender supera la disponible", "bg-danger");
+                return;
+            }
+
             axios.post(API_STOCK + "vender/" + this.sellStockData.id + "/" +this.sellStockData.cantidad)
                 .then(() => {
+                    this.showToast(`Venta realizada: ${this.formatNumber(cantidadAVender)} ${this.product.unidad}`, "bg-success");
                     this.loadCurrentStock(); // Recargar stock actualizado
                     bootstrap.Modal.getInstance(document.getElementById("sellStockModal")).hide();
                 })
-                .catch(error => console.error("Error al vender stock:", error));
+                .catch(error => {
+                    console.error("Error al vender stock:", error);
+                    this.showToast("Error al vender stock", "bg-danger");
+                });
         },
         formatDate(dateStr) {
             return new Date(dateStr).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
         },
         formatNumber(value) {
-            return new Intl.NumberFormat('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(value);
+            const num = parseFloat(value);
+            if (Number.isInteger(num)) {
+                return num.toLocaleString('es-ES', { minimumFractionDigits: 0 });
+            }
+            return num.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 3 });
         },
         openEditProductModal() {
             this.editingProduct = { ...this.product }; // Copiar datos actuales
@@ -171,11 +203,32 @@ createApp({
                 .then(() => {
                     this.product = { ...this.editingProduct };
                     bootstrap.Modal.getInstance(document.getElementById("editProductModal")).hide();
-                    this.showToast("✔️ Pescado actualizado correctamente.", "bg-success");
+                    this.showToast("Pescado actualizado correctamente.", "bg-success");
                 })
                 .catch(error => {
                     console.error("Error al actualizar el pescado:", error);
-                    this.showToast("❌ Error al actualizar el pescado.", "bg-danger");
+                    this.showToast("Error al actualizar el pescado.", "bg-danger");
+                });
+        },
+        // Métod0 para abrir el modal de eliminación
+        openDeleteModal() {
+            this.deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
+            this.deleteModal.show();
+        },
+        deleteProduct() {
+            // Se asume que el id del producto está en this.product.id
+            console.log("Llamado a eliminar")
+            axios.delete(API_PESCADO + this.product.id)
+                .then(() => {
+                    this.showToast("Pescado eliminado correctamente.", "bg-success");
+                    // Redirigir a la lista de productos o a otro lugar
+                    setTimeout(() => {
+                        window.location.href = "../pescado/gestion_pescado.html";
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error("Error al eliminar el pescado:", error);
+                    this.showToast("Error al eliminar el pescado.", "bg-danger");
                 });
         },
         showToast(message, bgClass) {

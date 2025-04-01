@@ -24,7 +24,6 @@ public abstract class AbstractJSONConverter<T extends StockProducto> {
         }
 
         String finalString = stringBuilder.toString();
-        System.out.println("csv: " + finalString);
         return finalString;
     }
 

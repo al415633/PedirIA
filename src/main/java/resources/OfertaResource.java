@@ -1,136 +1,118 @@
 package resources;
 
-import data.ComercioDetails;
 import data.Oferta;
-import data.Usuario;
+import data.StockProducto;
 import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import services.AprovechanteDao;
 import services.ComercioDao;
-import services.OfertaDao;
+import services.OfertaDAO;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.LocalDate;
+import java.util.List;
 
 @Path("/oferta")
 public class OfertaResource {
 
     @Inject
-    OfertaDao daoOferta;
+    OfertaDAO daoOferta;
 
     @Inject
     ComercioDao daoComercio;
 
+    @Inject
+    AprovechanteDao daoAprovechante;
+
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOfertas() {
-        return Response.ok(daoOferta.getOfertas()).build();
+    public Response getAllOfertas() {
+        List<Oferta> ofertas = daoOferta.obtenerOfertas();
+        return Response.ok(ofertas).build();
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/retrieve/{id_oferta}")
-    public Response getOferta(@PathParam("id_oferta") final Long id_oferta) {
 
-        Oferta oferta = daoOferta.getOfertaPorId(id_oferta);
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOferta(@PathParam("id") Long id) {
+        Oferta oferta = daoOferta.obtenerOfertaPorId(id);
         if (oferta == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Oferta no encontrada").build();
         }
         return Response.ok(oferta).build();
+    }
+
+
+    @GET
+    @Path("/mis-ofertas")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOfertasByNegocio(@CookieParam("usuario") String correo) {
+
+        Long idNegocio = daoComercio.getComercioPorCorreo(correo).getId_usuario();
+
+        if (idNegocio == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Se requiere el id del negocio").build();
+        }
+        List<Oferta> ofertas = daoOferta.obtenerOfertasPorNegocio(idNegocio);
+        return Response.ok(ofertas).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/create")
-    public Response createOferta(
-            @QueryParam("lugar") String lugar,
-            @QueryParam("idNegocio") Long idNegocio,
-            @QueryParam("idAprovechante") Long idAprovechante,
-            @QueryParam("fechaAlta") String fechaAlta,
-            @QueryParam("fechaBaja") String fechaBaja,
-            @QueryParam("fechaVencimiento") String fechaVencimiento,
-            @QueryParam("cantidad") Integer cantidad,
-            @QueryParam("idProducto") Long idProducto,
-            @QueryParam("tipoProducto") String tipoProducto
-    ) throws URISyntaxException {
-        // Verificar si el negocio existe
-        ComercioDetails negocio = daoComercio.getComercioPorId(idNegocio);
-        if (negocio == null) {
-            return Response.status(Response.Status.NOT_FOUND).build(); // Negocio no encontrado
+    public <T extends StockProducto<?>> Response createOffer(Oferta oferta, T stock)  {
+        try {
+            Oferta ofertaCreada = daoOferta.crearOferta(oferta, stock);
+            return Response.status(Response.Status.CREATED).entity(ofertaCreada).build();
+        } catch (PersistenceException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error de persistencia: " + e.getMessage()).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al crear la oferta: " + e.getMessage()).build();
         }
+    }
 
-        // Crear Oferta
-        Oferta oferta = new Oferta();
-        oferta.setLugar(lugar);
-        oferta.setId_negocio(idNegocio);
-        oferta.setId_aprovechante(idAprovechante);
-        oferta.setFecha_alta(LocalDate.parse(fechaAlta)); // Convertir la fecha de String a LocalDate
-        oferta.setFecha_baja(fechaBaja != null ? LocalDate.parse(fechaBaja) : null); // Manejar fecha baja opcional
-        oferta.setFecha_vencimiento(LocalDate.parse(fechaVencimiento)); // Convertir la fecha de String a LocalDate
-        oferta.setCantidad(cantidad);
-        oferta.setId_producto(idProducto);
-        oferta.setTipo_producto(tipoProducto);
-
-        // Guardar la oferta en la base de datos
-        daoOferta.crearOferta(oferta);
-
-        // Generar URI para el nuevo recurso
-        URI uri = new URI("/oferta/retrieve/" + oferta.getId_oferta());
-        return Response.created(uri).build();
+    @DELETE
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteOferta(@PathParam("id") Long id) {
+        try {
+            boolean result = daoOferta.eliminarOferta(id);
+            if (!result) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            return Response.noContent().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Ocurrió un error al eliminar: " + e.getMessage())
+                    .build();
+        }
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/update")
-    public Response updateOferta(Oferta oferta) {
-        // Buscar la oferta existente por su ID
-        Oferta ofertaExistente = daoOferta.getOfertaPorId(oferta.getId_oferta());
+    public Response aceptarOferta(Oferta oferta, @CookieParam("usuario") String correo) {
 
-        if (ofertaExistente == null) {
-            return Response.status(Response.Status.NOT_FOUND).build(); // Si la oferta no existe, devolvemos 404
+        Long idAprovechante = daoAprovechante.getAprovechantePorCorreo(correo).getId_usuario();
+
+        try {
+            Oferta ofertaAcepptada = daoOferta.aceptarOferta(oferta, idAprovechante);
+            return Response.status(Response.Status.CREATED).entity(ofertaAcepptada).build();
+        } catch (PersistenceException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error de persistencia: " + e.getMessage()).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al aceptar la oferta: " + e.getMessage()).build();
         }
-
-        // Verificar si el negocio asociado a la oferta existe
-        ComercioDetails negocio = daoComercio.getComercioPorId(oferta.getId_negocio());
-        if (negocio == null) {
-            return Response.status(Response.Status.NOT_FOUND).build(); // Si el negocio no existe, devolvemos 404
-        }
-
-        // Actualizar los campos de la oferta existente
-        ofertaExistente.setLugar(oferta.getLugar());
-        ofertaExistente.setId_aprovechante(oferta.getId_aprovechante());
-        ofertaExistente.setId_negocio(oferta.getId_negocio());
-        ofertaExistente.setFecha_alta(oferta.getFecha_alta());
-        ofertaExistente.setFecha_baja(oferta.getFecha_baja());
-        ofertaExistente.setFecha_vencimiento(oferta.getFecha_vencimiento());
-        ofertaExistente.setCantidad(oferta.getCantidad());
-        ofertaExistente.setId_producto(oferta.getId_producto());
-        ofertaExistente.setTipo_producto(oferta.getTipo_producto());
-
-        daoOferta.actualizarOferta(ofertaExistente);
-
-        return Response.noContent().build();
     }
-
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/delete/{idOferta}")
-    public Response deleteOferta(@PathParam("idOferta") final Long idOferta) {
-        Oferta ofertaExistente = daoOferta.getOfertaPorId(idOferta);
-
-        if (ofertaExistente == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        daoOferta.eliminarOferta(idOferta);
-
-        return Response.noContent().build();
-    }
-
-
-
 }

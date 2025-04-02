@@ -7,6 +7,12 @@ const API_HISTORICO = "/carnes/stock/historico/";
 const API_CARNE = "/carnes/";
 const VALIDAR_CARNE = "/carnes/validar";
 
+const API_OFERTAS = "/oferta";
+const RETRIEVE_ONE_OFERTA = "/oferta/retrieve/";
+const ADD_OFERTA = "/oferta/create";
+const UPDATE_OFERTA = "/oferta/update";
+const DELETE_OFERTA = "/oferta/delete/"
+
 createApp({
     data() {
         return {
@@ -73,6 +79,15 @@ createApp({
                 })
                 .catch(error => {
                     console.error("Error al cargar stock actual:", error);
+                });
+        },
+        loadOfertas() {
+            axios.get("/oferta")
+                .then(response => {
+                    this.ofertas = response.data;
+                })
+                .catch(error => {
+                    console.error("Error al cargar ofertas:", error);
                 });
         },
         addStock() {

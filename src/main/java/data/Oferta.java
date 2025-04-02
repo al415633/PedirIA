@@ -1,147 +1,116 @@
 package data;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 
+@Entity
+@Table(name = "Oferta")
 public class Oferta {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id_oferta;
+    @Column(name = "id_oferta")
+    private Long id;
 
-    @NotNull
-    @Column(name = "lugar", nullable = false, length = 250)
-    protected String lugar;
+    @Column(name = "ubicacion", nullable = false)
+    private String ubicacion;
 
-    @Column(name = "id_aprovechante", nullable = true)
-    protected Long id_aprovechante;
-
-    @NotNull
-    @Column(name = "id_negocio", nullable = false)
-    protected Long id_negocio;
-
-    @NotNull
     @Column(name = "fecha_alta", nullable = false)
-    private LocalDate fecha_alta;
-    @Column(name = "fecha_baja", nullable = true)
-    private LocalDate fecha_baja;
+    private LocalDate fechaAlta;
 
-    @NotNull
-    @Column(name = "fecha_vencimiento", nullable = false)
-    private LocalDate fecha_vencimiento;
+    @Column(name = "fecha_baja")
+    private LocalDate fechaBaja;
 
-
-    @NotNull
     @Column(name = "cantidad", nullable = false)
-    protected Integer cantidad;
+    private Integer cantidad;
 
-    @NotNull
-    @Column(name = "id_producto", nullable = false)
-    protected Long id_producto;
+    @ManyToOne
+    @JoinColumn(name = "id_aprovechante")
+    private AprovechanteDetails aprovechante;
 
-    @NotNull
-    @Column(name = "tipo_producto", nullable = false, length = 100)
-    protected String tipo_producto;
+    @ManyToOne
+    @JoinColumn(name = "id_negocio", nullable = false)
+    private ComercioDetails negocio;
 
+    @OneToOne(mappedBy = "oferta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ProductoOferta productoOferta;
 
-    public void setId_oferta(Long id_oferta) {
-        this.id_oferta = id_oferta;
+    public Long getId() {
+        return id;
     }
 
-    public void setLugar(String lugar) {
-        this.lugar = lugar;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setId_aprovechante(Long id_aprovechante) {
-        this.id_aprovechante = id_aprovechante;
+    public String getUbicacion() {
+        return ubicacion;
     }
 
-    public void setId_negocio(Long id_negocio) {
-        this.id_negocio = id_negocio;
+    public void setUbicacion(String ubicacion) {
+        this.ubicacion = ubicacion;
     }
 
-    public void setFecha_alta(LocalDate fecha_alta) {
-        this.fecha_alta = fecha_alta;
+    public LocalDate getFechaAlta() {
+        return fechaAlta;
     }
 
-    public void setFecha_baja(LocalDate fecha_baja) {
-        this.fecha_baja = fecha_baja;
+    public void setFechaAlta(LocalDate fechaAlta) {
+        this.fechaAlta = fechaAlta;
     }
 
-    public void setFecha_vencimiento(LocalDate fecha_vencimiento) {
-        this.fecha_vencimiento = fecha_vencimiento;
+    public LocalDate getFechaBaja() {
+        return fechaBaja;
     }
 
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    public void setId_producto(Long id_producto) {
-        this.id_producto = id_producto;
-    }
-
-    public void setTipo_producto(String tipo_producto) {
-        this.tipo_producto = tipo_producto;
-    }
-
-
-    public Long getId_oferta() {
-        return id_oferta;
-    }
-
-    public String getLugar() {
-        return lugar;
-    }
-
-    public Long getId_aprovechante() {
-        return id_aprovechante;
-    }
-
-    public Long getId_negocio() {
-        return id_negocio;
-    }
-
-    public LocalDate getFecha_alta() {
-        return fecha_alta;
-    }
-
-    public LocalDate getFecha_baja() {
-        return fecha_baja;
-    }
-
-    public LocalDate getFecha_vencimiento() {
-        return fecha_vencimiento;
+    public void setFechaBaja(LocalDate fechaBaja) {
+        this.fechaBaja = fechaBaja;
     }
 
     public Integer getCantidad() {
         return cantidad;
     }
 
-    public Long getId_producto() {
-        return id_producto;
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
     }
 
-    public String getTipo_producto() {
-        return tipo_producto;
+    public AprovechanteDetails getAprovechante() {
+        return aprovechante;
+    }
+
+    public void setAprovechante(AprovechanteDetails aprovechante) {
+        this.aprovechante = aprovechante;
+    }
+
+    public ComercioDetails getNegocio() {
+        return negocio;
+    }
+
+    public void setNegocio(ComercioDetails negocio) {
+        this.negocio = negocio;
+    }
+
+    public ProductoOferta getProductoOferta() {
+        return productoOferta;
+    }
+
+    public void setProductoOferta(ProductoOferta productoOferta) {
+        this.productoOferta = productoOferta;
     }
 
     @Override
     public String toString() {
         return "Oferta{" +
-                "id_oferta=" + id_oferta +
-                ", lugar='" + lugar + '\'' +
-                ", id_aprovechante=" + id_aprovechante +
-                ", id_negocio=" + id_negocio +
-                ", fecha_alta=" + fecha_alta +
-                ", fecha_baja=" + fecha_baja +
-                ", fecha_vencimiento=" + fecha_vencimiento +
+                "id=" + id +
+                ", ubicacion='" + ubicacion + '\'' +
+                ", fechaAlta=" + fechaAlta +
+                ", fechaBaja=" + fechaBaja +
                 ", cantidad=" + cantidad +
-                ", id_producto=" + id_producto +
-                ", tipo_producto='" + tipo_producto + '\'' +
+                ", aprovechante=" + aprovechante +
+                ", negocio=" + negocio +
+                ", productoOferta=" + productoOferta +
                 '}';
     }
 }

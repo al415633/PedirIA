@@ -1,0 +1,78 @@
+<!-- header.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PedirIA - Pescadería</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        /* Estilos del navbar */
+        .navbar_container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Estilos del dropdown */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 180px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            top: 100%;
+            left: 0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 10px;
+            display: block;
+            text-decoration: none;
+            background: white;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Mostrar el dropdown al pasar el mouse */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+<header class="navbar_container">
+    <div  >
+
+        <div id="app"  class="navbar-box">
+            <img src="images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
+            <a href="#" class="btn">Mis datos</a>
+            <a href="#" class="btn">Stock</a>
+            <a href="#" class="btn">Modificar datos</a>
+
+            <div class="dropdown">
+                <a href="#" class="btn">Generar informe</a>
+                <div class="dropdown-content">
+                    <a href="predecir_carnes.html">Predecir Carnes</a>
+                    <a href="predecir_pescados.html">Predecir Pescados</a>
+                    <a href="predecir_hortofruticolas.html">Predecir Hortofrutícolas</a>
+                </div>
+            </div>
+                <a   href="#" class="btn">{{ comercioActivo }}</a>
+            <script src="js/comercio.js"></script>
+        </div>
+    </div>
+</header>
+</html>

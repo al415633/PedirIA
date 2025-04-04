@@ -1,8 +1,13 @@
+// import Header from "../Header.vue";
+
+
 const RETRIEVE_ALL = "/comercio";
 const POST = "/comercio/create";
 const DELETE = "/comercio/delete/";
 const RETRIEVE_ONE = "/comercio/login";
 const UPDATE = "/comercio/update";
+const RETRIEVE_ACTIVE = "/comercio/obtener";
+
 
 
 
@@ -16,7 +21,8 @@ Vue.createApp({
             nombre: "",
             tipoComercio: "",
             dia: "",
-            currentComercio: {}
+            currentComercio: {},
+            comercioActivo: "sin sesion"
         };
     },
     methods: {
@@ -118,9 +124,20 @@ Vue.createApp({
                 .catch(function (error) {
                     console.log("Error al eliminar correo:", error);
                 });
-        }
+        },
+        async getActiveComercio() {
+            await axios.get(RETRIEVE_ACTIVE)
+                .then((response) => {
+                    this.comercioActivo = response.data;
+                    console.log(response.data);
+                })
+                .catch((error) => {
+                    console.log("Error al obtener los datos:", error);
+                });
+        },
     },
     mounted() {
         this.doGet();
+        this.getActiveComercio()
     }
 }).mount("#app"); //entiendo que hace que controlo lo que hay dentro del div de "app"

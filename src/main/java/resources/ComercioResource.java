@@ -45,7 +45,8 @@ public class ComercioResource {
         if (usuario == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("No hay sesión activa").build();
         }
-        return Response.ok("Perfil del usuario en sesión: " + usuario).build();
+//        return Response.ok("Perfil del usuario en sesión: " + usuario).build(); //versión anterior, no se puede observar donde se usaba
+        return Response.ok(usuario).build();
     }
 
     @POST

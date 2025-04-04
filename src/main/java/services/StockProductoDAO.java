@@ -37,7 +37,7 @@ public abstract class StockProductoDAO<T extends StockProducto> {
 
     // Obtener todos los registros de stock
     public List<T> getAll() {
-        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s", getEntityClass())
+        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + "s", getEntityClass())
                 .getResultList();
     }
 

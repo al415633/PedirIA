@@ -1,15 +1,15 @@
 package services;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.json.simple.JSONObject;
+
 import data.StockProducto;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.json.simple.JSONObject;
 import pythonAdapter.PythonManager;
 import pythonAdapter.jsonPacker.AbstractJSONPacker;
-import pythonAdapter.jsonPacker.JSONCarnePacker;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 public abstract class StockProductoDAO<T extends StockProducto> {
 
@@ -37,8 +37,9 @@ public abstract class StockProductoDAO<T extends StockProducto> {
 
     // Obtener todos los registros de stock
     public List<T> getAll() {
-        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + "s", getEntityClass())
-                .getResultList();
+
+        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s", getEntityClass())
+        .getResultList();
     }
 
     // Actualizar stock existente
@@ -71,7 +72,6 @@ public abstract class StockProductoDAO<T extends StockProducto> {
         String JSONtoFiles;
 
         List<T> stockList = getAll();
-        System.out.println("Stock obtenido: " + stockList);
 
         if (stockList == null || stockList.isEmpty()) {
             return "{\"error\": \"No hay datos en el stock\"}";
@@ -79,14 +79,13 @@ public abstract class StockProductoDAO<T extends StockProducto> {
 
         try {
             JSONtoFiles = packer.packageData(stockList);
-            System.out.println("JSON enviado a Python: " + JSONtoFiles);
         } catch (Exception e) {
             e.printStackTrace();
             return "{\"error\": \"Error en la serialización de datos\"}";
         }
 
         JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/predictor.py", JSONtoFiles);
-        packer.closeFiles();
+        //packer.closeFiles();
         if (prediction == null) {
             return "{\"error\": \"Python no devolvió respuesta\"}";
         }

@@ -1,7 +1,11 @@
 package resources;
 
+import data.ComercioDetails;
 import data.Oferta;
+import data.OfertaRequest;
 import data.StockProducto;
+import data.carniceria.StockCarne;
+import data.hortofruticola.StockHortoFruticola;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.ws.rs.*;
@@ -10,6 +14,9 @@ import jakarta.ws.rs.core.Response;
 import services.AprovechanteDao;
 import services.ComercioDao;
 import services.OfertaDAO;
+import services.carne.StockCarneDAO;
+import services.hortofruticola.StockHortoFruticolaDAO;
+import services.pescado.StockPescadoDAO;
 
 import java.util.List;
 
@@ -24,6 +31,15 @@ public class OfertaResource {
 
     @Inject
     AprovechanteDao daoAprovechante;
+
+    @Inject
+    StockCarneDAO daoStockCarne;
+
+    @Inject
+    StockPescadoDAO daoStockPescado;
+
+    @Inject
+    StockHortoFruticolaDAO daoStockHortoFrutico;
 
 
     @GET
@@ -65,14 +81,33 @@ public class OfertaResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public <T extends StockProducto<?>> Response createOffer(Oferta oferta, T stock)  {
+    public Response createOffer(OfertaRequest ofertaRequest, @CookieParam("usuario") String correo) {
+
+        ComercioDetails comercio = daoComercio.getComercioPorCorreo(correo).getNegocio();
+
+        Oferta oferta = new Oferta();
+        oferta.setUbicacion(ofertaRequest.getUbicacion());
+        oferta.setFechaAlta(ofertaRequest.getFechaAlta());
+        oferta.setFechaBaja(ofertaRequest.getFechaBaja());
+        oferta.setCantidad(ofertaRequest.getCantidad());
+
+        oferta.setNegocio(comercio);
+
+        StockProducto<?> stock = buscarStockPorIdYTipo(ofertaRequest.getIdStock(), ofertaRequest.getTipoStock());
+        if (stock == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Stock no encontrado o tipo incorrecto").build();
+        }
+
         try {
             Oferta ofertaCreada = daoOferta.crearOferta(oferta, stock);
             return Response.status(Response.Status.CREATED).entity(ofertaCreada).build();
         } catch (PersistenceException e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error de persistencia: " + e.getMessage()).build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error al crear la oferta: " + e.getMessage()).build();
         }
@@ -113,6 +148,19 @@ public class OfertaResource {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error al aceptar la oferta: " + e.getMessage()).build();
+        }
+    }
+
+    private StockProducto<?> buscarStockPorIdYTipo(Long stockId, String tipoStock) {
+        switch (tipoStock) {
+            case "Carne":
+                return daoStockCarne.retrieve(stockId);
+            case "Pescado":
+                return daoStockPescado.retrieve(stockId);
+            case "Hortofruticola":
+                return daoStockHortoFrutico.retrieve(stockId);
+            default:
+                return null;  // Tipo no válido
         }
     }
 }

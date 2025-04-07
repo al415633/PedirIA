@@ -7,17 +7,33 @@ import data.StockProducto;
 import data.carniceria.StockCarne;
 import data.hortofruticola.StockHortoFruticola;
 import data.pescaderia.StockPescado;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import jakarta.transaction.Transactional;
+import services.carne.StockCarneDAO;
+import services.hortofruticola.StockHortoFruticolaDAO;
+import services.pescado.StockPescadoDAO;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+@ApplicationScoped
 public class OfertaDAO {
 
     @Inject
     protected EntityManager em;
+
+    @Inject
+    protected StockCarneDAO stockCarneDAO;
+
+    @Inject
+    protected StockPescadoDAO stockPescadoDAO;
+
+    @Inject
+    protected StockHortoFruticolaDAO stockHortoFruticolaDAO;
 
     // Obtiene todas las ofertas
     public List<Oferta> obtenerOfertas() {
@@ -54,22 +70,25 @@ public class OfertaDAO {
         }
     }
 
+    @Transactional
     public <T extends StockProducto<?>> Oferta crearOferta(Oferta oferta, T stock) {
-        EntityTransaction transaction = em.getTransaction();
         try {
-            transaction.begin();
 
             // Crear ProductoOferta asociada al stock
+            StockProductoDAO<?> stockProductoDAO;
             ProductoOferta productoOferta = new ProductoOferta();
             productoOferta.setOferta(oferta);
 
             // Según el tipo de stock, asignamos a la relación correspondiente
             if (stock instanceof StockCarne) {
                 productoOferta.setStockCarne((StockCarne) stock);
+                stockProductoDAO = stockCarneDAO;
             } else if (stock instanceof StockPescado) {
                 productoOferta.setStockPescado((StockPescado) stock);
+                stockProductoDAO = stockPescadoDAO;
             } else if (stock instanceof StockHortoFruticola) {
                 productoOferta.setStockHortoFruticola((StockHortoFruticola) stock);
+                stockProductoDAO = stockHortoFruticolaDAO;
             } else {
                 throw new IllegalArgumentException("El stock debe ser de tipo StockCarne, StockPescado o StockHortoFruticola.");
             }
@@ -77,12 +96,10 @@ public class OfertaDAO {
             // Persistir la oferta y su ProductoOferta asociado
             em.persist(oferta);
             em.persist(productoOferta);
+            System.out.println(stockProductoDAO.getEntityManager());
+            stockProductoDAO.venderStock(stock.getId(), BigDecimal.valueOf(oferta.getCantidad()));
 
-            transaction.commit();
         } catch (Exception e) {
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
             throw e;
         }
         return oferta;

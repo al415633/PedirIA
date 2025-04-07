@@ -26,13 +26,18 @@ createApp({
             toastMessage: '',
             editingStock: { id: null, cantidad: '', fechaIngreso: '', fechaVencimiento: '' },
             sellStockData: { id: null, cantidad: '', disponible: 0 },
+            offerStockData: { id: null, cantidad: '', fechaIngreso: '', fechaVencimiento: ''},
             historicoStock: [],
             activeTab: "stock",
             editingCarne: { nombre: '', unidad: '', tipoConserva: '' },
             tiposConserva: ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO"],
             nombreError: '',
             unidadError: '',
-            isInvalid: false
+            isInvalid: false,
+            nuevaOferta: {
+                ubicacion: '',
+                cantidad: '',
+            }
         };
     },
     computed: {
@@ -81,6 +86,15 @@ createApp({
                     console.error("Error al cargar stock actual:", error);
                 });
         },
+        loadHistorico() {
+            const id = new URLSearchParams(window.location.search).get('id');
+            axios.get(API_HISTORICO + id)
+                .then(response => {
+                    this.historicoStock = response.data;
+                    this.activeTab = "historico";
+                })
+                .catch(error => console.error("Error al cargar el historial:", error));
+        },
         loadOfertas() {
             axios.get("/oferta")
                 .then(response => {
@@ -121,15 +135,6 @@ createApp({
                     this.showToast("Error al agregar stock", "bg-danger");
                 });
         },
-        loadHistorico() {
-            const id = new URLSearchParams(window.location.search).get('id');
-            axios.get(API_HISTORICO + id)
-                .then(response => {
-                    this.historicoStock = response.data;
-                    this.activeTab = "historico";
-                })
-                .catch(error => console.error("Error al cargar el historial:", error));
-        },
         editStock(stock) {
             this.editingStock = JSON.parse(JSON.stringify(stock));
             console.log(this.editingStock)
@@ -138,10 +143,12 @@ createApp({
         updateStock() {
             axios.put(API_STOCK + this.editingStock.id, this.editingStock)
                 .then(() => {
-                    this.loadCurrentStock();
                     bootstrap.Modal.getInstance(document.getElementById("editStockModal")).hide();
+                    this.loadProductDetails();
+                    this.loadCurrentStock();
                 })
                 .catch(error => console.error("Error al actualizar stock:", error));
+
         },
         showToast(message, bgClass) {
             this.toastMessage = message;
@@ -176,7 +183,6 @@ createApp({
         formatDate(dateStr) {
             return new Date(dateStr).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
         },
-        // Formatea el número: si es entero no muestra decimales, sino los decimales necesarios.
         formatNumber(value) {
             const num = parseFloat(value);
             if (Number.isInteger(num)) {
@@ -234,13 +240,11 @@ createApp({
                     this.showToast("Error al actualizar la carne.", "bg-danger");
                 });
         },
-        // Métod0 para abrir el modal de eliminación
         openDeleteModal() {
             this.deleteModal = new bootstrap.Modal(document.getElementById("deleteCarneModal"));
             this.deleteModal.show();
         },
         deleteCarne() {
-            // Se asume que el id del producto está en this.product.id
             console.log("Eliminando carne")
             axios.delete(API_CARNE + this.product.id)
                 .then(() => {
@@ -255,6 +259,39 @@ createApp({
                     this.showToast("Error al eliminar la carne.", "bg-danger");
                 });
         },
+        openCreateOfferModal(stock) {
+            this.nuevaOferta.stockId = stock.id;
+            this.nuevaOferta.cantidad = '';
+            this.nuevaOferta.ubicacion = '';
+            this.nuevaOferta.unidad = this.product.unidad;
+            new bootstrap.Modal(document.getElementById("createOfertaModal")).show();
+        },
+        crearOferta() {
+            const currentDate = new Date().toISOString().split('T')[0]; // Formato 'yyyy-mm-dd'
+
+            // Construimos la petición, que coincide con la estructura de OfertaRequest (oferta y stock)
+            const ofertaRequest = {
+                ubicacion: this.nuevaOferta.ubicacion,
+                cantidad: parseInt(this.nuevaOferta.cantidad),
+                fechaAlta: new Date().toISOString().split('T')[0],
+                fechaBaja: null,
+                idStock: this.nuevaOferta.stockId,
+                tipoStock: "Carne"
+
+            };
+
+            axios.post("/oferta", ofertaRequest)
+                .then(response => {
+                    this.showToast("Oferta creada con éxito", "bg-success");
+                    bootstrap.Modal.getInstance(document.getElementById("createOfertaModal")).hide();
+                    this.loadCurrentStock();
+                })
+                .catch(error => {
+                    this.showToast(error.response.data, "bg-danger");
+                    console.error("Error:", error);
+                });
+        }
+
     },
     mounted() {
         this.loadProductDetails();

@@ -3,23 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <title>Modificar - Comercio</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
-    <div class="header-box">
-        <div class="container">
-            <img src="images/logo.png" alt="PedirIA Logo" class="logo">
-            <div>
-                <p class="subtitle">Modificar COMERCIO</p>
-            </div>
-        </div>
-    </div>
-</header>
+
 <main>
+    <header class="navbar_container2">
+        <div id="app1" class="navbar-box">
+            <img src="images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
+            <a href="#" class="btn">Mis datos</a>
+            <a href="#" class="btn">Stock</a>
+            <a href="comercioUPDATE.html" class="btn">Modificar datos</a>
+
+            <div class="dropdown2">
+                <a href="#" class="btn">Generar informe</a>
+                <div class="dropdown-content2">
+                    <a href="predecir_carnes.html">Predecir Carnes</a>
+                    <a href="predecir_pescados.html">Predecir Pescados</a>
+                    <a href="predecir_hortofruticolas.html">Predecir Hortofrutícolas</a>
+                </div>
+            </div>
+            <a href="#" class="btn">{{ comercioActivo }}</a>
+            <script src="js/comercio.js"></script>
+        </div>
+    </header>
+
     <div id="app">
         <div class="login-container">
             <form @submit.prevent="updateComercio">

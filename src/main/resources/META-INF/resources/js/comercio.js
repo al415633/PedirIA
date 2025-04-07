@@ -230,10 +230,9 @@ Vue.createApp({
             } else {
                 console.warn("No se encontró la cookie");
             }
+
         }
-    },
-    mounted() {
         this.doGet();
         this.getActiveComercio()
-    }
+    },
 }).mount("#app"); //entiendo que hace que controlo lo que hay dentro del div de "app"

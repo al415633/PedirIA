@@ -1,9 +1,15 @@
+// import Header from "../Header.vue";
+
+
 const RETRIEVE_ALL = "/comercio";
 const POST = "/comercio/create";
 const DELETE = "/comercio/delete/";
 const RETRIEVE_ONE = "/comercio/login";
 const UPDATE = "/comercio/update";
 const LOGOUT = "/comercio/logout";
+
+const RETRIEVE_ACTIVE = "/comercio/obtener";
+
 
 
 
@@ -17,7 +23,8 @@ Vue.createApp({
             nombre: "",
             tipoComercio: "",
             dia: "",
-            currentComercio: {}
+            currentComercio: {},
+            comercioActivo: "sin sesion"
         };
     },
     methods: {
@@ -179,7 +186,17 @@ Vue.createApp({
                 alert("Hubo un problema al cerrar sesión.");
                 window.location.href = "registroError.html"; // Redirigir en caso de error
             }
-        }
+        },
+        async getActiveComercio() {
+            await axios.get(RETRIEVE_ACTIVE)
+                .then((response) => {
+                    this.comercioActivo = response.data;
+                    console.log(response.data);
+                })
+                .catch((error) => {
+                    console.log("Error al obtener los datos:", error);
+                });
+        },
 
     },
     mounted() {
@@ -214,9 +231,9 @@ Vue.createApp({
                 console.warn("No se encontró la cookie");
             }
         }
+    },
+    mounted() {
+        this.doGet();
+        this.getActiveComercio()
     }
-
-
-
-
-}).mount("#app"); //entiendo que hace que controle lo que hay dentro del div de "app"
+}).mount("#app"); //entiendo que hace que controlo lo que hay dentro del div de "app"

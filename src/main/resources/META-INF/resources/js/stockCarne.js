@@ -8,10 +8,6 @@ const API_CARNE = "/carnes/";
 const VALIDAR_CARNE = "/carnes/validar";
 
 const API_OFERTAS = "/oferta";
-const RETRIEVE_ONE_OFERTA = "/oferta/retrieve/";
-const ADD_OFERTA = "/oferta/create";
-const UPDATE_OFERTA = "/oferta/update";
-const DELETE_OFERTA = "/oferta/delete/"
 
 createApp({
     data() {
@@ -34,10 +30,12 @@ createApp({
             nombreError: '',
             unidadError: '',
             isInvalid: false,
+            ofertas: [],
             nuevaOferta: {
                 ubicacion: '',
                 cantidad: '',
-            }
+            },
+            editingOferta: { ubicacion: '' },
         };
     },
     computed: {
@@ -95,10 +93,13 @@ createApp({
                 })
                 .catch(error => console.error("Error al cargar el historial:", error));
         },
-        loadOfertas() {
-            axios.get("/oferta")
+        loadOfertasPublicadas() {
+            console.log("Actualizando ofertas")
+            axios.get(API_OFERTAS + "/mis-ofertas-publicadas/carne/" + this.product.id)
                 .then(response => {
                     this.ofertas = response.data;
+                    console.log(this.ofertas)
+                    this.activeTab = "ofertasPublicadas"
                 })
                 .catch(error => {
                     console.error("Error al cargar ofertas:", error);
@@ -127,7 +128,7 @@ createApp({
 
             axios.post(ADD_STOCK, stockData)
                 .then(response => {
-                    this.showToast(`${this.formatNumber(stockData.cantidad)} ${this.product.unidad} añadidas. Ingreso: ${this.formatDate(stockData.fechaIngreso)}, Vence: ${this.formatDate(stockData.fechaVencimiento)}`, "bg-primary");
+                    this.showToast(`${this.formatNumber(stockData.cantidad)} ${this.product.unidad} añadidas. Ingreso: ${this.formatDate(stockData.fechaIngreso)}, Vence: ${this.formatDate(stockData.fechaVencimiento)}`, "bg-success");
                     this.loadCurrentStock();
                     this.newStock = { cantidad: '', fechaIngreso: '', fechaVencimiento: '' };
                 })
@@ -290,7 +291,26 @@ createApp({
                     this.showToast(error.response.data, "bg-danger");
                     console.error("Error:", error);
                 });
-        }
+        },
+        editOferta(oferta) {
+            this.editingOferta = JSON.parse(JSON.stringify(oferta));
+            new bootstrap.Modal(document.getElementById("editOfertaModal")).show();
+        },
+        updateOferta() {
+            axios.put(API_OFERTAS + "/" + this.editingOferta.id, this.editingOferta)
+                .then(() => {
+                    bootstrap.Modal.getInstance(document.getElementById("editOfertaModal")).hide();
+                    this.loadProductDetails();
+                    this.loadCurrentStock();
+                    this.loadOfertasPublicadas();
+                    this.showToast("Oferta modificada con éxito", "bg-success");
+                })
+                .catch(error => {
+                    this.showToast(error.response.data, "bg-danger");
+                    console.error("Error:", error);
+                });
+
+        },
 
     },
     mounted() {

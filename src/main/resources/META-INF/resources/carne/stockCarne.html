@@ -132,7 +132,10 @@
                     <a class="nav-link clickable" :class="{ active: activeTab === 'historico' }" @click="loadHistorico">Histórico de Ventas</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link clickable" :class="{ active: activeTab === 'ofertas' }" @click="loadHistorico">Ofertas</a>
+                    <a class="nav-link clickable" :class="{ active: activeTab === 'ofertasPublicadas' }" @click="loadOfertasPublicadas">Ofertas publicadas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link clickable" :class="{ active: activeTab === 'ofertas' }" @click="">Ofertas aceptadas</a>
                 </li>
             </ul>
 
@@ -203,6 +206,31 @@
                         <td>{{ formatDate(venta.fechaVenta) }}</td>
                         <td>{{ formatDate(venta.fechaIngreso) }}</td>
                         <td>{{ formatDate(venta.fechaVencimiento) }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div v-if="activeTab === 'ofertasPublicadas'">
+                <h4>Ofertas Actuales</h4>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Ubicación</th>
+                        <th>Cantidad</th>
+                        <th>Fecha Alta</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="oferta in ofertas" :key="oferta.id">
+                        <td>{{ oferta.ubicacion }}</td>
+                        <td>{{ oferta.cantidad }}</td>
+                        <td>{{ formatDate(oferta.fechaAlta) }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-2" @click="editOferta(oferta)">Editar</button>
+                            <button class="btn btn-sm btn-danger" @click="darDeBajaOferta(oferta)">Eliminar</button>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -286,7 +314,7 @@
         </div>
     </div>
 
-    <!-- Modal de confirmación de eliminación -->
+    <!-- Modal de confirmación de eliminación producto -->
     <div class="modal fade" id="deleteCarneModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -330,6 +358,31 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="editOfertaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Oferta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Campo de Ubicación -->
+                    <div class="mb-3">
+                        <label for="ubicacionE" class="form-label">Ubicación</label>
+                        <input id="ubicacionE" type="text" class="form-control" v-model="editingOferta.ubicacion" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <!-- Botones de Cancelar y Confirmar -->
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" @click="updateOferta">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
 </div>
 

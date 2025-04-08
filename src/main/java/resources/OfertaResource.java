@@ -4,8 +4,6 @@ import data.ComercioDetails;
 import data.Oferta;
 import data.OfertaRequest;
 import data.StockProducto;
-import data.carniceria.StockCarne;
-import data.hortofruticola.StockHortoFruticola;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.ws.rs.*;
@@ -64,17 +62,25 @@ public class OfertaResource {
 
 
     @GET
-    @Path("/mis-ofertas")
+    @Path("/mis-ofertas-publicadas/{tipo}/{idProducto}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOfertasByNegocio(@CookieParam("usuario") String correo) {
+    public Response getOfertasByTipoYProducto(
+            @CookieParam("usuario") String correo,
+            @PathParam("tipo") String tipo,
+            @PathParam("idProducto") Long idProducto) {
 
         Long idNegocio = daoComercio.getComercioPorCorreo(correo).getId_usuario();
 
-        if (idNegocio == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Se requiere el id del negocio").build();
+        List<Oferta> ofertas;
+        switch (tipo.toLowerCase()) {
+            case "carne" -> ofertas = daoOferta.obtenerOfertasPorProductoCarne(idNegocio, idProducto);
+            case "pescado" -> ofertas = daoOferta.obtenerOfertasPorProductoPescado(idNegocio, idProducto);
+            case "hortofruticola" -> ofertas = daoOferta.obtenerOfertasPorProductoHortofruticola(idNegocio, idProducto);
+            default -> {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Tipo no válido").build();
+            }
         }
-        List<Oferta> ofertas = daoOferta.obtenerOfertasPorNegocio(idNegocio);
+
         return Response.ok(ofertas).build();
     }
 
@@ -150,6 +156,39 @@ public class OfertaResource {
                     .entity("Error al aceptar la oferta: " + e.getMessage()).build();
         }
     }
+
+    @PUT
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editarOferta(@PathParam("id") Long id, OfertaRequest ofertaRequest) {
+        // Buscar la oferta por ID
+        Oferta oferta = daoOferta.obtenerOfertaPorId(id);
+        if (oferta == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Oferta no encontrada").build();
+        }
+
+        // Actualizar los campos de la oferta con los datos proporcionados en ofertaRequest
+        oferta.setUbicacion(ofertaRequest.getUbicacion());
+        oferta.setCantidad(ofertaRequest.getCantidad());
+        oferta.setFechaAlta(ofertaRequest.getFechaAlta());
+        oferta.setFechaBaja(ofertaRequest.getFechaBaja());
+
+        // Actualizar la oferta en la base de datos
+        try {
+            Oferta ofertaActualizada = daoOferta.modificarOferta(oferta);
+            return Response.ok(ofertaActualizada).build();
+        } catch (PersistenceException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error de persistencia al actualizar la oferta: " + e.getMessage()).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al actualizar la oferta: " + e.getMessage()).build();
+        }
+    }
+
 
     private StockProducto<?> buscarStockPorIdYTipo(Long stockId, String tipoStock) {
         switch (tipoStock) {

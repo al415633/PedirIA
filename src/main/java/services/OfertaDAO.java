@@ -48,6 +48,50 @@ public class OfertaDAO {
                 .getResultList();
     }
 
+    public List<Oferta> obtenerOfertasPorProductoCarne(Long idNegocio, Long idProductoCarne) {
+        return em.createQuery("""
+        SELECT o FROM Oferta o
+        JOIN o.productoOferta po
+        JOIN po.stockCarne sc
+        WHERE o.negocio.id = :idNegocio
+          AND sc.producto.id = :idProductoCarne
+          AND o.fechaBaja IS NULL
+    """, Oferta.class)
+                .setParameter("idNegocio", idNegocio)
+                .setParameter("idProductoCarne", idProductoCarne)
+                .getResultList();
+    }
+
+    public List<Oferta> obtenerOfertasPorProductoPescado(Long idNegocio, Long idPescado) {
+        return em.createQuery("""
+            SELECT o FROM Oferta o
+            JOIN o.productoOferta po
+            JOIN po.stockPescado sc
+            WHERE o.negocio.id = :idNegocio
+              AND sc.producto.id = :idPescado
+              AND o.fechaBaja IS NULL
+        """, Oferta.class)
+                .setParameter("idNegocio", idNegocio)
+                .setParameter("idPescado", idPescado)
+                .getResultList();
+    }
+
+    public List<Oferta> obtenerOfertasPorProductoHortofruticola(Long idNegocio, Long idhortofruticola) {
+        return em.createQuery("""
+            SELECT o FROM Oferta o
+            JOIN o.productoOferta po
+            JOIN po.stockHortoFruticola sc
+            WHERE o.negocio.id = :idNegocio
+              AND sc.producto.id = :idhortofruticola
+              AND o.fechaBaja IS NULL
+        """, Oferta.class)
+                .setParameter("idNegocio", idNegocio)
+                .setParameter("idhortofruticola", idhortofruticola)
+                .getResultList();
+    }
+
+
+
     // Actualiza una oferta para asignarle un aprovechante y una fecha_baja
     public Oferta aceptarOferta(Oferta oferta, Long idAprovechante) {
         EntityTransaction transaction = em.getTransaction();
@@ -128,6 +172,17 @@ public class OfertaDAO {
                 transaction.rollback();
             }
             return false;
+        }
+    }
+
+    @Transactional
+    public Oferta modificarOferta(Oferta oferta) {
+        try {
+            // Guardar los cambios en la oferta
+            return em.merge(oferta);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;  // Si ocurre un error, retornar null
         }
     }
 }

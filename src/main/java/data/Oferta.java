@@ -1,5 +1,6 @@
 package data;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -35,6 +36,7 @@ public class Oferta {
     private ComercioDetails negocio;
 
     @OneToOne(mappedBy = "oferta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private ProductoOferta productoOferta;
 
     public Long getId() {

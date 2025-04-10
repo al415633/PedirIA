@@ -53,15 +53,23 @@ Vue.createApp({
                 const response = await axios.post(url);
 
                 if (response.status === 200) {
+                    console.log(response.data)
+                    const tipoComercio = response.data.negocio.tipo_negocio
+
                     alert("Inicio de sesión exitoso");
 
                     // PEQUEÑO RETRASO para asegurar que la cookie se guarda
                     setTimeout(() => {
 
-                        window.location.href = "./menu_productos.html";
                     }, 200); // 200ms suficiente
 
-                    window.location.href = "./menu_productos.html"; // Página correcta
+                    if (tipoComercio === "carne") {
+                        window.location.href = "/carne/gestion_carne.html";
+                    } else if (tipoComercio === "pescado") {
+                        window.location.href = "/pescado/gestion_pescado.html";
+                    } else if (tipoComercio === "fruta") {
+                        window.location.href = "/hortofruticola/gestion_hortofruticola.html";
+                    }
                 } else {
                     throw new Error("Error en la autenticación");
                 }
@@ -105,7 +113,14 @@ Vue.createApp({
 
                 if (response.status === 201) {
                     alert("Registro exitoso");
-                    window.location.href = "menu_productos.html";
+                    if (tipoComercio === "carne") {
+                        window.location.href = "/carne/gestion_carne.html";
+                    } else if (tipoComercio === "pescado") {
+                        window.location.href = "/pescado/gestion_pescado.html";
+                    } else if (tipoComercio === "fruta") {
+                        window.location.href = "/hortofruticola/gestion_hortofruticola.html";
+                    }
+
                 } else {
                     throw new Error("Error en el registro");
                 }

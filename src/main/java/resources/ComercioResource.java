@@ -12,6 +12,8 @@ import jakarta.ws.rs.core.Response;
 import services.ComercioDao;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Path("/comercio")
@@ -208,8 +210,15 @@ public class ComercioResource {
 
         NewCookie cookie = new NewCookie("usuario", correo, "/", null, "Usuario en sesión", 3600, false);
         System.out.println(cookie);
-        return Response.ok("Sesión iniciada para " + correo).cookie(cookie).build();
 
+        ComercioDetails negocio = usuario.getNegocio(); // Suponiendo que Usuario tiene un método 'getNegocio()'
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("mensaje", "Sesión iniciada para " + correo);
+        responseMap.put("negocio", negocio); // Incluir el objeto negocio en la respuesta
+
+        // Devolver la respuesta con el objeto negocio y la cookie
+        return Response.ok(responseMap).cookie(cookie).build();
 
     }
 

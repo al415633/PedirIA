@@ -45,7 +45,8 @@ public class ComercioResource {
         if (usuario == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("No hay sesión activa").build();
         }
-        return Response.ok("Perfil del usuario en sesión: " + usuario).build();
+//        return Response.ok("Perfil del usuario en sesión: " + usuario).build(); //versión anterior, no se puede observar donde se usaba
+        return Response.ok(usuario).build();
     }
 
     @POST
@@ -151,15 +152,35 @@ public class ComercioResource {
         }
     }
 
+
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/delete/{correo}")
-    public Response deleteComercio(@PathParam("correo") final String correo) {
-        boolean eliminado = dao.eliminarNegocio(correo);
-        if (!eliminado) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+    public Response deleteComercio(@PathParam("correo") String correo) {
+
+        Usuario usuario = dao.getComercioPorCorreo(correo);
+
+        // Verificar si el usuario existe
+        if (usuario == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Usuario no encontrado")
+                    .build();
         }
-        return Response.noContent().build();
+
+        // Eliminar el usuario y su negocio asociado
+        boolean eliminado = dao.eliminarNegocio(correo);
+
+        if (!eliminado) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al eliminar el comercio")
+                    .build();
+        }
+
+        NewCookie cookie = new NewCookie("usuario", "", "/", null, "Usuario en sesión", 0, false);
+
+        return Response.noContent()
+                .cookie(cookie) // Deshabilitar (eliminar) la cookie
+                .build();
     }
 
 
@@ -191,6 +212,26 @@ public class ComercioResource {
 
 
     }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/logout")
+    public Response logout(@CookieParam("usuario") String correo) {
+        // Verificar si el usuario está autenticado (si la cookie existe)
+        if (correo == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("No hay sesión activa")
+                    .build();
+        }
+
+        // Eliminar la cookie del usuario configurando su valor vacío y tiempo de expiración a 0
+        NewCookie cookie = new NewCookie("usuario", "", "/", null, "Usuario en sesión", 0, false);
+
+        return Response.ok("Sesión cerrada con éxito")
+                .cookie(cookie) // Deshabilitar (vaciar) la cookie
+                .build();
+    }
+
 
 
 }

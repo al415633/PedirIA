@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PedirIA - Pescadería</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!--  <script src="https://unpkg.com/vue@3"></script>  &lt;!&ndash; Usamos Vue 3 desde el CDN &ndash;&gt;-->
+<!--  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>-->
   <style>
     /* Estilos del navbar */
     .navbar_container {
@@ -50,28 +55,86 @@
   </style>
 </head>
 <body>
-<header>
-  <div class="navbar-box">
-    <div class="navbar_container">
-      <img src="images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
-      <a href="#" class="btn">Mis datos</a>
-      <a href="#" class="btn">Stock</a>
-      <a href="#" class="btn">Modificar datos</a>
+<!--<div id="header-container"></div>-->
+<!--<iframe src="header.html" style="width:100%; border:none;"></iframe>-->
+<!--<object type="text/html" data="header.html" width="100%" height="150px"></object>-->
+<!--<div id="header">-->
+<!--  &lt;!&ndash; Aquí incluyes el contenido de header.html &ndash;&gt;-->
+<!--  <div id="header-content"></div>-->
+<!--</div>-->
+<!--<div id="app">-->
+<!--  <Header></Header>-->
+<!--</div>-->
+<header class="navbar_container">
+        <div id="app"  class="navbar-box">
+            <img src="images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
+            <a href="#" class="btn">Mis datos</a>
+            <a href="#" class="btn">Stock</a>
+            <a href="#" class="btn">Modificar datos</a>
 
-      <!-- Menú desplegable en "Generar informe" -->
-      <div class="dropdown">
-        <a href="#" class="btn">Generar informe</a>
-        <div class="dropdown-content">
-          <a href="predecir_carnes.html">Predecir Carnes</a>
-          <a href="predecir_pescados.html">Predecir Pescados</a>
-          <a href="predecir_hortofruticolas.html">Predecir Hortofrutícolas</a>
+            <div class="dropdown">
+                <a href="#" class="btn">Generar informe</a>
+                <div class="dropdown-content">
+                    <a href="predecir_carnes.html">Predecir Carnes</a>
+                    <a href="predecir_pescados.html">Predecir Pescados</a>
+                    <a href="predecir_hortofruticolas.html">Predecir Hortofrutícolas</a>
+                </div>
+            </div>
+            <a   href="#" class="btn">{{ comercioActivo }}</a>
+            <script src="js/comercio.js"></script>
         </div>
-      </div>
-
-      <a href="#" class="btn">Pescadería Manolo Pérez</a>
-    </div>
-  </div>
 </header>
+<!--<script type="module">-->
+<!--  import { createApp } from 'src/main/resources/META-INF/resources/js/comercio.js';-->
+<!--  import Header from './Header.vue';-->
+
+<!--  createApp({-->
+<!--    components: {-->
+<!--      Header-->
+<!--    }-->
+<!--  }).mount('#app');-->
+<!--</script>-->
+<!--<script src="header.js"></script>-->
+<!--<script>-->
+<!--  // Aquí cargamos el header.html usando JavaScript-->
+<!--  fetch('header.html')-->
+<!--          .then(response => response.text())-->
+<!--          .then(data => {-->
+<!--            document.getElementById('header-content').innerHTML = data;-->
+<!--          });-->
+
+<!--  // Manejo básico de navegación sin recargar la página-->
+<!--  document.querySelectorAll('a').forEach(link => {-->
+<!--    link.addEventListener('click', (event) => {-->
+<!--      event.preventDefault(); // Prevenir la recarga de la página-->
+<!--      const target = event.target.getAttribute('href').substring(1); // Obtener la ruta-->
+<!--      document.querySelectorAll('.page-content').forEach(page => page.style.display = 'none');-->
+<!--      document.getElementById(target).style.display = 'block'; // Mostrar la página correspondiente-->
+<!--    });-->
+<!--  });-->
+<!--</script>-->
+<!--<header>-->
+<!--  <div class="navbar-box">-->
+<!--    <div class="navbar_container">-->
+<!--      <img src="images/logo_cropped.png" alt="PEDIRIA" class="small_logo">-->
+<!--      <a href="#" class="btn">Mis datos</a>-->
+<!--      <a href="#" class="btn">Stock</a>-->
+<!--      <a href="#" class="btn">Modificar datos</a>-->
+
+<!--      &lt;!&ndash; Menú desplegable en "Generar informe" &ndash;&gt;-->
+<!--      <div class="dropdown">-->
+<!--        <a href="#" class="btn">Generar informe</a>-->
+<!--        <div class="dropdown-content">-->
+<!--          <a href="predecir_carnes.html">Predecir Carnes</a>-->
+<!--          <a href="predecir_pescados.html">Predecir Pescados</a>-->
+<!--          <a href="predecir_hortofruticolas.html">Predecir Hortofrutícolas</a>-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      <a href="#" class="btn">Pescadería Manolo Pérez</a>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</header>-->
 
 <div class="message_content">
   <p>Datos muy interesantes</p>

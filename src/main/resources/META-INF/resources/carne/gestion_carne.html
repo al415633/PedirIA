@@ -55,7 +55,7 @@
 <body>
 
 <header class="d-flex align-items-center px-4">
-    <a href="../menu_productos.html">
+    <a href="/">
         <img src="/static/logo.png" alt="Logo PedirIA">
     </a>
     <h1>Gestión de Carne</h1>
@@ -154,8 +154,17 @@
             Mensaje de notificación aquí.
         </div>
     </div>
-
 </div>
+<div id="footer"></div>
+
+<script>
+    // Cargar el contenido del footer desde footer.html
+    fetch('../footer.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('footer').innerHTML = data;
+        });
+</script>
 
 <script src="../js/carne.js"></script>
 

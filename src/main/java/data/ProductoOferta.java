@@ -1,5 +1,6 @@
 package data;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import data.carniceria.StockCarne;
 import data.hortofruticola.StockHortoFruticola;
@@ -17,7 +18,7 @@ public class ProductoOferta {
 
     @OneToOne
     @JoinColumn(name = "id_oferta", nullable = false, unique = true)
-    @JsonManagedReference
+    @JsonBackReference
     private Oferta oferta;
 
     @ManyToOne

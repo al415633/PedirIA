@@ -36,6 +36,7 @@ createApp({
                 cantidad: '',
             },
             editingOferta: { ubicacion: '' },
+            selectedOffer: {},
         };
     },
     computed: {
@@ -94,11 +95,21 @@ createApp({
                 .catch(error => console.error("Error al cargar el historial:", error));
         },
         loadOfertasPublicadas() {
-            console.log("Actualizando ofertas")
             axios.get(API_OFERTAS + "/mis-ofertas-publicadas/carne/" + this.product.id)
                 .then(response => {
                     this.ofertas = response.data;
                     console.log(this.ofertas)
+
+                    // Ordenar las ofertas por fechaBaja (fecha de vencimiento)
+                    this.ofertas.sort((a, b) => {
+                        // Asegúrate de que las fechas están en formato Date (si no lo están, conviértelas)
+                        const fechaA = new Date(a.productoOferta.stock.fechaVencimiento);
+                        const fechaB = new Date(b.productoOferta.stock.fechaVencimiento);
+
+                        // Orden ascendente (de menor a mayor fecha de vencimiento)
+                        return fechaA - fechaB;
+                    });
+
                     this.activeTab = "ofertasPublicadas"
                 })
                 .catch(error => {
@@ -310,6 +321,24 @@ createApp({
                     console.error("Error:", error);
                 });
 
+        },
+        openDeleteOfferModal(oferta) {
+            this.selectedOffer = JSON.parse(JSON.stringify(oferta));
+            new bootstrap.Modal(document.getElementById("deleteOfferModal")).show();
+        },
+        deleteOferta() {
+            axios.delete(API_OFERTAS + "/" + this.selectedOffer.id)
+                .then(() => {
+                    this.showToast("Oferta eliminada con éxito.", "bg-success");
+                    // Cerrar el modal
+                    bootstrap.Modal.getInstance(document.getElementById("deleteOfferModal")).hide();
+                    // Recargar la lista de ofertas para reflejar la eliminación
+                    this.loadOfertasPublicadas();
+                })
+                .catch(error => {
+                    console.error("Error al eliminar la oferta:", error);
+                    this.showToast("Error al eliminar la oferta.", "bg-danger");
+                });
         },
 
     },

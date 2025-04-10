@@ -153,27 +153,47 @@ public class OfertaDAO {
         return em.find(Oferta.class, id);
     }
 
+    @Transactional
     public boolean eliminarOferta(Long id) {
-        EntityTransaction transaction = em.getTransaction();
         try {
-            transaction.begin();
-
             Oferta oferta = em.find(Oferta.class, id);
             if (oferta != null) {
+                // Se obtiene el ProductoOferta asociado
+                ProductoOferta productoOferta = oferta.getProductoOferta();
+                if (productoOferta != null) {
+                    BigDecimal cantidadOferta = BigDecimal.valueOf(oferta.getCantidad());
+                    StockProducto<?> stockProducto = productoOferta.getStock();
+                    if (stockProducto instanceof StockCarne stock) {
+                        if (stock.getFechaVencimiento().isAfter(LocalDate.now())) {
+                            stock.setCantidad(stock.getCantidad().add(cantidadOferta));
+                            em.merge(stock);
+                        }
+                    } else if (stockProducto instanceof StockPescado stock) {
+                        if (stock.getFechaVencimiento().isAfter(LocalDate.now())) {
+                            stock.setCantidad(stock.getCantidad().add(cantidadOferta));
+                            em.merge(stock);
+                        }
+                    } else if (stockProducto instanceof StockHortoFruticola stock) {
+                        if (stock.getFechaVencimiento().isAfter(LocalDate.now())) {
+                            stock.setCantidad(stock.getCantidad().add(cantidadOferta));
+                            em.merge(stock);
+                        }
+                    }
+                }
+                em.remove(oferta.getProductoOferta());
+
+                // Finalmente se elimina la oferta
                 em.remove(oferta);
-                transaction.commit();
                 return true;
             }
-
-            transaction.rollback();
             return false;
         } catch (Exception e) {
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
+
+            e.printStackTrace();
             return false;
         }
     }
+
 
     @Transactional
     public Oferta modificarOferta(Oferta oferta) {

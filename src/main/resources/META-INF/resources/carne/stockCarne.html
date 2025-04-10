@@ -219,17 +219,19 @@
                         <th>Ubicación</th>
                         <th>Cantidad</th>
                         <th>Fecha Alta</th>
+                        <th>Fecha Vencimiento</th>
                         <th>Acciones</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr v-for="oferta in ofertas" :key="oferta.id">
-                        <td>{{ oferta.ubicacion }}</td>
+                        <td>{{ oferta.ubicacion }} </td>
                         <td>{{ oferta.cantidad }}</td>
                         <td>{{ formatDate(oferta.fechaAlta) }}</td>
+                        <td>{{ formatDate(oferta.productoOferta.stock.fechaVencimiento) }}</td>
                         <td>
                             <button class="btn btn-sm btn-warning me-2" @click="editOferta(oferta)">Editar</button>
-                            <button class="btn btn-sm btn-danger" @click="darDeBajaOferta(oferta)">Eliminar</button>
+                            <button class="btn btn-sm btn-danger" @click="openDeleteOfferModal(oferta)">Eliminar</button>
                         </td>
                     </tr>
                     </tbody>
@@ -382,6 +384,24 @@
         </div>
     </div>
 
+    <!-- Modal para confirmar la eliminación de una oferta -->
+    <div class="modal fade" id="deleteOfferModal" tabindex="-1" aria-labelledby="deleteOfferModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteOfferModalLabel">Eliminar Oferta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar esta oferta?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" @click="deleteOferta">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </div>

@@ -67,17 +67,17 @@ def init_negocios():
         (
             "Carnicería Carlos Gómez",
             datetime.now(),
-            "carnicería",
+            "carne",
         ),
         (
             "Pescadería Laura Pérez",
             datetime.now(),
-            "pescadería",
+            "pescado",
         ),
         (
             "Frutería Miguel Ruiz",
             datetime.now(),
-            "frutería",
+            "fruta",
         ),
     ]
     print([(u[0], u[1], u[2]) for u in usuarios])

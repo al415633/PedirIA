@@ -48,7 +48,7 @@ public class OfertaDAO {
                 .getResultList();
     }
 
-    public List<Oferta> obtenerOfertasPorProductoCarne(Long idNegocio, Long idProductoCarne) {
+    public List<Oferta> obtenerOfertasPorProductoCarnePublicadas(Long idNegocio, Long idProductoCarne) {
         return em.createQuery("""
         SELECT o FROM Oferta o
         JOIN o.productoOferta po
@@ -62,7 +62,21 @@ public class OfertaDAO {
                 .getResultList();
     }
 
-    public List<Oferta> obtenerOfertasPorProductoPescado(Long idNegocio, Long idPescado) {
+    public List<Oferta> obtenerOfertasPorProductoCarneAceptadas(Long idNegocio, Long idProductoCarne) {
+        return em.createQuery("""
+        SELECT o FROM Oferta o
+        JOIN o.productoOferta po
+        JOIN po.stockCarne sc
+        WHERE o.negocio.id = :idNegocio
+          AND sc.producto.id = :idProductoCarne
+          AND o.fechaBaja IS NOT NULL
+    """, Oferta.class)
+                .setParameter("idNegocio", idNegocio)
+                .setParameter("idProductoCarne", idProductoCarne)
+                .getResultList();
+    }
+
+    public List<Oferta> obtenerOfertasPorProductoPescadoPublicadas(Long idNegocio, Long idPescado) {
         return em.createQuery("""
             SELECT o FROM Oferta o
             JOIN o.productoOferta po
@@ -75,8 +89,22 @@ public class OfertaDAO {
                 .setParameter("idPescado", idPescado)
                 .getResultList();
     }
+    public List<Oferta> obtenerOfertasPorProductoPescadoAceptadas(Long idNegocio, Long idPescado) {
+        return em.createQuery("""
+            SELECT o FROM Oferta o
+            JOIN o.productoOferta po
+            JOIN po.stockPescado sc
+            WHERE o.negocio.id = :idNegocio
+              AND sc.producto.id = :idPescado
+              AND o.fechaBaja IS NOT NULL
+        """, Oferta.class)
+                .setParameter("idNegocio", idNegocio)
+                .setParameter("idPescado", idPescado)
+                .getResultList();
+    }
 
-    public List<Oferta> obtenerOfertasPorProductoHortofruticola(Long idNegocio, Long idhortofruticola) {
+
+    public List<Oferta> obtenerOfertasPorProductoHortofruticolaPublicadas(Long idNegocio, Long idhortofruticola) {
         return em.createQuery("""
             SELECT o FROM Oferta o
             JOIN o.productoOferta po
@@ -90,6 +118,19 @@ public class OfertaDAO {
                 .getResultList();
     }
 
+    public List<Oferta> obtenerOfertasPorProductoHortofruticolaAceptadas(Long idNegocio, Long idhortofruticola) {
+        return em.createQuery("""
+            SELECT o FROM Oferta o
+            JOIN o.productoOferta po
+            JOIN po.stockHortoFruticola sc
+            WHERE o.negocio.id = :idNegocio
+              AND sc.producto.id = :idhortofruticola
+              AND o.fechaBaja IS NOT NULL
+        """, Oferta.class)
+                .setParameter("idNegocio", idNegocio)
+                .setParameter("idhortofruticola", idhortofruticola)
+                .getResultList();
+    }
 
 
     // Actualiza una oferta para asignarle un aprovechante y una fecha_baja

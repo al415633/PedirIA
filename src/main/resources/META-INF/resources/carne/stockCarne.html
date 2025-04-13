@@ -174,14 +174,14 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="stock in sortedCurrentStock" :key="stock.id">
+                    <tr v-for="stock in sortedCurrentStock" :key="stock.id" :class="{'table-danger': isNearExpiration(stock.fechaVencimiento)}">
                         <td>{{ stock.cantidadFormateada  }}</td>
                         <td>{{ formatDate(stock.fechaIngreso) }}</td>
-                        <td>{{ formatDate(stock.fechaVencimiento) }}</td>
+                        <td :class="{'text-danger': isNearExpiration(stock.fechaVencimiento)}">{{ formatDate(stock.fechaVencimiento) }}</td>
                         <td>
                             <button style="margin-right: 10px;" class="btn btn-sm btn-warning stock-actions" @click="editStock(stock)">✏️ Editar</button>
                             <button style="margin-right: 10px;" class="btn btn-sm btn-danger stock-actions" @click="openSellStock(stock)">🛒 Vender</button>
-                            <button class="btn btn-sm btn-success stock-actions" @click="openCreateOfferModal(stock)">🏷️ Ofertar</button>
+                            <button v-if="isNearExpiration(stock.fechaVencimiento)" class="btn btn-sm btn-success stock-actions" @click="openCreateOfferModal(stock)">🏷️ Ofertar</button>
                         </td>
                     </tr>
                     </tbody>

@@ -64,7 +64,7 @@ public class OfertaResource {
     @GET
     @Path("/mis-ofertas-publicadas/{tipo}/{idProducto}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOfertasByTipoYProducto(
+    public Response getOfertasByTipoYProductoPublicadas(
             @CookieParam("usuario") String correo,
             @PathParam("tipo") String tipo,
             @PathParam("idProducto") Long idProducto) {
@@ -73,9 +73,32 @@ public class OfertaResource {
 
         List<Oferta> ofertas;
         switch (tipo.toLowerCase()) {
-            case "carne" -> ofertas = daoOferta.obtenerOfertasPorProductoCarne(idNegocio, idProducto);
-            case "pescado" -> ofertas = daoOferta.obtenerOfertasPorProductoPescado(idNegocio, idProducto);
-            case "hortofruticola" -> ofertas = daoOferta.obtenerOfertasPorProductoHortofruticola(idNegocio, idProducto);
+            case "carne" -> ofertas = daoOferta.obtenerOfertasPorProductoCarnePublicadas(idNegocio, idProducto);
+            case "pescado" -> ofertas = daoOferta.obtenerOfertasPorProductoPescadoPublicadas(idNegocio, idProducto);
+            case "hortofruticola" -> ofertas = daoOferta.obtenerOfertasPorProductoHortofruticolaPublicadas(idNegocio, idProducto);
+            default -> {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Tipo no válido").build();
+            }
+        }
+
+        return Response.ok(ofertas).build();
+    }
+
+    @GET
+    @Path("/mis-ofertas-aceptadas/{tipo}/{idProducto}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOfertasByTipoYProductoAceptadas(
+            @CookieParam("usuario") String correo,
+            @PathParam("tipo") String tipo,
+            @PathParam("idProducto") Long idProducto) {
+
+        Long idNegocio = daoComercio.getComercioPorCorreo(correo).getId_usuario();
+
+        List<Oferta> ofertas;
+        switch (tipo.toLowerCase()) {
+            case "carne" -> ofertas = daoOferta.obtenerOfertasPorProductoCarneAceptadas(idNegocio, idProducto);
+            case "pescado" -> ofertas = daoOferta.obtenerOfertasPorProductoPescadoAceptadas(idNegocio, idProducto);
+            case "hortofruticola" -> ofertas = daoOferta.obtenerOfertasPorProductoHortofruticolaAceptadas(idNegocio, idProducto);
             default -> {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Tipo no válido").build();
             }

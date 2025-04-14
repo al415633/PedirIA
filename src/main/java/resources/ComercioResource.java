@@ -159,8 +159,8 @@ public class ComercioResource {
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/delete/{correo}")
-    public Response deleteComercio(@PathParam("correo") String correo) {
+    @Path("/delete/")
+    public Response deleteComercio(@CookieParam("usuario") String correo) {
 
         Usuario usuario = dao.getComercioPorCorreo(correo);
 

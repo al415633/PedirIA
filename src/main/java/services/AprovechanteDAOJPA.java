@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
+import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -79,10 +80,11 @@ public class AprovechanteDAOJPA implements AprovechanteDao{
     @Transactional
     public boolean eliminarAprovechante(String correo) {
         Usuario usuario = getAprovechantePorCorreo(correo);
+        System.out.println("llegooooooooœ");
+        System.out.println(correo);
         if (usuario == null) return false;
 
         usuario.setFechaBaja(LocalDateTime.now());
-
         em.merge(usuario);
         return true;
     }

@@ -49,6 +49,17 @@
         </div>
     </header>
 
+    <!-- Modal de Confirmación -->
+    <div v-if="showModal" class="modal-overlay">
+        <div class="modal">
+            <h3>{{ modalMessage }}</h3>
+            <div class="modal-buttons">
+                <button @click="confirmAction" class="btn">Confirmar</button>
+                <button @click="closeModal" class="btn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <div>
         <div class="login-container">
             <div class="registro">
@@ -91,5 +102,16 @@
 </main>
 
 <script src="js/comercio.js"></script>
+
+<div id="footer"></div>
+
+<script>
+    // Cargar el contenido del footer desde footer.html
+    fetch('footer.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('footer').innerHTML = data;
+        });
+</script>
 </body>
 </html>

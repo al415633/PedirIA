@@ -6,6 +6,8 @@ import io.quarkus.elytron.security.common.BcryptUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @ApplicationScoped
@@ -52,7 +54,7 @@ public class ComercioDAOJPA implements ComercioDao{
         negocio.setUsuario(usuario);
 
         em.persist(negocio);
-        negocio.setTipo_negocio(usuario.getTipo());
+        //negocio.setTipo_negocio(usuario.getTipo());
         usuario.setTipo("negocio");
         usuario.setNegocio(negocio);
         return usuario;
@@ -84,10 +86,9 @@ public class ComercioDAOJPA implements ComercioDao{
         Usuario usuario = getComercioPorCorreo(correo);
         if (usuario == null) return false;
 
-        if (usuario.getNegocio() != null) {
-            em.remove(usuario.getNegocio());
-        }
-        em.remove(usuario);
+        usuario.setFechaBaja(LocalDateTime.now());
+
+        em.merge(usuario);
         return true;
     }
 
@@ -95,7 +96,7 @@ public class ComercioDAOJPA implements ComercioDao{
     public Usuario verificarCredenciales(String correo, String password) {
         try {
             List<Usuario> usuarios = em.createQuery(
-                            "SELECT u FROM Usuario u WHERE u.correo = :correo",
+                            "SELECT u FROM Usuario u WHERE u.correo = :correo AND u.fecha_baja IS NULL",
                             Usuario.class)
                     .setParameter("correo", correo)
                     .getResultList();

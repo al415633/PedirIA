@@ -5,6 +5,7 @@ const RETRIEVE_ONE = "/aprovechante/login";
 const UPDATE = "/aprovechante/update";
 const LOGOUT = "/aprovechante/logout";
 
+const RETRIEVE_ACTIVE = "/aprovechante/obtener";
 
 
 Vue.createApp({
@@ -17,7 +18,13 @@ Vue.createApp({
             tipoAprovechante: "",
             condiciones: "",
             condiciones2: "",
-            currentAprovechante: {}
+            currentAprovechante: {},
+            usuarioActivo: "sin sesion",
+            showUserDropdown: false,  // Controla la visibilidad del dropdown de usuario
+            showModal: false,         // Controla la visibilidad del modal
+            modalMessage: '',         // Mensaje que se mostrará en el modal
+            actionToConfirm: null,    // Acción que se va a confirmar (cerrar sesión/eliminar cuenta)
+
         };
     },
     methods: {
@@ -31,6 +38,40 @@ Vue.createApp({
                     console.log("Error al obtener los datos:", error);
                 });
         },
+
+        // Mostrar/ocultar el dropdown del usuario
+        toggleUserDropdown() {
+            this.showUserDropdown = !this.showUserDropdown;
+        },
+
+        // Mostrar el modal para confirmar la acción de cerrar sesión
+        confirmLogout() {
+            this.modalMessage = '¿Estás seguro que quieres cerrar sesión?';
+            this.actionToConfirm = this.logoutAprovechante;  // Establecer la acción que se confirmará
+            this.showModal = true;  // Mostrar el modal
+        },
+
+        // Mostrar el modal para confirmar la eliminación de cuenta
+        confirmDeleteAccount() {
+            this.modalMessage = '¿Estás seguro que quieres eliminar tu cuenta?';
+            this.actionToConfirm = this.deletAprovechante;  // Establecer la acción que se confirmará
+            this.showModal = true;  // Mostrar el modal
+        },
+
+        // Ejecutar la acción confirmada (cerrar sesión o eliminar cuenta)
+        async confirmAction() {
+            if (this.actionToConfirm) {
+                await this.actionToConfirm();  // Ejecutar la acción confirmada
+            }
+            this.closeModal();  // Cerrar el modal después de la acción
+        },
+
+        // Cerrar el modal sin hacer nada
+        closeModal() {
+            this.showModal = false;
+            this.actionToConfirm = null;
+        },
+
 
         async verificarAprovechante() {
             const correo = this.correo;
@@ -47,7 +88,14 @@ Vue.createApp({
 
                 if (response.status === 200) {
                     alert("Inicio de sesión exitoso");
-                    window.location.href = "menu_productos.html"; // Página correcta
+
+                    // PEQUEÑO RETRASO para asegurar que la cookie se guarda
+                    setTimeout(() => {
+
+                        window.location.href = "./menu_productos.html";
+                    }, 200); // 200ms suficiente
+
+                    window.location.href = "./menu_productos.html"; // Página correcta
                 } else {
                     throw new Error("Error en la autenticación");
                 }
@@ -105,39 +153,25 @@ Vue.createApp({
 
             const url = `${UPDATE}?correo=${correo}&password=${password}&condiciones=${condiciones}&condiciones2=${condiciones2}`;
 
-            // Realizamos la solicitud PUT al backend para actualizar el comercio
+            // Realizamos la solicitud PUT al backend para actualizar el aprovechante
             try {
-                //const response = await axios.put(UPDATE, comercio);
+                //const response = await axios.put(UPDATE, aprovechante);
                 const response = await axios.put(url);
                 // Verificamos si la actualización fue exitosa
                 if (response.status === 204) {
-                    alert("Comercio actualizado con éxito");
+                    alert("Aprovechante actualizado con éxito");
                     window.location.href = "menu_productos.html"; // Redirigir a otra página si es necesario
                 } else {
                     throw new Error("Error en la actualización");
                 }
             } catch (error) {
-                console.error("Error al actualizar comercio:", error);
-                alert("Hubo un problema con la actualización del comercio.");
+                console.error("Error al actualizar aprovechante:", error);
+                alert("Hubo un problema con la actualización del aprovechante.");
                 window.location.href = "registroError.html"; // Redirigir en caso de error
             }
         },
 
-        async deleteAprovechante(correo){
 
-            //TODO: ESTA MAL
-            console.log("Eliminando correo:", correo);
-            let self = this;
-            let url = DELETE + correo;
-            await axios.delete(url)
-                .then(function (response) {
-                    console.log("Correo eliminado:", response);
-                    self.doGet();
-                })
-                .catch(function (error) {
-                    console.log("Error al eliminar correo:", error);
-                });
-        },
         leerCookie(nombre) {
             const cookies = document.cookie.split("; ");
             for (let i = 0; i < cookies.length; i++) {
@@ -180,7 +214,7 @@ Vue.createApp({
                 // Verificamos si la respuesta fue exitosa
                 if (response.status === 200) {
                     alert("Sesión cerrada con éxito");
-                    window.location.href = "login.html"; // Redirigir al login o a la página deseada
+                    window.location.href = "index.html"; // Redirigir al login o a la página deseada
                 } else {
                     throw new Error("Error al cerrar sesión");
                 }
@@ -189,11 +223,21 @@ Vue.createApp({
                 alert("Hubo un problema al cerrar sesión.");
                 window.location.href = "registroError.html"; // Redirigir en caso de error
             }
-        }
+        },
+        async getActiveAprovechante() {
+            await axios.get(RETRIEVE_ACTIVE)
+                .then((response) => {
+                    this.usuarioActivo = response.data;
+                    console.log(response.data);
+                })
+                .catch((error) => {
+                    console.log("Error al obtener los datos:", error);
+                });
+        },
     },
     mounted() {
         // Solo ejecutar si estás en la página de modificar
-        if (window.location.pathname.includes("modificar") || window.location.pathname.includes("aprovechanteUPDATE")) {
+        if (window.location.pathname.includes("modificar") || window.location.pathname.includes("aprovechanteUPDATE") || window.location.pathname.includes("aprovechanteREAD")) {
             const correo = this.leerCookie("usuario");
 
             console.log("Correo leído de cookie (crudo):", correo);
@@ -213,7 +257,7 @@ Vue.createApp({
 
                         // Asignamos campos
                         this.correo = aprovechante.correo;
-                        this.tipoAprovechante = aprovechante.aprovechante.tipo_aprovechante; // Tipo de comercio
+                        this.tipoAprovechante = aprovechante.aprovechante.tipo_aprovechante; // Tipo de aprovechante
                         this.condiciones = aprovechante.aprovechante.condiciones; // condiciones
                         this.condiciones2 = aprovechante.aprovechante.condiciones2; // condiciones2
                         this.password = aprovechante.password;
@@ -226,5 +270,10 @@ Vue.createApp({
                 console.warn("No se encontró la cookie");
             }
         }
+        this.doGet();
+        this.getActiveAprovechante();
+        console.log("Pagina cargada, showModal inicial:", this.showModal);
+        this.showModal = false;
+
     }
 }).mount("#app"); //entiendo que hace que controlo lo que hay dentro del div de "app"

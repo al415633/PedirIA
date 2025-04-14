@@ -185,18 +185,18 @@ def init_negocios():
         cur.execute(
             """INSERT INTO Carne (nombre, unidad, tipo_conserva, id_negocio)
         VALUES (%s, %s, %s, %s) RETURNING id_carne;""",
-            (carnes[i][0], carnes[i][1], carnes[i][2], usuarios_ids[i])
+            (carnes[i][0], carnes[i][1], carnes[i][2], usuarios_ids[0])
         )
         # Recuperamos la ID generada y la agregamos a la lista
         carne_id = cur.fetchone()[0]
         carnes_ids.append(carne_id)
     # carnes_ids = [row[0] for row in cur.fetchall()]
     print(carnes_ids)
-    cur.executemany(
-        """INSERT INTO Pescado (nombre, unidad, tipo_conserva, id_negocio)
-        VALUES (%s, %s, %s, %s) RETURNING id_pescado;""",
-        [(pescados[i][0], pescados[i][1], pescados[i][2], usuarios_ids[i]) for i in range(3)],
-    )
+    # cur.executemany(
+    #     """INSERT INTO Pescado (nombre, unidad, tipo_conserva, id_negocio)
+    #     VALUES (%s, %s, %s, %s) RETURNING id_pescado;""",
+    #     [(pescados[i][0], pescados[i][1], pescados[i][2], usuarios_ids[i]) for i in range(3)],
+    # )
     # cur.execute("""SELECT id_pescado
     #                         FROM Pescado
     #                         ORDER BY id_pescado DESC
@@ -206,7 +206,7 @@ def init_negocios():
         cur.execute(
             """INSERT INTO Pescado (nombre, unidad, tipo_conserva, id_negocio)
         VALUES (%s, %s, %s, %s) RETURNING id_pescado;""",
-            (pescados[i][0], pescados[i][1], pescados[i][2], usuarios_ids[i])
+            (pescados[i][0], pescados[i][1], pescados[i][2], usuarios_ids[1])
         )
         # Recuperamos la ID generada y la agregamos a la lista
         pescado_id = cur.fetchone()[0]
@@ -228,7 +228,7 @@ def init_negocios():
         cur.execute(
             """INSERT INTO HortoFruticola (nombre, unidad, tipo_conserva, id_negocio)
         VALUES (%s, %s, %s, %s) RETURNING id_hortofruticola;""",
-            (frutas[i][0], frutas[i][1], frutas[i][2], usuarios_ids[i])
+            (frutas[i][0], frutas[i][1], frutas[i][2], usuarios_ids[2])
         )
         # Recuperamos la ID generada y la agregamos a la lista
         fruta_id = cur.fetchone()[0]

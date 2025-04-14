@@ -80,76 +80,9 @@ def init_negocios():
             "fruta",
         ),
     ]
-    print([(u[0], u[1], u[2]) for u in usuarios])
-    print(usuarios)
-    # cur.executemany(
-    #     """
-    #     INSERT INTO Usuario (correo, password, tipo)
-    #     VALUES (%s, %s, %s) RETURNING id_usuario;
-    # """,
-    #     [(u[0], u[1], u[2]) for u in usuarios],
-    # )
 
-    # cur.executemany(
-    #     """
-    #     INSERT INTO Usuario (correo, password, tipo)
-    #     VALUES (%s, %s, %s) RETURNING *;
-    # """,
-    #     usuarios
-    # )
-
-    # print(cur.execute("""SELECT *
-    #                  FROM Usuario
-    #                  """))
-    # print(cur.fetchall())
-
-    # cur.execute("""SELECT id_usuario
-    #             FROM Usuario
-    #             ORDER BY id_usuario DESC
-    #             LIMIT 3;
-    #             """)
-    # usuarios_ids = [row[0] for row in cur.fetchall()]
-    for usuario in usuarios:
-        cur.execute(
-            """
-            INSERT INTO Usuario (correo, password, tipo)
-            VALUES (%s, %s, %s) RETURNING id_usuario;
-            """,
-            usuario
-        )
-        # Recuperamos la ID generada y la agregamos a la lista
-        usuario_id = cur.fetchone()[0]
-        usuarios_ids.append(usuario_id)
-
-    print(usuarios_ids)
-    # Crear Negocios
-    # cur.executemany(
-    #     """
-    #     INSERT INTO Negocio (id_negocio, nombre, dia, tipo_negocio)
-    #     VALUES (%s, %s, %s, %s) RETURNING id_negocio;
-    # """,
-    #     [(usuarios_ids[i], negocios[i][0], negocios[i][1], negocios[i][2]) for i in range(3)],
-    # )
-    for i in range(3):
-        cur.execute(
-            """
-            INSERT INTO Negocio (id_negocio, nombre, dia, tipo_negocio) 
-        VALUES (%s, %s, %s, %s) RETURNING id_negocio;
-            """,
-            (usuarios_ids[i], negocios[i][0], negocios[i][1], negocios[i][2])
-        )
-        # Recuperamos la ID generada y la agregamos a la lista
-        negocio_id = cur.fetchone()[0]
-        negocios_ids.append(negocio_id)
-    print(negocios_ids)
-    # cur.execute("""SELECT id_negocio
-    #                 FROM Negocio
-    #                 ORDER BY id_negocio DESC
-    #                 LIMIT 3;
-    #                 """)
-    # usuarios_ids = [row[0] for row in cur.fetchall()]
-    # negocios_ids = [row[0] for row in cur.fetchall()]
-
+    usuarios_ids = [1, 2, 3]
+    negocios_ids = [1, 2, 3]
     # Asociar negocios con su respectiva categoría
 
     # Productos de cada negocio
@@ -185,18 +118,18 @@ def init_negocios():
         cur.execute(
             """INSERT INTO Carne (nombre, unidad, tipo_conserva, id_negocio)
         VALUES (%s, %s, %s, %s) RETURNING id_carne;""",
-            (carnes[i][0], carnes[i][1], carnes[i][2], usuarios_ids[i])
+            (carnes[i][0], carnes[i][1], carnes[i][2], usuarios_ids[0])
         )
         # Recuperamos la ID generada y la agregamos a la lista
         carne_id = cur.fetchone()[0]
         carnes_ids.append(carne_id)
     # carnes_ids = [row[0] for row in cur.fetchall()]
     print(carnes_ids)
-    cur.executemany(
-        """INSERT INTO Pescado (nombre, unidad, tipo_conserva, id_negocio)
-        VALUES (%s, %s, %s, %s) RETURNING id_pescado;""",
-        [(pescados[i][0], pescados[i][1], pescados[i][2], usuarios_ids[i]) for i in range(3)],
-    )
+    # cur.executemany(
+    #     """INSERT INTO Pescado (nombre, unidad, tipo_conserva, id_negocio)
+    #     VALUES (%s, %s, %s, %s) RETURNING id_pescado;""",
+    #     [(pescados[i][0], pescados[i][1], pescados[i][2], usuarios_ids[0]) for i in range(3)],
+    # )
     # cur.execute("""SELECT id_pescado
     #                         FROM Pescado
     #                         ORDER BY id_pescado DESC
@@ -206,19 +139,19 @@ def init_negocios():
         cur.execute(
             """INSERT INTO Pescado (nombre, unidad, tipo_conserva, id_negocio)
         VALUES (%s, %s, %s, %s) RETURNING id_pescado;""",
-            (pescados[i][0], pescados[i][1], pescados[i][2], usuarios_ids[i])
+            (pescados[i][0], pescados[i][1], pescados[i][2], usuarios_ids[1])
         )
         # Recuperamos la ID generada y la agregamos a la lista
         pescado_id = cur.fetchone()[0]
         pescados_ids.append(pescado_id)
     # pescados_ids = [row[0] for row in cur.fetchall()]
-    print(pescados_ids)
-
-    cur.executemany(
-        """INSERT INTO HortoFruticola (nombre, unidad, tipo_conserva, id_negocio)
-        VALUES (%s, %s, %s, %s) RETURNING id_hortofruticola;""",
-        [(frutas[i][0], frutas[i][1], frutas[i][2], usuarios_ids[i]) for i in range(3)],
-    )
+    # print(pescados_ids)
+    #
+    # cur.executemany(
+    #     """INSERT INTO HortoFruticola (nombre, unidad, tipo_conserva, id_negocio)
+    #     VALUES (%s, %s, %s, %s) RETURNING id_hortofruticola;""",
+    #     [(frutas[i][0], frutas[i][1], frutas[i][2], usuarios_ids[1]) for i in range(3)],
+    # )
     # cur.execute("""SELECT id_hortofruticola
     #                         FROM Hortofruticola
     #                         ORDER BY id_hortofruticola DESC
@@ -228,7 +161,7 @@ def init_negocios():
         cur.execute(
             """INSERT INTO HortoFruticola (nombre, unidad, tipo_conserva, id_negocio)
         VALUES (%s, %s, %s, %s) RETURNING id_hortofruticola;""",
-            (frutas[i][0], frutas[i][1], frutas[i][2], usuarios_ids[i])
+            (frutas[i][0], frutas[i][1], frutas[i][2], usuarios_ids[2])
         )
         # Recuperamos la ID generada y la agregamos a la lista
         fruta_id = cur.fetchone()[0]

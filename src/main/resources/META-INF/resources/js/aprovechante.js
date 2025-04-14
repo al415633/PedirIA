@@ -92,10 +92,10 @@ Vue.createApp({
                     // PEQUEÑO RETRASO para asegurar que la cookie se guarda
                     setTimeout(() => {
 
-                        window.location.href = "./menu_productos.html";
+                        window.location.href = "./oferta.html";
                     }, 200); // 200ms suficiente
 
-                    window.location.href = "./menu_productos.html"; // Página correcta
+                    window.location.href = "./oferta.html"; // Página correcta
                 } else {
                     throw new Error("Error en la autenticación");
                 }
@@ -129,7 +129,7 @@ Vue.createApp({
 
                 if (response.status === 201) {
                     alert("Registro exitoso");
-                    window.location.href = "registroCorrecto.html";
+                    window.location.href = "oferta.html";
                 } else {
                     throw new Error("Error en el registro");
                 }
@@ -160,7 +160,7 @@ Vue.createApp({
                 // Verificamos si la actualización fue exitosa
                 if (response.status === 204) {
                     alert("Aprovechante actualizado con éxito");
-                    window.location.href = "menu_productos.html"; // Redirigir a otra página si es necesario
+                    window.location.href = "oferta.html"; // Redirigir a otra página si es necesario
                 } else {
                     throw new Error("Error en la actualización");
                 }

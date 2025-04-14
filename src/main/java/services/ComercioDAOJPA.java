@@ -44,7 +44,7 @@ public class ComercioDAOJPA implements ComercioDao{
         negocio.setUsuario(usuario);
 
         em.persist(negocio);
-        negocio.setTipo_negocio(usuario.getTipo());
+        //negocio.setTipo_negocio(usuario.getTipo());
         usuario.setTipo("negocio");
         usuario.setNegocio(negocio);
         return usuario;

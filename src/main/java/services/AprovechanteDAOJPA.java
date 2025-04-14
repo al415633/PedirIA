@@ -49,7 +49,7 @@ public class AprovechanteDAOJPA implements AprovechanteDao{
         aprovechante.setUsuario(usuario);
 
         em.persist(aprovechante);
-        aprovechante.setTipo_aprovechante(usuario.getTipo());
+        //aprovechante.setTipo_aprovechante(usuario.getTipo());
         usuario.setTipo("aprovechante");
         usuario.setAprovechante(aprovechante);
         return usuario;

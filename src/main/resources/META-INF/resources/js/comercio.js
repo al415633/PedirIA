@@ -24,7 +24,11 @@ Vue.createApp({
             tipoComercio: "",
             dia: "",
             currentComercio: {},
-            comercioActivo: "sin sesion"
+            usuarioActivo: "sin sesion",
+            showUserDropdown: false,  // Controla la visibilidad del dropdown de usuario
+            showModal: false,         // Controla la visibilidad del modal
+            modalMessage: '',         // Mensaje que se mostrará en el modal
+            actionToConfirm: null,    // Acción que se va a confirmar (cerrar sesión/eliminar cuenta)
         };
     },
     methods: {
@@ -37,6 +41,38 @@ Vue.createApp({
                 .catch((error) => {
                     console.log("Error al obtener los datos:", error);
                 });
+        },
+        // Mostrar/ocultar el dropdown del usuario
+        toggleUserDropdown() {
+            this.showUserDropdown = !this.showUserDropdown;
+        },
+
+        // Mostrar el modal para confirmar la acción de cerrar sesión
+        confirmLogout() {
+            this.modalMessage = '¿Estás seguro que quieres cerrar sesión?';
+            this.actionToConfirm = this.logoutComercio;  // Establecer la acción que se confirmará
+            this.showModal = true;  // Mostrar el modal
+        },
+
+        // Mostrar el modal para confirmar la eliminación de cuenta
+        confirmDeleteAccount() {
+            this.modalMessage = '¿Estás seguro que quieres eliminar tu cuenta?';
+            this.actionToConfirm = this.deleteComercio;  // Establecer la acción que se confirmará
+            this.showModal = true;  // Mostrar el modal
+        },
+
+        // Ejecutar la acción confirmada (cerrar sesión o eliminar cuenta)
+        async confirmAction() {
+            if (this.actionToConfirm) {
+                await this.actionToConfirm();  // Ejecutar la acción confirmada
+            }
+            this.closeModal();  // Cerrar el modal después de la acción
+        },
+
+        // Cerrar el modal sin hacer nada
+        closeModal() {
+            this.showModal = false;
+            this.actionToConfirm = null;
         },
 
         async verificarComercio() {
@@ -177,7 +213,7 @@ Vue.createApp({
                 // Verificamos si la respuesta fue exitosa
                 if (response.status === 200) {
                     alert("Sesión cerrada con éxito");
-                    window.location.href = "login.html"; // Redirigir al login o a la página deseada
+                    window.location.href = "index.html"; // Redirigir al login o a la página deseada
                 } else {
                     throw new Error("Error al cerrar sesión");
                 }
@@ -190,7 +226,7 @@ Vue.createApp({
         async getActiveComercio() {
             await axios.get(RETRIEVE_ACTIVE)
                 .then((response) => {
-                    this.comercioActivo = response.data;
+                    this.usuarioActivo = response.data;
                     console.log(response.data);
                 })
                 .catch((error) => {
@@ -201,7 +237,7 @@ Vue.createApp({
     },
     mounted() {
         // Solo ejecutar si estás en la página de modificar
-        if (window.location.pathname.includes("modificar") || window.location.pathname.includes("comercioUPDATE")) {
+        if (window.location.pathname.includes("modificar") || window.location.pathname.includes("comercioUPDATE") || window.location.pathname.includes("comercioREAD")) {
             const correo = this.leerCookie("usuario");
 
             console.log("Correo leído de cookie (crudo):", correo);
@@ -219,7 +255,7 @@ Vue.createApp({
                         // Asignamos campos
                         this.correo = comercio.correo;
                         this.nombre = comercio.negocio.nombre; // Nombre del comercio
-                        this.tipoComercio = comercio.negocio.tipo; // Tipo de comercio
+                        this.tipoComercio = comercio.negocio.tipo_negocio; // Tipo de comercio
                         this.dia = comercio.negocio.diaCompraDeStock; // Día de compra
                         this.password = comercio.password;
 

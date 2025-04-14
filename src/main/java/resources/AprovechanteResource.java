@@ -48,7 +48,7 @@ public class AprovechanteResource {
         if (usuario == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("No hay sesión activa").build();
         }
-        return Response.ok("Perfil del usuario en sesión: " + usuario).build();
+        return Response.ok(usuario).build();
     }
 
     @POST
@@ -73,12 +73,13 @@ public class AprovechanteResource {
 
         String encr_pass = BcryptUtil.bcryptHash(password);
         usuario.setPassword(encr_pass);
-        usuario.setTipo(tipoAprovechante);
+        usuario.setTipo("aprovechante");
 
         // Crear AprovechanteDetails
         AprovechanteDetails aprovechante = new AprovechanteDetails();
         aprovechante.setCondiciones(condiciones);
         aprovechante.setCondiciones2(condiciones2);
+        aprovechante.setTipo_aprovechante(tipoAprovechante);
 
 
         // Establecer relación entre Usuario y AprovechanteDetails

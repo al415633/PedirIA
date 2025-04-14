@@ -71,12 +71,13 @@ public class ComercioResource {
 
         String encr_pass = BcryptUtil.bcryptHash(password);
         usuario.setPassword(encr_pass);
-        usuario.setTipo(tipoComercio);
+        usuario.setTipo("negocio");
 
         // Crear ComercioDetails
         ComercioDetails negocio = new ComercioDetails();
         negocio.setNombre(nombre);
         negocio.setDiaCompraDeStock(diaCompraDeStock);
+        negocio.setTipo_negocio(tipoComercio);
 
 
         // Establecer relación entre Usuario y ComercioDetails

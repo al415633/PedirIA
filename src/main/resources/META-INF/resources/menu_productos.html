@@ -3,10 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
     <title>Inicio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
+
+<header class="navbar_container2">
+    <div id="app1" class="navbar-box">
+        <img src="images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
+        <a href="#" class="btn">Mis datos</a>
+        <a href="#" class="btn">Stock</a>
+        <a href="aprovechanteUPDATE.html" class="btn">Modificar datos</a>
+
+        <div class="dropdown2">
+            <a href="#" class="btn">Generar informe</a>
+            <div class="dropdown-content2">
+                <a href="predecir_carnes.html">Predecir Carnes</a>
+                <a href="predecir_pescados.html">Predecir Pescados</a>
+                <a href="predecir_hortofruticolas.html">Predecir Hortofrutícolas</a>
+            </div>
+        </div>
+        <a href="#" class="btn">{{ usuarioActivo }}</a>
+        <script src="js/aprovechante.js"></script>
+    </div>
+</header>
 
 <div class="container text-center mt-5">
     <h1>Bienvenido a PedirIA</h1>

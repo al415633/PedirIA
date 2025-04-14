@@ -1,12 +1,12 @@
 package pythonAdapter.jsonConverter;
 
-import data.StockProducto;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import data.StockProducto;
 
 public abstract class AbstractJSONConverter<T extends StockProducto> {
     public String extractHistoricStock(List<T> listaStock) {

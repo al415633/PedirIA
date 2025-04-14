@@ -158,8 +158,8 @@ public class AprovechanteResource {
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/delete/{correo}")
-    public Response deleteAprovechante(@PathParam("correo") final String correo) {
+    @Path("/delete")
+    public Response deleteAprovechante( @CookieParam("usuario") String correo) {
         Usuario usuario = dao.getAprovechantePorCorreo(correo);
 
         // Verificar si el usuario existe
@@ -170,6 +170,7 @@ public class AprovechanteResource {
         }
 
         // Eliminar el usuario y su negocio asociado
+        System.out.println("correo " + correo);
         boolean eliminado = dao.eliminarAprovechante(correo);
 
         if (!eliminado) {

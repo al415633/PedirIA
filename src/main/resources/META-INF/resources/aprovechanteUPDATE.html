@@ -82,5 +82,17 @@
     </main>
 
 <script src="js/aprovechante.js"></script>
+
+
+<div id="footer"></div>
+
+<script>
+    // Cargar el contenido del footer desde footer.html
+    fetch('footer.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('footer').innerHTML = data;
+        });
+</script>
 </body>
 </html>

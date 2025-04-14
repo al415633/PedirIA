@@ -19,7 +19,7 @@ public class AprovechanteDetails {
     private String condiciones2;
 
 
-    @Column(name = "tipo_aprov")
+    @Column(name = "tipo_aprov", nullable = false)
     private String tipo_aprovechante;
 
     @OneToOne

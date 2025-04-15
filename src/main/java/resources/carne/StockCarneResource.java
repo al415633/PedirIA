@@ -14,4 +14,6 @@ public class StockCarneResource extends StockProductoResource<StockCarne, Histor
     protected String getHistoricoEntityName() {
         return "HistoricoCarne";
     }
+
+
 }

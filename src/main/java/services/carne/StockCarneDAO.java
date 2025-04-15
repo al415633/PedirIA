@@ -16,7 +16,7 @@ public class StockCarneDAO extends StockProductoDAO<StockCarne> {
     }
 
     @Inject
-    private EntityManager em;
+    EntityManager em;
 
     @Override
     public EntityManager getEntityManager() {

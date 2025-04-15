@@ -33,7 +33,7 @@ public abstract class StockProductoDAO<T extends StockProducto> {
 
     // Obtener stock por idProducto
     public List<T> retrieveByProducto(Long idProducto) {
-        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.id = :idProducto AND s.cantidad > 0 ", getEntityClass())
+        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.id = :idProducto AND s.cantidad > 0 AND s.fechaVencimiento >= CURRENT DATE", getEntityClass())
                 .setParameter("idProducto", idProducto)
                 .getResultList();
     }

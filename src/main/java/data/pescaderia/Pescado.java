@@ -15,7 +15,8 @@ import jakarta.persistence.*;
                                 @FieldResult(name = "nombre", column = "nombre"),
                                 @FieldResult(name = "unidad", column = "unidad"),
                                 @FieldResult(name = "tipoConserva", column = "tipo_conserva"),
-                                @FieldResult(name = "idImg", column = "id_img")
+                                @FieldResult(name = "idImg", column = "id_img"),
+                                @FieldResult(name = "idNegocio", column = "id_negocio")
                         }
                 )
         },

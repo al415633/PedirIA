@@ -1,7 +1,9 @@
 package data;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usuario")
@@ -22,12 +24,20 @@ public class Usuario {
     @Column(nullable = false)
     private String tipo; //Valores: Negocio o Aprovechante
 
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @Column(nullable = true)
+    private LocalDateTime fecha_baja; //Valores: Negocio o Aprovechante
+
+
+/*    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     @JsonIgnore
+    private ComercioDetails negocio;*/
+
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private ComercioDetails negocio;
 
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
     private AprovechanteDetails aprovechante;
 
     @Override
@@ -87,5 +97,13 @@ public class Usuario {
 
     public void setAprovechante(AprovechanteDetails aprovechante) {
         this.aprovechante = aprovechante;
+    }
+
+    public LocalDateTime getFechaBaja() {
+        return fecha_baja;
+    }
+
+    public void setFechaBaja(LocalDateTime fecha_baja) {
+        this.fecha_baja = fecha_baja;
     }
 }

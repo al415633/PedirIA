@@ -33,10 +33,22 @@ createApp({
         sortedCurrentStock() {
             return [...this.currentStock]
                 .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
-                .map(stock => ({
-                    ...stock,
-                    cantidad: this.formatNumber(stock.cantidad) // 📌 Formatea la cantidad
-                }));
+                .map(stock => {
+                    return {
+                        ...stock,
+                        cantidadFormateada: this.formatNumber(stock.cantidad) + " " + (this.product.unidad || "")
+                    };
+                });
+        },
+        sortedCurrentHistorico() {
+            return [...this.historicoStock]
+                .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
+                .map(historico => {
+                    return {
+                        ...historico,
+                        cantidadFormateada: this.formatNumber(historico.cantidad) + " " + (this.product.unidad || "")
+                    };
+                });
         }
     },
     methods: {
@@ -132,7 +144,11 @@ createApp({
             return new Date(dateStr).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
         },
         formatNumber(value) {
-            return new Intl.NumberFormat('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(value);
+            const num = parseFloat(value);
+            if (Number.isInteger(num)) {
+                return num.toLocaleString('es-ES', { minimumFractionDigits: 0 });
+            }
+            return num.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 3 });
         },
         openEditHortofruticolaModal() {
             this.editingHortofruticola = { ...this.product }; // Copiar datos actuales
@@ -192,7 +208,26 @@ createApp({
             toastEl.className = `toast custom-toast text-white ${bgClass} show`;
             const toast = new bootstrap.Toast(toastEl);
             toast.show();
-        }
+        },
+        // Métod0 para abrir el modal de eliminación
+        openDeleteModal() {
+            this.deleteModal = new bootstrap.Modal(document.getElementById("deleteHortofruticolaModal"));
+            this.deleteModal.show();
+        },
+        deleteHortofruticola() {
+            axios.delete(API_HORTOFRUTICOLA + this.product.id)
+                .then(() => {
+                    this.showToast("Producto eliminada correctamente.", "bg-success");
+                    // Redirigir a la lista de productos o a otro lugar
+                    setTimeout(() => {
+                        window.location.href = "../hortofruticola/gestion_hortofruticola.html";
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error("Error al eliminar el hortofruticola:", error);
+                    this.showToast("Error al eliminar el hortofruticola.", "bg-danger");
+                });
+        },
 
     },
     mounted() {

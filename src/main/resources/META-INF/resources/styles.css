@@ -326,3 +326,169 @@ input, select {
         flex-direction: column;
     }
 }
+
+/* Estilo para el Footer */
+footer {
+    background-color: #5a7d4b; /* Verde */
+    color: white;
+    padding: 40px 0;
+    margin-top: 400px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    align-items: center; /* Centrar el contenido verticalmente */
+    justify-content: space-between; /* Espacio entre el logo y el texto */
+    padding: 20px;
+}
+
+.footer-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.footer-logo {
+    width: 300px; /* Aumentamos el tamaño del logo */
+    margin-right: 20px; /* Separación entre logo y texto */
+}
+
+.footer-info {
+    flex-grow: 1; /* Hace que el texto se expanda y ocupe el espacio disponible */
+    text-align: left; /* Alineamos el texto a la izquierda */
+}
+
+.footer-info h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.footer-info ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    text-align: left;
+}
+
+.footer-info ul li {
+    font-size: 1em;
+    margin: 5px 0;
+}
+
+.footer-text {
+    font-size: 1em;
+    margin-top: 20px;
+    color: white;
+}
+
+/* Asegurar que en móviles el footer se vea bien */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column; /* Colocamos el contenido en columna para móviles */
+        text-align: center;
+    }
+    .footer-info {
+        text-align: center;
+    }
+    .footer-info ul {
+        padding-left: 0;
+    }
+}
+
+/* Estilos del navbar */
+.navbar_container2 {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 100px;
+    padding-top: 100px;
+}
+
+/* Estilos del dropdown */
+.dropdown2 {
+    position: relative;
+}
+
+.dropdown-content2 {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 180px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    top: 100%;
+    left: 0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.dropdown-content2 a {
+    color: black;
+    padding: 10px;
+    display: block;
+    text-decoration: none;
+    background: white;
+}
+
+.dropdown-content2 a:hover {
+    background-color: #f1f1f1;
+}
+
+/* Mostrar el dropdown al pasar el mouse */
+.dropdown2:hover .dropdown-content2 {
+    display: block;
+}
+
+/* Estilo para el overlay (fondo oscuro) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Estilo para el modal */
+.modal {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    width: 300px;
+    text-align: center;
+}
+
+.modal button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #5a7d4b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal button:hover {
+    background: #445a35; /* verde oscuro */
+}
+.modal-buttons {
+    display: flex;
+    justify-content: space-between; /* Espacio entre los botones */
+    margin-top: 20px; /* Separación entre el texto y los botones */
+}
+
+.modal-buttons button {
+    margin-right: 10px; /* Espacio entre los botones */
+}
+
+.modal-buttons button:last-child {
+    margin-right: 0; /* Para no dejar espacio al final */
+}

@@ -53,26 +53,24 @@
         }
     </style>
 </head>
+<!--Para usarlo copia este header y asegurate de que los scripts de arriba están en el fichero en el que lo pegas -->
 <header class="navbar_container">
-    <div  >
+    <div id="app" class="navbar-box">
+        <img src="images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
+        <a href="#" class="btn">Mis datos</a>
+        <a href="#" class="btn">Stock</a>
+        <a href="comercioUPDATE.html" class="btn">Modificar datos</a>
 
-        <div id="app"  class="navbar-box">
-            <img src="images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
-            <a href="#" class="btn">Mis datos</a>
-            <a href="#" class="btn">Stock</a>
-            <a href="#" class="btn">Modificar datos</a>
-
-            <div class="dropdown">
-                <a href="#" class="btn">Generar informe</a>
-                <div class="dropdown-content">
-                    <a href="predecir_carnes.html">Predecir Carnes</a>
-                    <a href="predecir_pescados.html">Predecir Pescados</a>
-                    <a href="predecir_hortofruticolas.html">Predecir Hortofrutícolas</a>
-                </div>
+        <div class="dropdown">
+            <a href="#" class="btn">Generar informe</a>
+            <div class="dropdown-content">
+                <a href="predecir_carnes.html">Predecir Carnes</a>
+                <a href="predecir_pescados.html">Predecir Pescados</a>
+                <a href="predecir_hortofruticolas.html">Predecir Hortofrutícolas</a>
             </div>
-                <a   href="#" class="btn">{{ comercioActivo }}</a>
-            <script src="js/comercio.js"></script>
         </div>
+        <a href="#" class="btn">{{ comercioActivo }}</a>
+        <script src="js/comercio.js"></script>
     </div>
 </header>
 </html>

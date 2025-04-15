@@ -14,24 +14,29 @@
             height: 250px;
             object-fit: cover;
         }
+
         .table {
             font-size: 0.9rem;
         }
+
         header {
             background-color: #2848a7;
             color: white;
             padding: 10px 0;
         }
+
         header img {
             height: 40px;
             margin-right: 10px;
         }
+
         .toast-container {
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 1050;
         }
+
         .custom-toast {
             font-family: Arial, sans-serif;
             font-size: 1rem;
@@ -40,6 +45,11 @@
             display: flex;
             align-items: center;
             width: 300px;
+        }
+
+        .clickable {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
     </style>
 </head>
@@ -78,7 +88,10 @@
             </div>
 
             <!-- Botón para abrir el modal de edición -->
-            <button class="btn btn-warning w-100" @click="openEditProductModal"> Editar Pescado </button>
+            <button class="btn btn-warning w-100" @click="openEditProductModal"> Editar Pescado</button>
+            <!-- Botón para eliminar el pescado -->
+            <button class="btn btn-danger w-100 mt-2" @click="openDeleteModal">Eliminar Pescado</button>
+
         </div>
 
         <!--  Modal para editar producto -->
@@ -93,12 +106,14 @@
                         <form @submit.prevent="updateProduct">
                             <div class="mb-3">
                                 <label class="form-label">Nombre</label>
-                                <input type="text" class="form-control" v-model="editingProduct.nombre" @input="validateEditProduct" required>
+                                <input type="text" class="form-control" v-model="editingProduct.nombre"
+                                       @input="validateEditProduct" required>
                                 <small v-if="nombreError" class="text-danger">{{ nombreError }}</small>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Unidad</label>
-                                <input type="text" class="form-control" v-model="editingProduct.unidad" @input="validateEditProduct" required>
+                                <input type="text" class="form-control" v-model="editingProduct.unidad"
+                                       @input="validateEditProduct" required>
                                 <small v-if="unidadError" class="text-danger">{{ unidadError }}</small>
                             </div>
                             <div class="mb-3">
@@ -114,16 +129,17 @@
             </div>
         </div>
 
-
         <!-- Sección que cambia entre Stock Actual e Histórico -->
         <div class="col-md-8">
             <!-- Navbar de selección -->
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link" :class="{ active: activeTab === 'stock' }" @click="activeTab = 'stock'">Stock Actual</a>
+                    <a class="nav-link clickable" :class="{ active: activeTab === 'stock' }"
+                       @click="activeTab = 'stock'">Stock Actual</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" :class="{ active: activeTab === 'historico' }" @click="loadHistorico">Histórico de Ventas</a>
+                    <a class="nav-link clickable" :class="{ active: activeTab === 'historico' }" @click="loadHistorico">Histórico
+                        de Ventas</a>
                 </li>
             </ul>
 
@@ -134,13 +150,17 @@
                 <!-- Formulario para añadir stock -->
                 <form @submit.prevent="addStock" class="row g-2 align-items-center mb-3">
                     <div class="col-auto">
-                        <input type="number" class="form-control" v-model="newStock.cantidad" placeholder="Cantidad" required min="0" step="0.001">
+                        <label for="cantidad" class="form-label">Cantidad</label>
+                        <input type="number" id="cantidad" class="form-control" v-model="newStock.cantidad" placeholder="Cantidad"
+                               required min="0" step="0.001">
                     </div>
                     <div class="col-auto">
-                        <input type="date" class="form-control" v-model="newStock.fechaIngreso" required>
+                        <label for="fechaIngreso" class="form-label">Fecha de Ingreso</label>
+                        <input type="date" id="fechaIngreso" class="form-control" v-model="newStock.fechaIngreso" required>
                     </div>
                     <div class="col-auto">
-                        <input type="date" class="form-control" v-model="newStock.fechaVencimiento" required>
+                        <label for="fechaVencimiento" class="form-label">Fecha de Vencimiento</label>
+                        <input type="date" id="fechaVencimiento" class="form-control" v-model="newStock.fechaVencimiento" required>
                     </div>
                     <div class="col-auto">
                         <button type="submit" class="btn btn-primary">Añadir</button>
@@ -159,12 +179,14 @@
                     </thead>
                     <tbody>
                     <tr v-for="stock in sortedCurrentStock" :key="stock.id">
-                        <td>{{ stock.cantidad }}</td>
+                        <td>{{ stock.cantidadFormateada }}</td>
                         <td>{{ formatDate(stock.fechaIngreso) }}</td>
                         <td>{{ formatDate(stock.fechaVencimiento) }}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning stock-actions" @click="editStock(stock)">✏️ Editar</button>
-                            <button class="btn btn-sm btn-danger stock-actions" @click="openSellStock(stock)">🛒 Vender</button>
+                            <button class="btn btn-sm btn-warning stock-actions" @click="editStock(stock)">✏️ Editar
+                            </button>
+                            <button class="btn btn-sm btn-danger stock-actions" @click="openSellStock(stock)">🛒 Vender
+                            </button>
                         </td>
                     </tr>
                     </tbody>
@@ -184,8 +206,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="venta in historicoStock" :key="venta.id">
-                        <td>{{ venta.cantidad }}</td>
+                    <tr v-for="venta in sortedCurrentHistorico" :key="venta.id">
+                        <td>{{ venta.cantidadFormateada }}</td>
                         <td>{{ formatDate(venta.fechaVenta) }}</td>
                         <td>{{ formatDate(venta.fechaIngreso) }}</td>
                         <td>{{ formatDate(venta.fechaVencimiento) }}</td>
@@ -196,70 +218,96 @@
         </div>
     </div>
 
+        <!-- Modal para editar stock -->
+        <div class="modal fade" id="editStockModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Stock</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="updateStock">
+                            <div class="mb-3">
+                                <label class="form-label">Cantidad</label>
+                                <input type="number" class="form-control" v-model="editingStock.cantidad" required
+                                       min="0"
+                                       step="0.001" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Fecha de Ingreso</label>
+                                <input type="date" class="form-control" v-model="editingStock.fechaIngreso" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Fecha de Vencimiento</label>
+                                <input type="date" class="form-control" v-model="editingStock.fechaVencimiento"
+                                       required>
+                            </div>
+                            <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <!-- Modal para editar stock -->
-    <div class="modal fade" id="editStockModal" tabindex="-1" aria-hidden="true">
+        <!-- Modal para VENDER stock -->
+        <div class="modal fade" id="sellStockModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Vender Stock</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="sellStock">
+                            <div class="mb-3">
+                                <label class="form-label">Cantidad a vender</label>
+                                <input type="number" class="form-control" v-model="sellStockData.cantidad" required
+                                       min="0.001" step="0.001">
+                            </div>
+                            <button type="submit" class="btn btn-danger">Confirmar Venta</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast de Bootstrap -->
+        <div class="toast-container">
+            <div id="toastMessage" class="toast custom-toast text-white" role="alert" aria-live="assertive"
+                 aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <strong>{{ toastMessage }}</strong>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                            aria-label="Cerrar"></button>
+                </div>
+            </div>
+        </div>
+
+
+    <!-- Modal de confirmación de eliminación -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Editar Stock</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <form @submit.prevent="updateStock">
-                        <div class="mb-3">
-                            <label class="form-label">Cantidad</label>
-                            <input type="number" class="form-control" v-model="editingStock.cantidad" required min="0" step="0.001">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Fecha de Ingreso</label>
-                            <input type="date" class="form-control" v-model="editingStock.fechaIngreso" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Fecha de Vencimiento</label>
-                            <input type="date" class="form-control" v-model="editingStock.fechaVencimiento" required>
-                        </div>
-                        <button type="submit" class="btn btn-success">Guardar Cambios</button>
-                    </form>
+                    ¿Está seguro de que desea eliminar este pescado?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" @click="deleteProduct">Eliminar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal para VENDER stock -->
-    <div class="modal fade" id="sellStockModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Vender Stock</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form @submit.prevent="sellStock">
-                        <div class="mb-3">
-                            <label class="form-label">Cantidad a vender</label>
-                            <input type="number" class="form-control" v-model="sellStockData.cantidad" required min="0.001" step="0.001">
-                        </div>
-                        <button type="submit" class="btn btn-danger">Confirmar Venta</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Toast de Bootstrap -->
-    <div class="toast-container">
-        <div id="toastMessage" class="toast custom-toast text-white" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <strong>{{ toastMessage }}</strong>
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
-            </div>
-        </div>
-    </div>
 </div>
+
 
 <script src="../js/stockPescado.js"></script>
 

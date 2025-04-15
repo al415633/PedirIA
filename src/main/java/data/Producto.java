@@ -116,7 +116,7 @@ public abstract class Producto {
                 ", idImg=" + idImg +
                 ", imagenNombre='" + imagenNombre + '\'' +
                 ", imagenTipo='" + imagenTipo + '\'' +
-                ", imagenDatos=" + Arrays.toString(imagenDatos) +
+                ", idnegocio='" + idNegocio + '\'' +
                 '}';
     }
 }

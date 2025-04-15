@@ -8,6 +8,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
+import java.sql.SQLOutput;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @ApplicationScoped
@@ -48,7 +50,7 @@ public class AprovechanteDAOJPA implements AprovechanteDao{
         aprovechante.setUsuario(usuario);
 
         em.persist(aprovechante);
-        aprovechante.setTipo_aprovechante(usuario.getTipo());
+        //aprovechante.setTipo_aprovechante(usuario.getTipo());
         usuario.setTipo("aprovechante");
         usuario.setAprovechante(aprovechante);
         return usuario;
@@ -78,12 +80,12 @@ public class AprovechanteDAOJPA implements AprovechanteDao{
     @Transactional
     public boolean eliminarAprovechante(String correo) {
         Usuario usuario = getAprovechantePorCorreo(correo);
+        System.out.println("llegooooooooœ");
+        System.out.println(correo);
         if (usuario == null) return false;
 
-        if (usuario.getNegocio() != null) {
-            em.remove(usuario.getNegocio());
-        }
-        em.remove(usuario);
+        usuario.setFechaBaja(LocalDateTime.now());
+        em.merge(usuario);
         return true;
     }
 
@@ -91,7 +93,7 @@ public class AprovechanteDAOJPA implements AprovechanteDao{
     public Usuario verificarCredenciales(String correo, String password) {
         try {
             List<Usuario> usuarios = em.createQuery(
-                            "SELECT u FROM Usuario u WHERE u.correo = :correo",
+                            "SELECT u FROM Usuario u WHERE u.correo = :correo AND u.fecha_baja IS NULL",
                             Usuario.class)
                     .setParameter("correo", correo)
                     .getResultList();

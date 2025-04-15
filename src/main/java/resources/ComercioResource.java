@@ -71,12 +71,13 @@ public class ComercioResource {
 
         String encr_pass = BcryptUtil.bcryptHash(password);
         usuario.setPassword(encr_pass);
-        usuario.setTipo(tipoComercio);
+        usuario.setTipo("negocio");
 
         // Crear ComercioDetails
         ComercioDetails negocio = new ComercioDetails();
         negocio.setNombre(nombre);
         negocio.setDiaCompraDeStock(diaCompraDeStock);
+        negocio.setTipo_negocio(tipoComercio);
 
 
         // Establecer relación entre Usuario y ComercioDetails
@@ -88,6 +89,9 @@ public class ComercioResource {
 
         // Generar URI para el nuevo recurso
         URI uri = new URI("/comercio/retrieve/" + correo);
+
+        NewCookie cookie = new NewCookie("usuario", correo, "/", null, "Usuario en sesión", 3600, false);
+
         return Response.created(uri).build();
     }
 
@@ -95,23 +99,92 @@ public class ComercioResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/update")
-    public Response updateComercio(Usuario usuario, ComercioDetails negocio) {
-        boolean actualizado = dao.actualizarNegocio(usuario, negocio);
-        if (!actualizado) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+    public Response updateComercio(   @QueryParam("correo") String correo,
+                                      @QueryParam("password") String password,
+                                      @QueryParam("nombre") String nombre,
+                                      @QueryParam("diaCompraDeStock") String diaCompraDeStock) {
+        try {
+            // Verificar que el correo y los datos del comercio no sean nulos
+            if (correo == null) {
+                System.out.println("correo = " + correo);
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Datos incompletos para la actualización")
+                        .build();
+            }
+
+            // Buscar el usuario por su correo
+            Usuario usuarioExistente = dao.getComercioPorCorreo(correo);
+            if (usuarioExistente == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("Usuario no encontrado")
+                        .build();
+            }
+
+            // Actualizar los datos del usuario
+            //TODO: NO SE SI DEBERIA DE ENCRIPTAR AQUI LA CONTRASEÑA
+            String encr_pass = BcryptUtil.bcryptHash(password);
+            usuarioExistente.setPassword(encr_pass); // Actualizar la contraseña
+
+            // Actualizar los datos del comercio (negocio)
+            ComercioDetails negocioExistente = usuarioExistente.getNegocio();
+            if (negocioExistente != null) {
+                negocioExistente.setNombre(nombre);
+                negocioExistente.setDiaCompraDeStock(diaCompraDeStock);
+            } else {
+                // Si el negocio no existe, podemos crear uno nuevo y asociarlo
+                negocioExistente = new ComercioDetails();
+                negocioExistente.setUsuario(usuarioExistente);
+                negocioExistente.setNombre(nombre);
+                negocioExistente.setDiaCompraDeStock(diaCompraDeStock);
+                usuarioExistente.setNegocio(negocioExistente);
+            }
+
+            // Guardar los cambios en la base de datos
+            boolean actualizado = dao.actualizarNegocio(usuarioExistente, negocioExistente);
+            if (!actualizado) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity("Error al actualizar el comercio")
+                        .build();
+            }
+
+            return Response.noContent().build(); // Retorna un código 204 cuando la actualización fue exitosa
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Ocurrió un error inesperado")
+                    .build();
         }
-        return Response.noContent().build();
     }
+
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/delete/{correo}")
-    public Response deleteComercio(@PathParam("correo") final String correo) {
-        boolean eliminado = dao.eliminarNegocio(correo);
-        if (!eliminado) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+    @Path("/delete/")
+    public Response deleteComercio(@CookieParam("usuario") String correo) {
+
+        Usuario usuario = dao.getComercioPorCorreo(correo);
+
+        // Verificar si el usuario existe
+        if (usuario == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Usuario no encontrado")
+                    .build();
         }
-        return Response.noContent().build();
+
+        // Eliminar el usuario y su negocio asociado
+        boolean eliminado = dao.eliminarNegocio(correo);
+
+        if (!eliminado) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al eliminar el comercio")
+                    .build();
+        }
+
+        NewCookie cookie = new NewCookie("usuario", "", "/", null, "Usuario en sesión", 0, false);
+
+        return Response.noContent()
+                .cookie(cookie) // Deshabilitar (eliminar) la cookie
+                .build();
     }
 
 
@@ -143,6 +216,26 @@ public class ComercioResource {
 
 
     }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/logout")
+    public Response logout(@CookieParam("usuario") String correo) {
+        // Verificar si el usuario está autenticado (si la cookie existe)
+        if (correo == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("No hay sesión activa")
+                    .build();
+        }
+
+        // Eliminar la cookie del usuario configurando su valor vacío y tiempo de expiración a 0
+        NewCookie cookie = new NewCookie("usuario", "", "/", null, "Usuario en sesión", 0, false);
+
+        return Response.ok("Sesión cerrada con éxito")
+                .cookie(cookie) // Deshabilitar (vaciar) la cookie
+                .build();
+    }
+
 
 
 }

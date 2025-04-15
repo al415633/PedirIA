@@ -6,7 +6,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <title>Modificar - Aprovechante</title>
+    <title>Ver datos - Aprovechante</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -45,9 +45,9 @@
     </div>
 
 
+    <div>
         <div class="login-container">
-            <form @submit.prevent="updateAprovechante">
-                <div class="registro">
+            <div class="registro">
                 <div>
                     <div class="form-group">
                         <label for="email">Email</label>
@@ -56,30 +56,24 @@
 
                     <div class="form-group">
                         <label for="password">Contraseña</label>
-                        <input type="password" id="password" v-model="password" required >
+                        <input readonly type="password" id="password" v-model="password" required >
                     </div>
-
                 </div>
 
                 <div>
-
                     <div class="form-group">
                         <label for="condiciones">Condiciones</label>
                         <input type="text" id="condiciones" v-model="condiciones" required>
                     </div>
-
                     <div class="form-group">
                         <label for="condiciones2">Otras condiciones</label>
                         <input type="text" id="condiciones2" v-model="condiciones2" required>
                     </div>
                 </div>
-                </div>
-                <button type="submit" class="btn register" id="registerButton" >Modificar</button>
-
-            </form>
+            </div>
         </div>
-
-    </main>
+    </div>
+</main>
 
 <script src="js/aprovechante.js"></script>
 

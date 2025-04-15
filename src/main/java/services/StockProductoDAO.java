@@ -31,10 +31,18 @@ public abstract class StockProductoDAO<T extends StockProducto> {
         return getEntityManager().find(getEntityClass(), id);
     }
 
-    // Obtener stock por idProducto ¡
+    // Obtener stock por idProducto
     public List<T> retrieveByProducto(Long idProducto) {
         return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.id = :idProducto", getEntityClass())
                 .setParameter("idProducto", idProducto)
+                .getResultList();
+    }
+
+    // Obtener stock por Negocio
+    @Transactional
+    public List<T> getAllByNegocio(Long idNegocio) {
+        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.idNegocio = :idNegocio", getEntityClass())
+                .setParameter("idNegocio", idNegocio)
                 .getResultList();
     }
 

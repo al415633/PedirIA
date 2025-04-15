@@ -24,6 +24,14 @@ public abstract class HistoricoProductoDAO<T extends HistoricoProducto> {
                 .getResultList();
     }
 
+    public List<T> obtenerHistorialPorUsuario(Long idNegocio, String entityName) {
+        return getEntityManager().createQuery(
+                        "SELECT h FROM " + entityName + " h WHERE h.producto.idNegocio = :idNegocio ORDER BY h.fechaVenta DESC",
+                        (Class<T>) getEntityClass())
+                .setParameter("idNegocio", idNegocio)
+                .getResultList();
+    }
+
     // Obtener ventas históricas de un producto en un rango de fechas
     public List<T> obtenerHistorialPorProductoYRangoFechas(Long idProducto, LocalDate fechaInicio, LocalDate fechaFin, String entityName) {
         TypedQuery<T> query = getEntityManager().createQuery(

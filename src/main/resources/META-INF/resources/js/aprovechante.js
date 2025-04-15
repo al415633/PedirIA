@@ -1,6 +1,6 @@
 const RETRIEVE_ALL = "/aprovechante";
 const POST = "/aprovechante/create";
-const DELETE = "/aprovechante/delete/";
+const DELETE = "/aprovechante/delete";
 const RETRIEVE_ONE = "/aprovechante/login";
 const UPDATE = "/aprovechante/update";
 const LOGOUT = "/aprovechante/logout";
@@ -184,9 +184,10 @@ Vue.createApp({
         }
         ,
 
-        async deletAprovechante(correo) {
+        async deletAprovechante() {
+            console.log("llego al delete")
             // Construimos la URL para el DELETE con el correo como parámetro
-            const url = `${DELETE}${correo}`;
+            const url = `${DELETE}`;
 
             try {
                 // Realizamos la solicitud DELETE al backend

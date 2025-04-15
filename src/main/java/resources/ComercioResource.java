@@ -91,6 +91,9 @@ public class ComercioResource {
 
         // Generar URI para el nuevo recurso
         URI uri = new URI("/comercio/retrieve/" + correo);
+
+        NewCookie cookie = new NewCookie("usuario", correo, "/", null, "Usuario en sesión", 3600, false);
+
         return Response.created(uri).build();
     }
 
@@ -158,8 +161,8 @@ public class ComercioResource {
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/delete/{correo}")
-    public Response deleteComercio(@PathParam("correo") String correo) {
+    @Path("/delete/")
+    public Response deleteComercio(@CookieParam("usuario") String correo) {
 
         Usuario usuario = dao.getComercioPorCorreo(correo);
 

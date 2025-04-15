@@ -3,7 +3,7 @@
 
 const RETRIEVE_ALL = "/comercio";
 const POST = "/comercio/create";
-const DELETE = "/comercio/delete/";
+const DELETE = "/comercio/delete";
 const RETRIEVE_ONE = "/comercio/login";
 const UPDATE = "/comercio/update";
 const LOGOUT = "/comercio/logout";
@@ -198,9 +198,9 @@ Vue.createApp({
         }
         ,
 
-        async deleteComercio(correo) {
+        async deleteComercio() {
             // Construimos la URL para el DELETE con el correo como parámetro
-            const url = `${DELETE}${correo}`;
+            const url = `${DELETE}`;
 
             try {
                 // Realizamos la solicitud DELETE al backend

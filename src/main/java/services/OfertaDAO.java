@@ -181,8 +181,12 @@ public class OfertaDAO {
             // Persistir la oferta y su ProductoOferta asociado
             em.persist(oferta);
             em.persist(productoOferta);
-            System.out.println(stockProductoDAO.getEntityManager());
-            stockProductoDAO.venderStock(stock.getId(), BigDecimal.valueOf(oferta.getCantidad()));
+            try {
+                stockProductoDAO.venderStock(stock.getId(), BigDecimal.valueOf(oferta.getCantidad()));
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("No hay suficiente cantidad para ofertar");
+            }
+
 
         } catch (Exception e) {
             throw e;

@@ -76,6 +76,8 @@ createApp({
             axios.get(STOCK_RETRIEVE_ONE + id)
                 .then(response => {
                     this.currentStock = response.data;
+                    this.activeTab = "stock";
+
                 })
                 .catch(error => {
                     console.error("Error al cargar stock actual:", error);

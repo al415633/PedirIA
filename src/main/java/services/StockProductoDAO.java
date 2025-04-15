@@ -33,7 +33,7 @@ public abstract class StockProductoDAO<T extends StockProducto> {
 
     // Obtener stock por idProducto
     public List<T> retrieveByProducto(Long idProducto) {
-        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.id = :idProducto", getEntityClass())
+        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.id = :idProducto AND s.cantidad > 0 ", getEntityClass())
                 .setParameter("idProducto", idProducto)
                 .getResultList();
     }
@@ -41,7 +41,7 @@ public abstract class StockProductoDAO<T extends StockProducto> {
     // Obtener stock por Negocio
     @Transactional
     public List<T> getAllByNegocio(Long idNegocio) {
-        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.idNegocio = :idNegocio", getEntityClass())
+        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.idNegocio = :AND s.cantidad > 0", getEntityClass())
                 .setParameter("idNegocio", idNegocio)
                 .getResultList();
     }
@@ -81,19 +81,13 @@ public abstract class StockProductoDAO<T extends StockProducto> {
 
         // Verificar que la cantidad vendida sea menor o igual que la cantidad disponible
         if (stock.getCantidad().compareTo(cantidadVendida) < 0) {
-            throw new IllegalArgumentException("Cantidad vendida mayor que la cantidad disponible en el stock.");
+            throw new IllegalArgumentException("No hay suficiente cantidad para vender");
         }
 
         // Reducir la cantidad del stock
         stock.setCantidad(stock.getCantidad().subtract(cantidadVendida));
 
-        // Si la cantidad llega a cero o menos, podemos eliminar el stock (opcional)
-        if (stock.getCantidad().compareTo(BigDecimal.ZERO) <= 0) {
-            getEntityManager().remove(stock);
-        } else {
-            // Si no se eliminó, actualizar el stock
-            getEntityManager().merge(stock);
-        }
+        getEntityManager().merge(stock);
     }
 
     @Transactional

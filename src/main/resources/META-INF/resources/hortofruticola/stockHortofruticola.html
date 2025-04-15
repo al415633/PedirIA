@@ -126,7 +126,7 @@
             <!-- Navbar de selección -->
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link clickable" :class="{ active: activeTab === 'stock' }" @click="activeTab = 'stock'">Stock Actual</a>
+                    <a class="nav-link clickable" :class="{ active: activeTab === 'stock' }" @click="loadCurrentStock">Stock Actual</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link clickable" :class="{ active: activeTab === 'historico' }" @click="loadHistorico">Histórico de Ventas</a>

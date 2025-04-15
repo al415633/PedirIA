@@ -79,6 +79,7 @@ createApp({
             axios.get(STOCK_RETRIEVE_ONE + id)
                 .then(response => {
                     this.currentStock = response.data;
+                    this.activeTab = "stock";
                 })
                 .catch(error => {
                     console.error("Error al cargar stock actual:", error);
@@ -226,11 +227,11 @@ createApp({
                 .then(() => {
                     this.product = { ...this.editingHortofruticola }; // Actualizar UI
                     bootstrap.Modal.getInstance(document.getElementById("editHortofruticolaModal")).hide();
-                    this.showToast("✔️ Hortofruticola actualizada correctamente.", "bg-success");
+                    this.showToast("Hortofruticola actualizada correctamente.", "bg-success");
                 })
                 .catch(error => {
                     console.error("Error al actualizar hortofruticola:", error);
-                    this.showToast("❌ Error al actualizar la hortofruticola.", "bg-danger");
+                    this.showToast("Error al actualizar la hortofruticola.", "bg-danger");
                 });
         },
 

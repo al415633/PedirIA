@@ -7,8 +7,19 @@ createApp({
         return {
             ofertas: [],
             ofertaSeleccionada: null,
-            toastMessage: ""
+            toastMessage: "",
+            currentPage: 1,
+            itemsPerPage: 8
         };
+    },
+    computed: {
+        displayedOfertas() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            return this.ofertas.slice(start, start + this.itemsPerPage);
+        },
+        totalPages() {
+            return Math.ceil(this.ofertas.length / this.itemsPerPage);
+        }
     },
     methods: {
         async cargarOfertas() {
@@ -40,6 +51,15 @@ createApp({
             } finally {
                 bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
             }
+        },
+        prevPage() {
+            if (this.currentPage > 1) this.currentPage--;
+        },
+        nextPage() {
+            if (this.currentPage < this.totalPages) this.currentPage++;
+        },
+        goToPage(page) {
+            this.currentPage = page;
         },
         showToast(msg, bgClass) {
             this.toastMessage = msg;

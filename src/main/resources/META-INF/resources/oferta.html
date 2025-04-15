@@ -51,9 +51,9 @@
             </thead>
             <tbody>
             <tr v-for="oferta in ofertas" :key="oferta.id">
-                <td>{{ oferta.productoOferta.nombre }}</td>
+                <td>{{ oferta.productoOferta.stock.producto.nombre }}</td>
                 <td>{{ oferta.cantidad }}</td>
-                <td>{{ oferta.productoOferta.unidad }}</td>
+                <td>{{ oferta.productoOferta.stock.producto.unidad }}</td>
                 <td>{{ oferta.ubicacion }}</td>
                 <td>{{ formatDate(oferta.fechaAlta) }}</td>
                 <td>{{ formatDate(oferta.productoOferta.stock.fechaVencimiento) }}</td>
@@ -63,6 +63,21 @@
             </tr>
             </tbody>
         </table>
+
+        <!-- Paginación -->
+        <nav v-if="totalPages > 1" aria-label="Paginación" class="mt-3">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                    <a class="page-link" href="#" @click.prevent="prevPage">Anterior</a>
+                </li>
+                <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: page === currentPage }">
+                    <a class="page-link" href="#" @click.prevent="goToPage(page)">{{ page }}</a>
+                </li>
+                <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                    <a class="page-link" href="#" @click.prevent="nextPage">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 
     <!-- Modal de confirmación -->

@@ -17,7 +17,7 @@ import java.util.List;
 public abstract class StockProductoDAO<T extends StockProducto> {
 
     public abstract EntityManager getEntityManager();
-    public AbstractJSONPacker<T> packer;
+    public AbstractJSONPacker packer;
 
     // Agregar un nuevo stock
     @Transactional
@@ -127,19 +127,24 @@ public abstract class StockProductoDAO<T extends StockProducto> {
     protected abstract Class<T> getEntityClass();
     protected abstract Class<T> getHistoricoEntityClass();
 
-    public String getPrediction() {
+    public String getPrediction(Long usuario, HistoricoProductoDAO historicoProductoDAO) {
         PythonManager pythonManager = new PythonManager();
         String JSONtoFiles;
 
-        List<T> stockList = getAll();
+        List<T> stockList = getAllByNegocio(usuario);
+        List<HistoricoProducto> historicoList = historicoProductoDAO.obtenerHistorialPorUsuario(usuario, historicoProductoDAO.getEntityClass().getSimpleName());
         System.out.println("Stock obtenido: " + stockList);
+        System.out.println("Historial obtenido: " + historicoList);
 
         if (stockList == null || stockList.isEmpty()) {
             return "{\"error\": \"No hay datos en el stock\"}";
         }
+        if (historicoList == null || historicoList.isEmpty()) {
+            return "{\"error\": \"No hay datos en el historial\"}";
+        }
 
         try {
-            JSONtoFiles = packer.packageData(stockList);
+            JSONtoFiles = packer.packageData((List<StockProducto>) stockList, historicoList);
             System.out.println("JSON enviado a Python: " + JSONtoFiles);
         } catch (Exception e) {
             e.printStackTrace();

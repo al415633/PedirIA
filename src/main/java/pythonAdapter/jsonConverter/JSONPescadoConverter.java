@@ -1,11 +1,12 @@
 package pythonAdapter.jsonConverter;
 import data.hortofruticola.StockHortoFruticola;
+import data.pescaderia.HistoricoPescado;
 import data.pescaderia.StockPescado;
 import jakarta.enterprise.context.ApplicationScoped;
 
 
 @ApplicationScoped
-public class JSONPescadoConverter extends AbstractJSONConverter<StockPescado> {
+public class JSONPescadoConverter extends AbstractJSONConverter {
 
 
 //    public String extractHistoricStock(List<T> listaStock) {

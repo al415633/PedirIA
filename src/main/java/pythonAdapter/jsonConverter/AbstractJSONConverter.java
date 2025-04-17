@@ -1,19 +1,20 @@
 package pythonAdapter.jsonConverter;
 
+import data.HistoricoProducto;
+import data.StockProducto;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import data.StockProducto;
-
-public abstract class AbstractJSONConverter<T extends StockProducto> {
-    public String extractHistoricStock(List<T> listaStock) {
+public abstract class AbstractJSONConverter {
+    public String extractHistoricStock(List<HistoricoProducto> listaHistorico) {
         StringBuilder stringBuilder = new StringBuilder("ds,producto,y");
         stringBuilder.append(System.lineSeparator());
 
-        for (StockProducto stock : listaStock) { //Crear el CSV
+        for (HistoricoProducto stock : listaHistorico) { //Crear el CSV
             stringBuilder
                     .append(stock.getFechaIngreso().toString())
                     .append(",")
@@ -24,15 +25,16 @@ public abstract class AbstractJSONConverter<T extends StockProducto> {
         }
 
         String finalString = stringBuilder.toString();
+        System.out.println(("csv: " + finalString));
         return finalString;
     }
 
-    public String extractCurrentStock(List<T> listaStock) {
+    public String extractCurrentStock(List<StockProducto> listaStock) {
         Map<String, BigDecimal> ProductoMap = new HashMap<>();
 
         StringBuilder stringBuilder = new StringBuilder("{\"stock_actual\":[");
 
-        for (StockProducto stock : listaStock) {
+        for (data.StockProducto stock : listaStock) {
             if (stock.getFechaIngreso().isBefore(LocalDate.now()) && stock.getFechaVencimiento().isAfter(LocalDate.now())) {
                 ProductoMap.compute(
                         stock.getProducto().getNombre().trim(),  // 🔥 Eliminamos espacios extra en el nombre
@@ -57,6 +59,8 @@ public abstract class AbstractJSONConverter<T extends StockProducto> {
         }
 
         stringBuilder.append("]}");
+        System.out.println(("json: " + stringBuilder.toString()));
+
         return stringBuilder.toString();
     }
 }

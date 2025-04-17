@@ -2,10 +2,12 @@ package resources;
 
 import data.HistoricoProducto;
 import data.StockProducto;
+import data.Usuario;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import services.ComercioDao;
 import services.HistoricoProductoDAO;
 import services.StockProductoDAO;
 
@@ -19,6 +21,9 @@ public abstract class StockProductoResource<T extends StockProducto, H extends H
 
     @Inject
     private HistoricoProductoDAO<H> historicoDAO;
+
+    @Inject
+    protected ComercioDao daoComercio;
 
     // Obtener todos los stocks
     @GET
@@ -105,9 +110,11 @@ public abstract class StockProductoResource<T extends StockProducto, H extends H
     }
     @GET
     @Path("/prediccion")
-    public Response obtenerPrediccion() {
+    public Response obtenerPrediccion(@CookieParam("usuario") String usuario) {
         try {
-            String prediction = stockDAO.getPrediction();
+            Usuario datosUsuario = daoComercio.getComercioPorCorreo(usuario);
+            Long id = datosUsuario.getNegocio().getIdNegocio();
+            String prediction = stockDAO.getPrediction(id, historicoDAO);
             return Response.ok("{\"message\": " + prediction + "}").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

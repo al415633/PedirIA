@@ -4,7 +4,7 @@ import sys
 import os
 from prophet import Prophet
 import logging
-from sklearn.metrics import mean_absolute_error
+#from sklearn.metrics import mean_absolute_error
 
 # Configurar logs para que no se muestren
 logger = logging.getLogger("cmdstanpy")

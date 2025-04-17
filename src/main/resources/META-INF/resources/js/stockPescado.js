@@ -7,6 +7,8 @@ const API_HISTORICO = "/pescados/stock/historico/";
 const API_PESCADO = "/pescados/";
 const VALIDAR = "/pescados/validar";
 
+const API_OFERTAS = "/oferta";
+
 createApp({
     data() {
         return {
@@ -26,7 +28,14 @@ createApp({
             tiposConserva: ["REFRIGERADO", "FRESCO", "CONGELADO", "VIVO"],
             nombreError: '',
             unidadError: '',
-            isInvalid: false
+            isInvalid: false,
+            ofertas: [],
+            nuevaOferta: {
+                ubicacion: '',
+                cantidad: '',
+            },
+            editingOferta: { ubicacion: '' },
+            selectedOffer: {},
         };
     },
     computed: {
@@ -61,6 +70,48 @@ createApp({
                     console.error("Error al cargar detalles del producto:", error);
                 });
         },
+        loadCurrentStock() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            axios.get(STOCK_RETRIEVE_ONE + id)
+                .then(response => {
+                    this.currentStock = response.data;
+                })
+                .catch(error => {
+                    console.error("Error al cargar stock actual:", error);
+                });
+        },
+        loadHistorico() {
+            const id = new URLSearchParams(window.location.search).get('id');
+            axios.get(API_HISTORICO + id)
+                .then(response => {
+                    this.historicoStock = response.data;
+                    this.activeTab = "historico";
+                })
+                .catch(error => console.error("Error al cargar el historial:", error));
+        },
+        loadOfertasPublicadas() {
+            axios.get(API_OFERTAS + "/mis-ofertas-publicadas/pescado/" + this.product.id)
+                .then(response => {
+                    this.ofertas = response.data;
+                    console.log(this.ofertas)
+
+                    // Ordenar las ofertas por fechaBaja (fecha de vencimiento)
+                    this.ofertas.sort((a, b) => {
+                        // Asegúrate de que las fechas están en formato Date (si no lo están, conviértelas)
+                        const fechaA = new Date(a.productoOferta.stock.fechaVencimiento);
+                        const fechaB = new Date(b.productoOferta.stock.fechaVencimiento);
+
+                        // Orden ascendente (de menor a mayor fecha de vencimiento)
+                        return fechaA - fechaB;
+                    });
+
+                    this.activeTab = "ofertasPublicadas"
+                })
+                .catch(error => {
+                    console.error("Error al cargar ofertas:", error);
+                });
+        },
         addStock() {
             const params = new URLSearchParams(window.location.search);
             const idPescado = params.get('id');
@@ -92,26 +143,6 @@ createApp({
                 .catch(error => {
                     this.showToast("Error al agregar stock", "bg-danger");
                 });
-        },
-        loadCurrentStock() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
-            axios.get(STOCK_RETRIEVE_ONE + id)
-                .then(response => {
-                    this.currentStock = response.data;
-                })
-                .catch(error => {
-                    console.error("Error al cargar stock actual:", error);
-                });
-        },
-        loadHistorico() {
-            const id = new URLSearchParams(window.location.search).get('id');
-            axios.get(API_HISTORICO + id)
-                .then(response => {
-                    this.historicoStock = response.data;
-                    this.activeTab = "historico";
-                })
-                .catch(error => console.error("Error al cargar el historial:", error));
         },
         editStock(stock) {
             this.editingStock = JSON.parse(JSON.stringify(stock));
@@ -210,7 +241,6 @@ createApp({
                     this.showToast("Error al actualizar el pescado.", "bg-danger");
                 });
         },
-        // Métod0 para abrir el modal de eliminación
         openDeleteModal() {
             this.deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
             this.deleteModal.show();
@@ -237,7 +267,76 @@ createApp({
             toastEl.className = `toast custom-toast text-white ${bgClass} show`;
             const toast = new bootstrap.Toast(toastEl);
             toast.show();
-        }
+        },
+        openCreateOfferModal(stock) {
+            this.nuevaOferta.stockId = stock.id;
+            this.nuevaOferta.cantidad = '';
+            this.nuevaOferta.ubicacion = '';
+            this.nuevaOferta.unidad = this.product.unidad;
+            new bootstrap.Modal(document.getElementById("createOfertaModal")).show();
+        },
+        crearOferta() {
+            const currentDate = new Date().toISOString().split('T')[0]; // Formato 'yyyy-mm-dd'
+
+            // Construimos la petición, que coincide con la estructura de OfertaRequest (oferta y stock)
+            const ofertaRequest = {
+                ubicacion: this.nuevaOferta.ubicacion,
+                cantidad: parseInt(this.nuevaOferta.cantidad),
+                fechaAlta: new Date().toISOString().split('T')[0],
+                fechaBaja: null,
+                idStock: this.nuevaOferta.stockId,
+                tipoStock: "Pescado"
+
+            };
+
+            axios.post("/oferta", ofertaRequest)
+                .then(response => {
+                    this.showToast("Oferta creada con éxito", "bg-success");
+                    bootstrap.Modal.getInstance(document.getElementById("createOfertaModal")).hide();
+                    this.loadCurrentStock();
+                })
+                .catch(error => {
+                    this.showToast(error.response.data, "bg-danger");
+                    console.error("Error:", error);
+                });
+        },
+        editOferta(oferta) {
+            this.editingOferta = JSON.parse(JSON.stringify(oferta));
+            new bootstrap.Modal(document.getElementById("editOfertaModal")).show();
+        },
+        updateOferta() {
+            axios.put(API_OFERTAS + "/" + this.editingOferta.id, this.editingOferta)
+                .then(() => {
+                    bootstrap.Modal.getInstance(document.getElementById("editOfertaModal")).hide();
+                    this.loadProductDetails();
+                    this.loadCurrentStock();
+                    this.loadOfertasPublicadas();
+                    this.showToast("Oferta modificada con éxito", "bg-success");
+                })
+                .catch(error => {
+                    this.showToast(error.response.data, "bg-danger");
+                    console.error("Error:", error);
+                });
+
+        },
+        openDeleteOfferModal(oferta) {
+            this.selectedOffer = JSON.parse(JSON.stringify(oferta));
+            new bootstrap.Modal(document.getElementById("deleteOfferModal")).show();
+        },
+        deleteOferta() {
+            axios.delete(API_OFERTAS + "/" + this.selectedOffer.id)
+                .then(() => {
+                    this.showToast("Oferta eliminada con éxito.", "bg-success");
+                    // Cerrar el modal
+                    bootstrap.Modal.getInstance(document.getElementById("deleteOfferModal")).hide();
+                    // Recargar la lista de ofertas para reflejar la eliminación
+                    this.loadOfertasPublicadas();
+                })
+                .catch(error => {
+                    console.error("Error al eliminar la oferta:", error);
+                    this.showToast("Error al eliminar la oferta.", "bg-danger");
+                });
+        },
     },
     mounted() {
         this.loadProductDetails();

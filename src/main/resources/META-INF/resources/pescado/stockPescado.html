@@ -56,7 +56,7 @@
 <body>
 
 <header class="d-flex align-items-center px-4">
-    <a href="../menu_productos.html">
+    <a href="/">
         <img src="/static/logo.png" alt="Logo Empresa">
     </a>
     <h1>Gestión de Pescado</h1>
@@ -141,6 +141,14 @@
                     <a class="nav-link clickable" :class="{ active: activeTab === 'historico' }" @click="loadHistorico">Histórico
                         de Ventas</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link clickable" :class="{ active: activeTab === 'ofertasPublicadas' }"
+                       @click="loadOfertasPublicadas">Ofertas publicadas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link clickable" :class="{ active: activeTab === 'ofertas' }" @click="">Ofertas
+                        aceptadas</a>
+                </li>
             </ul>
 
             <!-- Contenido de Stock Actual -->
@@ -151,16 +159,19 @@
                 <form @submit.prevent="addStock" class="row g-2 align-items-center mb-3">
                     <div class="col-auto">
                         <label for="cantidad" class="form-label">Cantidad</label>
-                        <input type="number" id="cantidad" class="form-control" v-model="newStock.cantidad" placeholder="Cantidad"
+                        <input type="number" id="cantidad" class="form-control" v-model="newStock.cantidad"
+                               placeholder="Cantidad"
                                required min="0" step="0.001">
                     </div>
                     <div class="col-auto">
                         <label for="fechaIngreso" class="form-label">Fecha de Ingreso</label>
-                        <input type="date" id="fechaIngreso" class="form-control" v-model="newStock.fechaIngreso" required>
+                        <input type="date" id="fechaIngreso" class="form-control" v-model="newStock.fechaIngreso"
+                               required>
                     </div>
                     <div class="col-auto">
                         <label for="fechaVencimiento" class="form-label">Fecha de Vencimiento</label>
-                        <input type="date" id="fechaVencimiento" class="form-control" v-model="newStock.fechaVencimiento" required>
+                        <input type="date" id="fechaVencimiento" class="form-control"
+                               v-model="newStock.fechaVencimiento" required>
                     </div>
                     <div class="col-auto">
                         <button type="submit" class="btn btn-primary">Añadir</button>
@@ -183,10 +194,11 @@
                         <td>{{ formatDate(stock.fechaIngreso) }}</td>
                         <td>{{ formatDate(stock.fechaVencimiento) }}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning stock-actions" @click="editStock(stock)">✏️ Editar
+                            <button style="margin-right: 10px;" class="btn btn-sm btn-warning stock-actions" @click="editStock(stock)">✏️ Editar
                             </button>
-                            <button class="btn btn-sm btn-danger stock-actions" @click="openSellStock(stock)">🛒 Vender
+                            <button style="margin-right: 10px;" class="btn btn-sm btn-danger stock-actions" @click="openSellStock(stock)">🛒 Vender
                             </button>
+                            <button class="btn btn-sm btn-success stock-actions" @click="openCreateOfferModal(stock)" v-if="isNearExpiration(stock.fechaVencimiento)">🏷️ Ofertar</button>
                         </td>
                     </tr>
                     </tbody>
@@ -215,77 +227,104 @@
                     </tbody>
                 </table>
             </div>
+
+            <div v-if="activeTab === 'ofertasPublicadas'">
+                <h4>Ofertas Actuales</h4>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Ubicación</th>
+                        <th>Cantidad</th>
+                        <th>Fecha Alta</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="oferta in ofertas" :key="oferta.id">
+                        <td>{{ oferta.ubicacion }}</td>
+                        <td>{{ oferta.cantidad }}</td>
+                        <td>{{ formatDate(oferta.fechaAlta) }}</td>
+                        <td>{{ formatDate(oferta.productoOferta.stock.fechaVencimiento) }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-2" @click="editOferta(oferta)">Editar</button>
+                            <button class="btn btn-sm btn-danger" @click="openDeleteOfferModal(oferta)">Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-        <!-- Modal para editar stock -->
-        <div class="modal fade" id="editStockModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Editar Stock</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form @submit.prevent="updateStock">
-                            <div class="mb-3">
-                                <label class="form-label">Cantidad</label>
-                                <input type="number" class="form-control" v-model="editingStock.cantidad" required
-                                       min="0"
-                                       step="0.001" readonly>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Fecha de Ingreso</label>
-                                <input type="date" class="form-control" v-model="editingStock.fechaIngreso" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Fecha de Vencimiento</label>
-                                <input type="date" class="form-control" v-model="editingStock.fechaVencimiento"
-                                       required>
-                            </div>
-                            <button type="submit" class="btn btn-success">Guardar Cambios</button>
-                        </form>
-                    </div>
+    <!-- Modal para editar stock -->
+    <div class="modal fade" id="editStockModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="updateStock">
+                        <div class="mb-3">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" v-model="editingStock.cantidad" required
+                                   min="0"
+                                   step="0.001" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fecha de Ingreso</label>
+                            <input type="date" class="form-control" v-model="editingStock.fechaIngreso" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fecha de Vencimiento</label>
+                            <input type="date" class="form-control" v-model="editingStock.fechaVencimiento"
+                                   required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Modal para VENDER stock -->
-        <div class="modal fade" id="sellStockModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Vender Stock</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form @submit.prevent="sellStock">
-                            <div class="mb-3">
-                                <label class="form-label">Cantidad a vender</label>
-                                <input type="number" class="form-control" v-model="sellStockData.cantidad" required
-                                       min="0.001" step="0.001">
-                            </div>
-                            <button type="submit" class="btn btn-danger">Confirmar Venta</button>
-                        </form>
-                    </div>
+    <!-- Modal para VENDER stock -->
+    <div class="modal fade" id="sellStockModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Vender Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="sellStock">
+                        <div class="mb-3">
+                            <label class="form-label">Cantidad a vender</label>
+                            <input type="number" class="form-control" v-model="sellStockData.cantidad" required
+                                   min="0.001" step="0.001">
+                        </div>
+                        <button type="submit" class="btn btn-danger">Confirmar Venta</button>
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Toast de Bootstrap -->
-        <div class="toast-container">
-            <div id="toastMessage" class="toast custom-toast text-white" role="alert" aria-live="assertive"
-                 aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <strong>{{ toastMessage }}</strong>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                            aria-label="Cerrar"></button>
+    <!-- Toast de Bootstrap -->
+    <div class="toast-container">
+        <div id="toastMessage" class="toast custom-toast text-white" role="alert" aria-live="assertive"
+             aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <strong>{{ toastMessage }}</strong>
                 </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                        aria-label="Cerrar"></button>
             </div>
         </div>
-
+    </div>
 
     <!-- Modal de confirmación de eliminación -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
@@ -301,6 +340,75 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-danger" @click="deleteProduct">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear oferta -->
+    <div class="modal fade" id="createOfertaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Crear Oferta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="ubicacion" class="form-label">Ubicación</label>
+                        <input id="ubicacion" type="text" class="form-control" v-model="nuevaOferta.ubicacion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cantidadOferta" class="form-label">Cantidad a donar ({{ nuevaOferta.unidad }})</label>
+                        <input type="number" id="cantidadOferta" class="form-control" v-model="nuevaOferta.cantidad" required min="1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" @click="crearOferta">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar oferta -->
+    <div class="modal fade" id="editOfertaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Oferta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Campo de Ubicación -->
+                    <div class="mb-3">
+                        <label for="ubicacionE" class="form-label">Ubicación</label>
+                        <input id="ubicacionE" type="text" class="form-control" v-model="editingOferta.ubicacion" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <!-- Botones de Cancelar y Confirmar -->
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" @click="updateOferta">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para confirmar la eliminación de una oferta -->
+    <div class="modal fade" id="deleteOfferModal" tabindex="-1" aria-labelledby="deleteOfferModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteOfferModalLabel">Eliminar Oferta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar esta oferta?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" @click="deleteOferta">Eliminar</button>
                 </div>
             </div>
         </div>

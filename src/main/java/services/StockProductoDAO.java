@@ -31,10 +31,18 @@ public abstract class StockProductoDAO<T extends StockProducto> {
         return getEntityManager().find(getEntityClass(), id);
     }
 
-    // Obtener stock por idProducto ¡
+    // Obtener stock por idProducto
     public List<T> retrieveByProducto(Long idProducto) {
         return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.id = :idProducto", getEntityClass())
                 .setParameter("idProducto", idProducto)
+                .getResultList();
+    }
+
+    // Obtener stock por Negocio
+    @Transactional
+    public List<T> getAllByNegocio(Long idNegocio) {
+        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.idNegocio = :idNegocio", getEntityClass())
+                .setParameter("idNegocio", idNegocio)
                 .getResultList();
     }
 
@@ -64,6 +72,32 @@ public abstract class StockProductoDAO<T extends StockProducto> {
     // Método genérico para vender un producto del stock
     @Transactional
     public void venderStock(Long idStock, BigDecimal cantidadVendida) {
+        // Buscar el stock con el ID proporcionado
+        T stock = getEntityManager().find(getEntityClass(), idStock);
+
+        if (stock == null) {
+            throw new IllegalArgumentException("El stock con ID " + idStock + " no existe.");
+        }
+
+        // Verificar que la cantidad vendida sea menor o igual que la cantidad disponible
+        if (stock.getCantidad().compareTo(cantidadVendida) < 0) {
+            throw new IllegalArgumentException("Cantidad vendida mayor que la cantidad disponible en el stock.");
+        }
+
+        // Reducir la cantidad del stock
+        stock.setCantidad(stock.getCantidad().subtract(cantidadVendida));
+
+        // Si la cantidad llega a cero o menos, podemos eliminar el stock (opcional)
+        if (stock.getCantidad().compareTo(BigDecimal.ZERO) <= 0) {
+            getEntityManager().remove(stock);
+        } else {
+            // Si no se eliminó, actualizar el stock
+            getEntityManager().merge(stock);
+        }
+    }
+
+    @Transactional
+    public void eliminarStock(Long idStock, BigDecimal cantidadVendida) {
         // Buscar el stock con el ID proporcionado
         T stock = getEntityManager().find(getEntityClass(), idStock);
 

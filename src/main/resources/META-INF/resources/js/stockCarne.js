@@ -1,4 +1,4 @@
-const { createApp } = Vue;
+const {createApp} = Vue;
 const RETRIEVE_ONE_CARNE = "/carnes/";
 const STOCK_RETRIEVE_ONE = "/carnes/stock/producto/";
 const ADD_STOCK = "/carnes/stock";
@@ -20,12 +20,12 @@ createApp({
                 fechaVencimiento: ''
             },
             toastMessage: '',
-            editingStock: { id: null, cantidad: '', fechaIngreso: '', fechaVencimiento: '' },
-            sellStockData: { id: null, cantidad: '', disponible: 0 },
-            offerStockData: { id: null, cantidad: '', fechaIngreso: '', fechaVencimiento: ''},
+            editingStock: {id: null, cantidad: '', fechaIngreso: '', fechaVencimiento: ''},
+            sellStockData: {id: null, cantidad: '', disponible: 0},
+            offerStockData: {id: null, cantidad: '', fechaIngreso: '', fechaVencimiento: ''},
             historicoStock: [],
             activeTab: "stock",
-            editingCarne: { nombre: '', unidad: '', tipoConserva: '' },
+            editingCarne: {nombre: '', unidad: '', tipoConserva: ''},
             tiposConserva: ["REFRIGERADO", "FRESCO", "CONGELADO", "SECO"],
             nombreError: '',
             unidadError: '',
@@ -36,33 +36,46 @@ createApp({
                 ubicacion: '',
                 cantidad: '',
             },
-            editingOferta: { ubicacion: '' },
+            editingOferta: {ubicacion: ''},
             selectedOffer: {},
+
+            currentPageStock: 1,
+            currentPageHistorico: 1,
+            itemsPerPage: 7,
         };
     },
     computed: {
         // Se crea un array con la cantidad formateada y la unidad concatenada.
-        sortedCurrentStock() {
-            return [...this.currentStock]
-                .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
-                .map(stock => {
-                    return {
-                        ...stock,
-                        cantidadFormateada: this.formatNumber(stock.cantidad) + " " + (this.product.unidad || "")
-                    };
-                });
+        sortedCurrentStockPaginated() {
+            const start = (this.currentPageStock - 1) * this.itemsPerPage;
+            const sortedStock = [...this.currentStock].sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento));
+            return sortedStock.slice(start, start + this.itemsPerPage).map(stock => {
+                return {
+                    ...stock,
+                    cantidadFormateada: this.formatNumber(stock.cantidad) + " " + (this.product.unidad || "")
+                };
+            });
         },
-        sortedCurrentHistorico() {
-            return [...this.historicoStock]
-                .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
-                .map(historico => {
-                    return {
-                        ...historico,
-                        cantidadFormateada: this.formatNumber(historico.cantidad) + " " + (this.product.unidad || "")
-                    };
-                });
+        sortedCurrentHistoricoPaginated() {
+            const start = (this.currentPageHistorico - 1) * this.itemsPerPage;
+            const sortedHistorico = [...this.historicoStock].sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento));
+            return sortedHistorico.slice(start, start + this.itemsPerPage).map(historico => {
+                return {
+                    ...historico,
+                    cantidadFormateada: this.formatNumber(historico.cantidad) + " " + (this.product.unidad || "")
+                };
+            });
+        },
+
+        totalPagesStock() {
+            return Math.ceil(this.currentStock.length / this.itemsPerPage);
+        },
+
+        totalPagesHistorico() {
+            return Math.ceil(this.historicoStock.length / this.itemsPerPage);
         }
     },
+
     methods: {
         loadProductDetails() {
             const params = new URLSearchParams(window.location.search);
@@ -158,14 +171,14 @@ createApp({
                 cantidad: parseFloat(this.newStock.cantidad),
                 fechaIngreso: this.newStock.fechaIngreso,
                 fechaVencimiento: this.newStock.fechaVencimiento,
-                producto: { id: idCarne }
+                producto: {id: idCarne}
             };
 
             axios.post(ADD_STOCK, stockData)
                 .then(response => {
                     this.showToast(`${this.formatNumber(stockData.cantidad)} ${this.product.unidad} añadidas. Ingreso: ${this.formatDate(stockData.fechaIngreso)}, Vence: ${this.formatDate(stockData.fechaVencimiento)}`, "bg-success");
                     this.loadCurrentStock();
-                    this.newStock = { cantidad: '', fechaIngreso: '', fechaVencimiento: '' };
+                    this.newStock = {cantidad: '', fechaIngreso: '', fechaVencimiento: ''};
                 })
                 .catch(error => {
                     this.showToast("Error al agregar stock", "bg-danger");
@@ -195,7 +208,7 @@ createApp({
             toast.show();
         },
         openSellStock(stock) {
-            this.sellStockData = { id: stock.id, cantidad: '', disponible: stock.cantidad };
+            this.sellStockData = {id: stock.id, cantidad: '', disponible: stock.cantidad};
             new bootstrap.Modal(document.getElementById("sellStockModal")).show();
         },
         sellStock() {
@@ -216,18 +229,50 @@ createApp({
                     this.showToast("Error al vender stock", "bg-danger");
                 });
         },
+
+        prevPageStock() {
+            if (this.currentPageStock > 1) {
+                this.currentPageStock--;
+            }
+        },
+        nextPageStock() {
+            if (this.currentPageStock < this.totalPagesStock) {
+                this.currentPageStock++;
+            }
+        },
+        goToPageStock(page) {
+            this.currentPageStock = page;
+        },
+        prevPageHistorico() {
+            if (this.currentPageHistorico > 1) {
+                this.currentPageHistorico--;
+            }
+        },
+        nextPageHistorico() {
+            if (this.currentPageHistorico < this.totalPagesHistorico) {
+                this.currentPageHistorico++;
+            }
+        },
+        goToPageHistorico(page) {
+            this.currentPageHistorico = page;
+        },
+
         formatDate(dateStr) {
-            return new Date(dateStr).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            return new Date(dateStr).toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
         },
         formatNumber(value) {
             const num = parseFloat(value);
             if (Number.isInteger(num)) {
-                return num.toLocaleString('es-ES', { minimumFractionDigits: 0 });
+                return num.toLocaleString('es-ES', {minimumFractionDigits: 0});
             }
-            return num.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+            return num.toLocaleString('es-ES', {minimumFractionDigits: 0, maximumFractionDigits: 3});
         },
         openEditCarneModal() {
-            this.editingCarne = { ...this.product };
+            this.editingCarne = {...this.product};
             this.nombreError = '';
             this.unidadError = '';
             this.isInvalid = false;
@@ -267,7 +312,7 @@ createApp({
 
             axios.put(API_CARNE, this.editingCarne)
                 .then(() => {
-                    this.product = { ...this.editingCarne };
+                    this.product = {...this.editingCarne};
                     bootstrap.Modal.getInstance(document.getElementById("editCarneModal")).hide();
                     this.showToast("Carne actualizada correctamente.", "bg-success");
                 })

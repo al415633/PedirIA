@@ -31,6 +31,7 @@ createApp({
             unidadError: '',
             isInvalid: false,
             ofertas: [],
+            ofertasAceptadas: [],
             nuevaOferta: {
                 ubicacion: '',
                 cantidad: '',
@@ -112,6 +113,28 @@ createApp({
                     });
 
                     this.activeTab = "ofertasPublicadas"
+                })
+                .catch(error => {
+                    console.error("Error al cargar ofertas:", error);
+                });
+        },
+        loadOfertasAceptadas() {
+            axios.get(API_OFERTAS + "/mis-ofertas-aceptadas/carne/" + this.product.id)
+                .then(response => {
+                    this.ofertasAceptadas = response.data;
+                    console.log(this.ofertasAceptadas)
+
+                    // Ordenar las ofertas por fechaBaja (fecha de vencimiento)
+                    this.ofertasAceptadas.sort((a, b) => {
+                        // Asegúrate de que las fechas están en formato Date (si no lo están, conviértelas)
+                        const fechaA = new Date(a.productoOferta.stock.fechaVencimiento);
+                        const fechaB = new Date(b.productoOferta.stock.fechaVencimiento);
+
+                        // Orden ascendente (de menor a mayor fecha de vencimiento)
+                        return fechaA - fechaB;
+                    });
+
+                    this.activeTab = "ofertasAceptadas"
                 })
                 .catch(error => {
                     console.error("Error al cargar ofertas:", error);

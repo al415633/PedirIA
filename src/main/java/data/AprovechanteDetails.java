@@ -1,11 +1,17 @@
 package data;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import data.Usuario;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "aprovechante")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "idAprovechante"
+)
 public class AprovechanteDetails {
 
     @Id
@@ -25,13 +31,13 @@ public class AprovechanteDetails {
     @OneToOne
     @MapsId // Indica que usa el mismo ID que Usuario
     @JoinColumn(name = "id_usuario")
-    @JsonIgnore
     private Usuario usuario;
 
     @Override
     public String toString() {
         return "AprovechanteDetails{" +
                 "idAprovechante=" + idAprovechante +
+                ", correo='" + usuario.getCorreo() + '\'' +
                 ", condiciones='" + condiciones + '\'' +
                 ", condiciones2='" + condiciones2 + '\'' +
                 ", tipo_aprovechante='" + tipo_aprovechante + '\'' +
@@ -77,4 +83,6 @@ public class AprovechanteDetails {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
+
+
 }

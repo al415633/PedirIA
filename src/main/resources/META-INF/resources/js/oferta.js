@@ -1,6 +1,5 @@
 const { createApp } = Vue;
 const API_OFERTAS = "/oferta";
-const API_ACEPTAR = "/oferta/aceptar";
 
 createApp({
     data() {
@@ -41,14 +40,12 @@ createApp({
         },
         async aceptarOferta() {
             try {
-                await axios.post(API_ACEPTAR, {
-                    ofertaId: this.ofertaSeleccionada.id
-                });
+                await axios.put(`${API_OFERTAS}/aceptar/${this.ofertaSeleccionada.id}`);
                 this.showToast("Oferta aceptada correctamente", "bg-success");
                 this.cargarOfertas();
             } catch (err) {
                 console.error("Error al aceptar la oferta:", err);
-                this.showToast("No se pudo aceptar la oferta", "bg-danger");
+                this.showToast("No se pudo aceptar la oferta: " + error, "bg-danger");
             } finally {
                 bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
             }

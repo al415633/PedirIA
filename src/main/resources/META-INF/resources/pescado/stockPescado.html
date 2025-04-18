@@ -146,7 +146,7 @@
                        @click="loadOfertasPublicadas">Ofertas publicadas</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link clickable" :class="{ active: activeTab === 'ofertas' }" @click="">Ofertas
+                    <a class="nav-link clickable" :class="{ active: activeTab === 'ofertas' }" @click="loadOfertasAceptadas">Ofertas
                         aceptadas</a>
                 </li>
             </ul>
@@ -255,6 +255,29 @@
                     </tbody>
                 </table>
             </div>
+
+            <div v-if="activeTab === 'ofertasAceptadas'">
+                <h4>Ofertas Aceptadas</h4>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Ubicación</th>
+                        <th>Cantidad</th>
+                        <th>Fecha Aceptación</th>
+                        <th>Aprovechante</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="oferta in ofertasAceptadas" :key="oferta.id">
+                        <td>{{ oferta.ubicacion }} </td>
+                        <td>{{ oferta.cantidad }}</td>
+                        <td>{{ formatDate(oferta.fechaBaja) }}</td>
+                        <td>{{ oferta.aprovechante.usuario.correo }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 

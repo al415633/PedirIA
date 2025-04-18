@@ -42,7 +42,7 @@ public class OfertaResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllOfertas() {
+    public Response getAllOfertasPublicadas() {
         List<Oferta> ofertas = daoOferta.obtenerOfertas();
         return Response.ok(ofertas).build();
     }
@@ -161,13 +161,13 @@ public class OfertaResource {
     }
 
     @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response aceptarOferta(Oferta oferta, @CookieParam("usuario") String correo) {
+    @Path("/aceptar/{id}")
+    public Response aceptarOferta(@PathParam("id") Long idOferta, @CookieParam("usuario") String correo) {
 
         Long idAprovechante = daoAprovechante.getAprovechantePorCorreo(correo).getId_usuario();
 
         try {
-            Oferta ofertaAcepptada = daoOferta.aceptarOferta(oferta, idAprovechante);
+            Oferta ofertaAcepptada = daoOferta.aceptarOferta(idOferta, idAprovechante);
             return Response.status(Response.Status.CREATED).entity(ofertaAcepptada).build();
         } catch (PersistenceException e) {
             e.printStackTrace();

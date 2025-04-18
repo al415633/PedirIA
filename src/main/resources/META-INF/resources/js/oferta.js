@@ -26,6 +26,7 @@ createApp({
             try {
                 const res = await axios.get(API_OFERTAS);
                 this.ofertas = res.data;
+                console.log(this.ofertas)
             } catch (err) {
                 console.error("Error al cargar ofertas", err);
                 this.showToast("No se pudieron cargar las ofertas", "bg-danger");

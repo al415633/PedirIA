@@ -84,42 +84,7 @@
             <button class="btn btn-warning w-100" @click="openEditCarneModal"> Editar Carne</button>
             <!-- Botón para eliminar la carne -->
             <button class="btn btn-danger w-100 mt-2" @click="openDeleteModal">Eliminar Carne</button>
-
         </div>
-
-        <!--  Modal para editar carne -->
-        <div class="modal fade" id="editCarneModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Editar Carne</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form @submit.prevent="updateCarne">
-                            <div class="mb-3">
-                                <label class="form-label">Nombre</label>
-                                <input type="text" class="form-control" v-model="editingCarne.nombre" @input="validateEditCarne" required>
-                                <small v-if="nombreError" class="text-danger">{{ nombreError }}</small>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Unidad</label>
-                                <input type="text" class="form-control" v-model="editingCarne.unidad" @input="validateEditCarne" required>
-                                <small v-if="unidadError" class="text-danger">{{ unidadError }}</small>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Tipo de Conserva</label>
-                                <select class="form-select" v-model="editingCarne.tipoConserva">
-                                    <option v-for="tipo in tiposConserva" :key="tipo" :value="tipo">{{ tipo }}</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-success" :disabled="isInvalid">Guardar Cambios</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
 
         <!-- Sección que cambia entre Stock Actual e Histórico -->
         <div class="col-md-8">
@@ -134,34 +99,11 @@
                 <li class="nav-item">
                     <a class="nav-link clickable" :class="{ active: activeTab === 'ofertasPublicadas' }" @click="loadOfertasPublicadas">Ofertas publicadas</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link clickable" :class="{ active: activeTab === 'ofertas' }" @click="">Ofertas aceptadas</a>
-                </li>
             </ul>
 
             <!-- Contenido de Stock Actual -->
             <div v-if="activeTab === 'stock'">
                 <h4>Stock Disponible</h4>
-
-                <!-- Formulario para añadir stock -->
-                <form @submit.prevent="addStock" class="row g-2 align-items-center mb-3">
-                    <div class="col-auto">
-                        <label for="cantidad" class="form-label">Cantidad</label>
-                        <input type="number" id="cantidad" class="form-control" v-model="newStock.cantidad" placeholder="Cantidad" required min="0" step="0.001" inputmode="decimal">
-                    </div>
-                    <div class="col-auto">
-                        <label for="fechaIngreso" class="form-label">Fecha de Ingreso</label>
-                        <input type="date" id="fechaIngreso" class="form-control" v-model="newStock.fechaIngreso" required>
-                    </div>
-                    <div class="col-auto">
-                        <label for="fechaVencimiento" class="form-label">Fecha de Vencimiento</label>
-                        <input type="date" id="fechaVencimiento" class="form-control" v-model="newStock.fechaVencimiento" required>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary">Añadir</button>
-                    </div>
-                </form>
-
 
                 <!-- Tabla de stock -->
                 <table class="table table-bordered">
@@ -174,18 +116,32 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="stock in sortedCurrentStock" :key="stock.id" :class="{'table-danger': isNearExpiration(stock.fechaVencimiento)}">
-                        <td>{{ stock.cantidadFormateada  }}</td>
+                    <tr v-for="stock in sortedCurrentStockPaginated" :key="stock.id">
+                        <td>{{ stock.cantidadFormateada }}</td>
                         <td>{{ formatDate(stock.fechaIngreso) }}</td>
-                        <td :class="{'text-danger': isNearExpiration(stock.fechaVencimiento)}">{{ formatDate(stock.fechaVencimiento) }}</td>
+                        <td>{{ formatDate(stock.fechaVencimiento) }}</td>
                         <td>
-                            <button style="margin-right: 10px;" class="btn btn-sm btn-warning stock-actions" @click="editStock(stock)">✏️ Editar</button>
-                            <button style="margin-right: 10px;" class="btn btn-sm btn-danger stock-actions" @click="openSellStock(stock)">🛒 Vender</button>
-                            <button v-if="isNearExpiration(stock.fechaVencimiento)" class="btn btn-sm btn-success stock-actions" @click="openCreateOfferModal(stock)">🏷️ Ofertar</button>
+                            <button class="btn btn-sm btn-warning stock-actions" @click="editStock(stock)">✏️ Editar</button>
+                            <button class="btn btn-sm btn-danger stock-actions" @click="openSellStock(stock)">🛒 Vender</button>
                         </td>
                     </tr>
                     </tbody>
                 </table>
+
+                <!-- Paginación para el Stock -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" :class="{ disabled: currentPageStock === 1 }">
+                            <a class="page-link" href="#" @click.prevent="prevPageStock">Anterior</a>
+                        </li>
+                        <li class="page-item" v-for="page in totalPagesStock" :key="page" :class="{ active: page === currentPageStock }">
+                            <a class="page-link" href="#" @click.prevent="goToPageStock(page)">{{ page }}</a>
+                        </li>
+                        <li class="page-item" :class="{ disabled: currentPageStock === totalPagesStock }">
+                            <a class="page-link" href="#" @click.prevent="nextPageStock">Siguiente</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
 
             <!-- Contenido del Histórico -->
@@ -201,7 +157,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="venta in sortedCurrentHistorico" :key="venta.id">
+                    <tr v-for="venta in sortedCurrentHistoricoPaginated" :key="venta.id">
                         <td>{{ venta.cantidadFormateada }}</td>
                         <td>{{ formatDate(venta.fechaVenta) }}</td>
                         <td>{{ formatDate(venta.fechaIngreso) }}</td>
@@ -209,37 +165,24 @@
                     </tr>
                     </tbody>
                 </table>
-            </div>
 
-            <div v-if="activeTab === 'ofertasPublicadas'">
-                <h4>Ofertas Actuales</h4>
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <th>Ubicación</th>
-                        <th>Cantidad</th>
-                        <th>Fecha Alta</th>
-                        <th>Fecha Vencimiento</th>
-                        <th>Acciones</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="oferta in ofertas" :key="oferta.id">
-                        <td>{{ oferta.ubicacion }} </td>
-                        <td>{{ oferta.cantidad }}</td>
-                        <td>{{ formatDate(oferta.fechaAlta) }}</td>
-                        <td>{{ formatDate(oferta.productoOferta.stock.fechaVencimiento) }}</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning me-2" @click="editOferta(oferta)">Editar</button>
-                            <button class="btn btn-sm btn-danger" @click="openDeleteOfferModal(oferta)">Eliminar</button>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                <!-- Paginación para el Histórico -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" :class="{ disabled: currentPageHistorico === 1 }">
+                            <a class="page-link" href="#" @click.prevent="prevPageHistorico">Anterior</a>
+                        </li>
+                        <li class="page-item" v-for="page in totalPagesHistorico" :key="page" :class="{ active: page === currentPageHistorico }">
+                            <a class="page-link" href="#" @click.prevent="goToPageHistorico(page)">{{ page }}</a>
+                        </li>
+                        <li class="page-item" :class="{ disabled: currentPageHistorico === totalPagesHistorico }">
+                            <a class="page-link" href="#" @click.prevent="nextPageHistorico">Siguiente</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
-
 
     <!-- Modal para editar stock -->
     <div class="modal fade" id="editStockModal" tabindex="-1" aria-hidden="true">
@@ -290,7 +233,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Toast de Bootstrap -->
     <div class="toast-container">
@@ -360,51 +302,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal para editar oferta -->
-    <div class="modal fade" id="editOfertaModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Oferta</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Campo de Ubicación -->
-                    <div class="mb-3">
-                        <label for="ubicacionE" class="form-label">Ubicación</label>
-                        <input id="ubicacionE" type="text" class="form-control" v-model="editingOferta.ubicacion" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <!-- Botones de Cancelar y Confirmar -->
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" @click="updateOferta">Confirmar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para confirmar la eliminación de una oferta -->
-    <div class="modal fade" id="deleteOfferModal" tabindex="-1" aria-labelledby="deleteOfferModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteOfferModalLabel">Eliminar Oferta</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Estás seguro de que deseas eliminar esta oferta?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" @click="deleteOferta">Eliminar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
 </div>
 
 <script src="../js/stockCarne.js"></script>

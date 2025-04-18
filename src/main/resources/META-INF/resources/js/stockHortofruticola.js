@@ -6,7 +6,9 @@ const API_STOCK = "/hortofruticolas/stock/";
 const API_HISTORICO = "/hortofruticolas/stock/historico/";
 const API_HORTOFRUTICOLA = "/hortofruticolas/";
 const VALIDAR_HORTOFRUTICOLA = "/hortofruticolas/validar";
+
 const API_OFERTAS = "/oferta";
+
 
 createApp({
     data() {
@@ -35,41 +37,28 @@ createApp({
             },
             editingOferta: { ubicacion: '' },
             selectedOffer: {},
-
-            // Variables de paginación
-            currentPageStock: 1,
-            currentPageHistorico: 1,
-            itemsPerPage: 7, // Número de elementos por página
         };
     },
     computed: {
-        // Stock Actual paginado
-        sortedCurrentStockPaginated() {
-            const start = (this.currentPageStock - 1) * this.itemsPerPage;
-            return this.currentStock.slice(start, start + this.itemsPerPage).map(stock => {
-                return {
-                    ...stock,
-                    cantidadFormateada: this.formatNumber(stock.cantidad) + " " + (this.product.unidad || "") // Formato de cantidad
-                };
-            });
+        sortedCurrentStock() {
+            return [...this.currentStock]
+                .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
+                .map(stock => {
+                    return {
+                        ...stock,
+                        cantidadFormateada: this.formatNumber(stock.cantidad) + " " + (this.product.unidad || "")
+                    };
+                });
         },
-        // Histórico de Ventas paginado
-        sortedCurrentHistoricoPaginated() {
-            const start = (this.currentPageHistorico - 1) * this.itemsPerPage;
-            return this.historicoStock.slice(start, start + this.itemsPerPage).map(historico => {
-                return {
-                    ...historico,
-                    cantidadFormateada: this.formatNumber(historico.cantidad) + " " + (this.product.unidad || "") // Formato de cantidad
-                };
-            });
-        },
-        // Total de páginas para Stock Actual
-        totalPagesStock() {
-            return Math.ceil(this.currentStock.length / this.itemsPerPage);
-        },
-        // Total de páginas para Histórico de Ventas
-        totalPagesHistorico() {
-            return Math.ceil(this.historicoStock.length / this.itemsPerPage);
+        sortedCurrentHistorico() {
+            return [...this.historicoStock]
+                .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
+                .map(historico => {
+                    return {
+                        ...historico,
+                        cantidadFormateada: this.formatNumber(historico.cantidad) + " " + (this.product.unidad || "")
+                    };
+                });
         }
     },
     methods: {
@@ -105,31 +94,84 @@ createApp({
                 })
                 .catch(error => console.error("Error al cargar el historial:", error));
         },
-        prevPageStock() {
-            if (this.currentPageStock > 1) {
-                this.currentPageStock--;
+        loadOfertasPublicadas() {
+            axios.get(API_OFERTAS + "/mis-ofertas-publicadas/hortofruticola/" + this.product.id)
+                .then(response => {
+                    this.ofertas = response.data;
+                    console.log(this.ofertas)
+
+                    // Ordenar las ofertas por fechaBaja (fecha de vencimiento)
+                    this.ofertas.sort((a, b) => {
+                        // Asegúrate de que las fechas están en formato Date (si no lo están, conviértelas)
+                        const fechaA = new Date(a.productoOferta.stock.fechaVencimiento);
+                        const fechaB = new Date(b.productoOferta.stock.fechaVencimiento);
+
+                        // Orden ascendente (de menor a mayor fecha de vencimiento)
+                        return fechaA - fechaB;
+                    });
+
+                    this.activeTab = "ofertasPublicadas"
+                })
+                .catch(error => {
+                    console.error("Error al cargar ofertas:", error);
+                });
+        },
+        addStock() {
+            const params = new URLSearchParams(window.location.search);
+            const idHortofruticola = params.get('id');
+
+            if (!idHortofruticola) {
+                this.showToast("Error: Producto no encontrado", "bg-danger");
+                return;
             }
+
+            const stockData = {
+                cantidad: parseFloat(this.newStock.cantidad),
+                fechaIngreso: this.newStock.fechaIngreso,
+                fechaVencimiento: this.newStock.fechaVencimiento,
+                producto: { id: idHortofruticola }
+            };
+
+            axios.post(ADD_STOCK, stockData)
+                .then(response => {
+                    this.showToast(`${stockData.cantidad} unidades añadidas. Ingreso: ${this.formatDate(stockData.fechaIngreso)}, Vence: ${this.formatDate(stockData.fechaVencimiento)}`, "bg-primary");
+                    this.loadCurrentStock();
+                    this.newStock = { cantidad: '', fechaIngreso: '', fechaVencimiento: '' };
+                })
+                .catch(error => {
+                    this.showToast("Error al agregar stock", "bg-danger");
+                });
+            },
+        editStock(stock) {
+            this.editingStock = JSON.parse(JSON.stringify(stock)); // Evita modificar el original directamente
+            new bootstrap.Modal(document.getElementById("editStockModal")).show();
         },
-        nextPageStock() {
-            if (this.currentPageStock < this.totalPagesStock) {
-                this.currentPageStock++;
-            }
+        updateStock() {
+            axios.put(API_STOCK + this.editingStock.id, this.editingStock)
+                .then(() => {
+                    this.loadCurrentStock();
+                    bootstrap.Modal.getInstance(document.getElementById("editStockModal")).hide();
+                })
+                .catch(error => console.error("Error al actualizar stock:", error));
         },
-        goToPageStock(page) {
-            this.currentPageStock = page;
+        showToast(message, bgClass) {
+            this.toastMessage = message;
+            const toastEl = document.getElementById("toastMessage");
+            toastEl.className = `toast custom-toast text-white ${bgClass} show`;
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
         },
-        prevPageHistorico() {
-            if (this.currentPageHistorico > 1) {
-                this.currentPageHistorico--;
-            }
+        openSellStock(stock) {
+            this.sellStockData = { id: stock.id, cantidad: '' };
+            new bootstrap.Modal(document.getElementById("sellStockModal")).show();
         },
-        nextPageHistorico() {
-            if (this.currentPageHistorico < this.totalPagesHistorico) {
-                this.currentPageHistorico++;
-            }
-        },
-        goToPageHistorico(page) {
-            this.currentPageHistorico = page;
+        sellStock() {
+            axios.post(API_STOCK + "vender/" + this.sellStockData.id + "/" +this.sellStockData.cantidad)
+                .then(() => {
+                    this.loadCurrentStock(); // Recargar stock actualizado
+                    bootstrap.Modal.getInstance(document.getElementById("sellStockModal")).hide();
+                })
+                .catch(error => console.error("Error al vender stock:", error));
         },
         formatDate(dateStr) {
             return new Date(dateStr).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -141,13 +183,154 @@ createApp({
             }
             return num.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 3 });
         },
+        openEditHortofruticolaModal() {
+            this.editingHortofruticola = { ...this.product }; // Copiar datos actuales
+            this.nombreError = '';
+            this.unidadError = '';
+            this.isInvalid = false;
+            new bootstrap.Modal(document.getElementById("editHortofruticolaModal")).show();
+        },
+        validateEditHortofruticola() {
+            const nombre = this.editingHortofruticola.nombre.trim().toLowerCase();
+            const unidad = this.editingHortofruticola.unidad.trim().toLowerCase();
+
+            // No validar si no se ha cambiado nada
+            if (nombre === this.product.nombre.trim().toLowerCase() && unidad === this.product.unidad.trim().toLowerCase()) {
+                this.nombreError = '';
+                this.unidadError = '';
+                this.isInvalid = false;
+                return;
+            }
+
+            axios.get(`${VALIDAR_HORTOFRUTICOLA}?nombre=${encodeURIComponent(nombre)}&unidad=${encodeURIComponent(unidad)}`)
+                .then(response => {
+                    if (response.data.existe) {
+                        this.nombreError = "Ya existe un hortofruticola con este nombre y unidad.";
+                        this.unidadError = "Por favor, elija un nombre o unidad diferente.";
+                        this.isInvalid = true;
+                    } else {
+                        this.nombreError = '';
+                        this.unidadError = '';
+                        this.isInvalid = false;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error en la validación:", error);
+                    this.nombreError = "Error al validar el nombre.";
+                    this.isInvalid = true;
+                });
+        },
+        updateHortofruticola() {
+            if (this.isInvalid) return; // 📌 No permitir actualizar si hay error
+
+            axios.put(API_HORTOFRUTICOLA, this.editingHortofruticola)
+                .then(() => {
+                    this.product = { ...this.editingHortofruticola }; // Actualizar UI
+                    bootstrap.Modal.getInstance(document.getElementById("editHortofruticolaModal")).hide();
+                    this.showToast("Hortofruticola actualizada correctamente.", "bg-success");
+                })
+                .catch(error => {
+                    console.error("Error al actualizar hortofruticola:", error);
+                    this.showToast("Error al actualizar la hortofruticola.", "bg-danger");
+                });
+        },
+
         showToast(message, bgClass) {
             this.toastMessage = message;
-            const toastEl = document.getElementById("toastMessage");
+            const toastEl = document.getElementById("editToast");
             toastEl.className = `toast custom-toast text-white ${bgClass} show`;
             const toast = new bootstrap.Toast(toastEl);
             toast.show();
-        }
+        },
+        // Métod0 para abrir el modal de eliminación
+        openDeleteModal() {
+            this.deleteModal = new bootstrap.Modal(document.getElementById("deleteHortofruticolaModal"));
+            this.deleteModal.show();
+        },
+        deleteHortofruticola() {
+            axios.delete(API_HORTOFRUTICOLA + this.product.id)
+                .then(() => {
+                    this.showToast("Producto eliminada correctamente.", "bg-success");
+                    // Redirigir a la lista de productos o a otro lugar
+                    setTimeout(() => {
+                        window.location.href = "../hortofruticola/gestion_hortofruticola.html";
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error("Error al eliminar el hortofruticola:", error);
+                    this.showToast("Error al eliminar el hortofruticola.", "bg-danger");
+                });
+        },
+        openCreateOfferModal(stock) {
+            this.nuevaOferta.stockId = stock.id;
+            this.nuevaOferta.cantidad = '';
+            this.nuevaOferta.ubicacion = '';
+            this.nuevaOferta.unidad = this.product.unidad;
+            new bootstrap.Modal(document.getElementById("createOfertaModal")).show();
+        },
+        crearOferta() {
+            const currentDate = new Date().toISOString().split('T')[0]; // Formato 'yyyy-mm-dd'
+
+            // Construimos la petición, que coincide con la estructura de OfertaRequest (oferta y stock)
+            const ofertaRequest = {
+                ubicacion: this.nuevaOferta.ubicacion,
+                cantidad: parseInt(this.nuevaOferta.cantidad),
+                fechaAlta: new Date().toISOString().split('T')[0],
+                fechaBaja: null,
+                idStock: this.nuevaOferta.stockId,
+                tipoStock: "Hortofruticola"
+
+            };
+
+            axios.post("/oferta", ofertaRequest)
+                .then(response => {
+                    this.showToast("Oferta creada con éxito", "bg-success");
+                    bootstrap.Modal.getInstance(document.getElementById("createOfertaModal")).hide();
+                    this.loadCurrentStock();
+                })
+                .catch(error => {
+                    this.showToast(error.response.data, "bg-danger");
+                    console.error("Error:", error);
+                });
+        },
+        editOferta(oferta) {
+            this.editingOferta = JSON.parse(JSON.stringify(oferta));
+            new bootstrap.Modal(document.getElementById("editOfertaModal")).show();
+        },
+        updateOferta() {
+            axios.put(API_OFERTAS + "/" + this.editingOferta.id, this.editingOferta)
+                .then(() => {
+                    bootstrap.Modal.getInstance(document.getElementById("editOfertaModal")).hide();
+                    this.loadProductDetails();
+                    this.loadCurrentStock();
+                    this.loadOfertasPublicadas();
+                    this.showToast("Oferta modificada con éxito", "bg-success");
+                })
+                .catch(error => {
+                    this.showToast(error.response.data, "bg-danger");
+                    console.error("Error:", error);
+                });
+
+        },
+        openDeleteOfferModal(oferta) {
+            this.selectedOffer = JSON.parse(JSON.stringify(oferta));
+            new bootstrap.Modal(document.getElementById("deleteOfferModal")).show();
+        },
+        deleteOferta() {
+            axios.delete(API_OFERTAS + "/" + this.selectedOffer.id)
+                .then(() => {
+                    this.showToast("Oferta eliminada con éxito.", "bg-success");
+                    // Cerrar el modal
+                    bootstrap.Modal.getInstance(document.getElementById("deleteOfferModal")).hide();
+                    // Recargar la lista de ofertas para reflejar la eliminación
+                    this.loadOfertasPublicadas();
+                })
+                .catch(error => {
+                    console.error("Error al eliminar la oferta:", error);
+                    this.showToast("Error al eliminar la oferta.", "bg-danger");
+                });
+        },
+
     },
     mounted() {
         this.loadProductDetails();

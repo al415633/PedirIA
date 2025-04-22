@@ -26,7 +26,6 @@ public class JSONConverter {
                     .append("\n");
         }
         String finalString = stringBuilder.toString();
-        System.out.println(finalString);
         return finalString;
     }
     public JSONObject extractMapCurrentStockCarne(List<StockCarne> listaStock){
@@ -77,7 +76,6 @@ public class JSONConverter {
         stringBuilder.deleteCharAt(stringBuilder.length()-1);
         stringBuilder.append("]");
         Gson gson = new Gson();
-        System.out.println(stringBuilder.toString());
         return stringBuilder.toString();
 //        System.out.println( JSONObject.toJSONString(carneMap));
 
@@ -102,7 +100,6 @@ public class JSONConverter {
                 .append("\"")
                 .append("}");
 
-        System.out.println(stringBuilder);
         Gson gson = new Gson();
         return gson.fromJson(stringBuilder.toString(), JSONObject.class);
     }

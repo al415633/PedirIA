@@ -1,16 +1,18 @@
 package pythonAdapter.jsonPacker;
 
-import com.google.gson.Gson;
-import data.HistoricoProducto;
-import data.StockProducto;
-import org.json.simple.JSONObject;
-import pythonAdapter.jsonConverter.AbstractJSONConverter;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+
+import org.json.simple.JSONObject;
+
+import com.google.gson.Gson;
+
+import data.HistoricoProducto;
+import data.StockProducto;
+import pythonAdapter.jsonConverter.AbstractJSONConverter;
 
 public abstract class AbstractJSONPacker {
     AbstractJSONConverter converter;
@@ -30,7 +32,6 @@ public abstract class AbstractJSONPacker {
                     "temp", ".json",
                     new File(
                             "src/main/resources/temp"));
-            System.out.println(jsonFile.getName());
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(jsonFile.getPath()))) {
                 writer.write(json.toJSONString());
             }
@@ -42,12 +43,10 @@ public abstract class AbstractJSONPacker {
                 writer.write(csv);
             }
             String line;
-            jsonFile.deleteOnExit();
-            csvFile.deleteOnExit();
+            // jsonFile.deleteOnExit();
+            // csvFile.deleteOnExit();
             return "{\"csv\": \"" + csvFile.getAbsolutePath().replace("\\", "/") + "\", \"json\": \"" + jsonFile.getAbsolutePath().replace("\\", "/") + "\"}";
         }catch(Exception e){
-            System.out.println("es esto");
-            e.printStackTrace();
             throw e;
         }
     }
@@ -88,10 +87,11 @@ public abstract class AbstractJSONPacker {
 //    }
 
     public void closeFiles() {
-        if (!jsonFile.delete())
+        /*if (!jsonFile.delete())
             jsonFile.deleteOnExit();
         if (!csvFile.delete())
             csvFile.deleteOnExit();
+        */
     }
 
 }

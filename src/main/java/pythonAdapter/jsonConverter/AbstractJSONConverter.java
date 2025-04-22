@@ -1,13 +1,13 @@
 package pythonAdapter.jsonConverter;
 
-import data.HistoricoProducto;
-import data.StockProducto;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import data.HistoricoProducto;
+import data.StockProducto;
 
 public abstract class AbstractJSONConverter {
     public String extractHistoricStock(List<HistoricoProducto> listaHistorico) {
@@ -25,7 +25,6 @@ public abstract class AbstractJSONConverter {
         }
 
         String finalString = stringBuilder.toString();
-        System.out.println(("csv: " + finalString));
         return finalString;
     }
 
@@ -59,7 +58,6 @@ public abstract class AbstractJSONConverter {
         }
 
         stringBuilder.append("]}");
-        System.out.println(("json: " + stringBuilder.toString()));
 
         return stringBuilder.toString();
     }

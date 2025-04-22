@@ -14,10 +14,18 @@ import java.util.Collections;
 public abstract class ProductoResource<T extends Producto> {
 
     @Inject
-    protected ProductoDAO<T> daoProducto;
+    ProductoDAO<T> daoProducto;
+
+    public void setDaoProducto(ProductoDAO<T> daoProducto) {
+        this.daoProducto = daoProducto;
+    }
 
     @Inject
-    protected ComercioDao daoComercio;
+    ComercioDao daoComercio;
+
+    public void setDaoComercio(ComercioDao daoComercio) {
+        this.daoComercio = daoComercio;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -49,10 +57,12 @@ public abstract class ProductoResource<T extends Producto> {
             }
             return Response.status(Response.Status.CREATED).entity(productoCreado).build();
         } catch (PersistenceException e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error de persistencia: " + e.getMessage())
                     .build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Ocurrió un error inesperado: " + e.getMessage())
                     .build();

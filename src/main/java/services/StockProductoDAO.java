@@ -147,8 +147,4 @@ public abstract class StockProductoDAO<T extends StockProducto> {
         
         return prediction;
     }
-
-    public boolean enviarPdfPorCorreo(String base64Archivo, String nombreArchivo, String correoDestino) {
-        return false;
-    }
 }

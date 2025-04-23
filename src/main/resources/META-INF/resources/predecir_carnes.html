@@ -58,22 +58,22 @@
       <button class="btn btn-info" @click="enviarAhora">Enviar informe por correo</button>
     </div>
 
-    <button class="btn btn-primary" onclick="window.history.back()">Volver</button>
-  </div>
-
-  <!-- Modal de éxito -->
-  <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content text-center">
-        <div class="modal-header">
-          <h5 class="modal-title w-100" id="modalExitoLabel">¡Informe enviado!</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <p>El informe se ha enviado con éxito a <strong>{{ correoDestino }}</strong>.</p>
+    <!-- Modal de éxito -->
+    <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+          <div class="modal-header">
+            <h5 class="modal-title w-100" id="modalExitoLabel">¡Informe enviado!</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p>El informe se ha enviado con éxito a <strong>{{ correoDestino }}</strong>.</p>
+          </div>
         </div>
       </div>
     </div>
+
+    <button class="btn btn-primary" onclick="window.history.back()">Volver</button>
   </div>
 
   <script>
@@ -126,55 +126,33 @@
             .from(contenido)
             .save();
         },
-
+        
         async enviarAhora() {
           const contenido = document.getElementById("contenidoPDF");
-          const fechaActual = new Date();
-          const dia = ("0" + fechaActual.getDate()).slice(-2);
-          const mes = ("0" + (fechaActual.getMonth() + 1)).slice(-2);
-          const anio = fechaActual.getFullYear();
-          const nombreArchivo = `informe_carnes_${dia}${mes}${anio}.pdf`;
-
-          const correo = this.correoDestino.trim();
-          if (!correo || !correo.includes("@")) {
-            alert("Por favor, ingresa un correo válido.");
-            return;
-          }
 
           const opt = {
             margin: 1,
-            filename: nombreArchivo,
-            image: { type: 'jpeg', quality: 0.98 },
+            filename: "temp.pdf",
+            image: { type: "jpeg", quality: 0.98 },
             html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
           };
 
-          const pdf = html2pdf().set(opt).from(contenido);
-          const blob = await pdf.outputPdf('blob');
+          html2pdf().set(opt).from(contenido).outputPdf('datauristring').then(async (pdfDataUri) => {
+            try {
+              await axios.post("http://localhost:3000/enviar-informe", {
+                destinatario: "hugomclase@gmail.com",
+                pdfBase64: pdfDataUri
+              });
 
-          const toBase64 = blob => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result.split(',')[1]);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
+              const modal = new bootstrap.Modal(document.getElementById("modalExito"));
+              modal.show();
+            } catch (error) {
+              console.error("Error al enviar el correo:", error);
+            }
           });
-
-          const pdfBase64 = await toBase64(blob);
-
-          try {
-            const response = await axios.post('http://localhost:8080/carnes/stock/enviar-pdf', {
-              archivo: pdfBase64,
-              nombreArchivo,
-              correo
-            });
-
-            const modal = new bootstrap.Modal(document.getElementById("modalExito"));
-            modal.show();
-            
-          } catch (error) {
-            alert("Error al enviar el PDF: " + error);
-          }
         }
+        
       }
     });
 

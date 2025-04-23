@@ -145,16 +145,6 @@ public abstract class StockProductoResource<T extends StockProducto, H extends H
         }
     }
 
-    @POST
-    @Path("/enviar-pdf")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response enviarInformePorCorreo(JSONObject json) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("ERROR")
-                    .build();
-    }
-
     // Método abstracto para obtener el nombre de la entidad de historial (subclase específica)
     protected abstract String getHistoricoEntityName();
 }

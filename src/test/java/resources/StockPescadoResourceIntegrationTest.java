@@ -218,7 +218,6 @@ public class StockPescadoResourceIntegrationTest {
         assertEquals(200, response.getStatus());
         assertTrue(response.getEntity().toString().contains("diccionario de respuesta desde python"));
     }
-
     @Test
     public void testObtenerPrediccion_Error() {
         when(daoComercio.getComercioPorCorreo(anyString())).thenThrow(new RuntimeException());

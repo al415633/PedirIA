@@ -51,6 +51,7 @@
             height: 100%;
         }
     </style>
+    <link rel="stylesheet" href="../footer.css">
 
 </head>
 <body>
@@ -156,16 +157,30 @@
         </div>
     </div>
 </div>
-<div id="footer"></div>
 
-<script>
-    // Cargar el contenido del footer desde footer.html
-    fetch('../footer.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('footer').innerHTML = data;
-        });
-</script>
+<footer>
+    <div class="footer-container">
+        <!-- Logo PedirIA a la izquierda -->
+        <div class="footer-logo-container">
+            <img src="../images/logo.png" alt="Logo PedirIA" class="footer-logo">
+        </div>
+
+        <!-- Texto de información a la derecha -->
+        <div class="footer-info">
+            <h3>Trabajo hecho por:</h3>
+            <ul>
+                <li>Ángela Ausina Sáncehz</li>
+                <li>Andrea Belen Cretu Toma</li>
+                <li>Alejandro Tendero Ferrandis</li>
+                <li>Alejandro Díaz Rivero</li>
+                <li>Óscar Renau Pallarés</li>
+                <li>Hugo Martí Fernández</li>
+            </ul>
+        </div>
+
+        <p class="footer-text">PedirIA &copy; 2025. Todos los derechos reservados.</p>
+    </div>
+</footer>
 
 <script src="../js/carne.js"></script>
 

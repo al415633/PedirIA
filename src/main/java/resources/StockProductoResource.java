@@ -9,11 +9,6 @@ import data.HistoricoProducto;
 import data.StockProducto;
 import data.Usuario;
 import jakarta.inject.Inject;
-import jakarta.mail.Multipart;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeBodyPart;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.DELETE;
@@ -136,16 +131,6 @@ public abstract class StockProductoResource<T extends StockProducto, H extends H
                     .entity("{\"error\": \"No se pudo obtener la predicción\"}")
                     .build();
         }
-    }
-
-    @POST
-    @Path("/enviar-pdf")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response enviarInformePorCorreo(JSONObject json) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("ERROR")
-                    .build();
     }
 
     // Método abstracto para obtener el nombre de la entidad de historial (subclase específica)

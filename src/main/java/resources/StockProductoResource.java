@@ -130,6 +130,7 @@ public abstract class StockProductoResource<T extends StockProducto, H extends H
         List<H> historial = historicoDAO.obtenerHistorialPorProducto(idProducto, getHistoricoEntityName());
         return Response.ok(historial).build();
     }
+    
     @GET
     @Path("/prediccion")
     public Response obtenerPrediccion(@CookieParam("usuario") String usuario) {

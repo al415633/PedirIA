@@ -55,25 +55,25 @@
 
     <div class="mb-3">
       <button class="btn btn-success me-2" @click="generarInforme">Generar informe</button>
-      <button class="btn btn-info" @click="enviarAhora">Enviar informe</button>
+      <button class="btn btn-info" @click="enviarAhora">Enviar informe por correo</button>
     </div>
 
-    <button class="btn btn-primary" onclick="window.history.back()">Volver</button>
-  </div>
-
-  <!-- Modal de éxito -->
-  <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content text-center">
-        <div class="modal-header">
-          <h5 class="modal-title w-100" id="modalExitoLabel">¡Informe enviado!</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <p>El informe se ha enviado con éxito a <strong>{{ correoDestino }}</strong>.</p>
+    <!-- Modal de éxito -->
+    <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+          <div class="modal-header">
+            <h5 class="modal-title w-100" id="modalExitoLabel">¡Informe enviado!</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p>El informe se ha enviado con éxito a <strong>{{ correoDestino }}</strong>.</p>
+          </div>
         </div>
       </div>
     </div>
+
+    <button class="btn btn-primary" onclick="window.history.back()">Volver</button>
   </div>
 
   <script>
@@ -93,7 +93,6 @@
           try {
               const response = await axios.get("http://localhost:8080/hortofruticolas/stock/prediccion");
               this.predicciones = response.data.message;
-              alert()
           } catch (error) {
               console.error("Error al obtener predicciones:", error);
           }
@@ -127,18 +126,33 @@
             .from(contenido)
             .save();
         },
-
-        async enviarAhora() {
-          const correo = this.correoDestino.trim();
-
-          if (!correo || !correo.includes("@")) {
-            alert("Por favor, ingresa un correo válido.");
-            return;
-          }
-
-          alert(`Se enviará el informe al correo: ${correo}`);
         
+        async enviarAhora() {
+          const contenido = document.getElementById("contenidoPDF");
+
+          const opt = {
+            margin: 1,
+            filename: "temp.pdf",
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
+          };
+
+          html2pdf().set(opt).from(contenido).outputPdf('datauristring').then(async (pdfDataUri) => {
+            try {
+              await axios.post("http://localhost:3000/enviar-informe", {
+                destinatario: this.correoDestino,
+                pdfBase64: pdfDataUri
+              });
+
+              const modal = new bootstrap.Modal(document.getElementById("modalExito"));
+              modal.show();
+            } catch (error) {
+              console.error("Error al enviar el correo:", error);
+            }
+          });
         }
+        
       }
     });
 

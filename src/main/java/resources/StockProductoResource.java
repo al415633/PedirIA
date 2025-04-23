@@ -17,13 +17,25 @@ import java.util.List;
 public abstract class StockProductoResource<T extends StockProducto, H extends HistoricoProducto> {
 
     @Inject
-    private StockProductoDAO<T> stockDAO;
+    protected StockProductoDAO<T> stockDAO;
 
     @Inject
-    private HistoricoProductoDAO<H> historicoDAO;
+    protected HistoricoProductoDAO<H> historicoDAO;
 
     @Inject
     protected ComercioDao daoComercio;
+
+    public void setStockDAO(StockProductoDAO<T> stockDAO) {
+        this.stockDAO = stockDAO;
+    }
+
+    public void setHistoricoDAO(HistoricoProductoDAO<H> historicoDAO) {
+        this.historicoDAO = historicoDAO;
+    }
+
+    public void setDaoComercio(ComercioDao daoComercio) {
+        this.daoComercio = daoComercio;
+    }
 
     // Obtener todos los stocks
     @GET

@@ -11,8 +11,6 @@
 
     <style>
 
-
-
         /* Tarjetas clickeables */
         .clickable {
             cursor: pointer;
@@ -57,7 +55,7 @@
 
 
 
-<div id="app" >
+<div id="app" class="container mt-4"  >
 
 
     <header class="navbar_container2">
@@ -66,25 +64,15 @@
             <a href="../comercioREAD.html" class="btn">Mis datos</a>
 
             <div class="dropdown2">
-                <a href="#" class="btn">Stock</a>
-                <div class="dropdown-content2">
-                    <!-- Solo mostrar la opción de informe correspondiente según el tipo de comercio -->
-                    <a v-if="tipoComercio === 'carne'" href="carne/gestion_carne.html">Predecir Carnes</a>
-                    <a v-if="tipoComercio === 'pescado'" href="pescado/gestion_pescado.html">Predecir Pescados</a>
-                    <a v-if="tipoComercio === 'fruta'" href="hortofruticola/gestion_hortofruticola.html">Predecir Hortofrutícolas</a>
-                </div>
+                <a href="gestion_carne.html"class="btn">Stock</a>
+
             </div>
 
             <a href="../comercioUPDATE.html" class="btn">Modificar datos</a>
 
             <div class="dropdown2">
-                <a href="#" class="btn">Generar informe</a>
-                <div class="dropdown-content2">
-                    <!-- Solo mostrar la opción de informe correspondiente según el tipo de comercio -->
-                    <a v-if="tipoComercio === 'carne'" href="predecir_carnes.html">Predecir Carnes</a>
-                    <a v-if="tipoComercio === 'pescado'" href="predecir_pescados.html">Predecir Pescados</a>
-                    <a v-if="tipoComercio === 'fruta'" href="predecir_hortofruticolas.html">Predecir Hortofrutícolas</a>
-                </div>
+                <a href="../predecir_carnes.html" class="btn">Generar informe</a>
+
             </div>
 
             <div class="dropdown2">
@@ -108,7 +96,7 @@
         </div>
     </div>
 
-    <div class="container mt-4" >
+
 
     <!-- Formulario para agregar producto -->
     <div class="card p-3 mb-4">
@@ -203,7 +191,11 @@
     </div>
 </div>
 
-<footer>
+
+    <script src="../js/carne.js"></script>
+
+
+    <footer>
     <div class="footer-container">
         <!-- Logo PedirIA a la izquierda -->
         <div class="footer-logo-container">
@@ -227,8 +219,7 @@
     </div>
 
 </footer>
-</div>
-<script src="../js/carne.js"></script>
+
 
 </body>
 </html>

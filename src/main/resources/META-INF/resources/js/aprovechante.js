@@ -46,15 +46,15 @@ Vue.createApp({
         // Mostrar el modal para confirmar la acción de cerrar sesión
         confirmLogout() {
             this.modalMessage = '¿Estás seguro que quieres cerrar sesión?';
-            this.actionToConfirm = this.logoutAprovechante;  // Establecer la acción que se confirmará
-            this.showModal = true;  // Mostrar el modal
+            this.actionToConfirm = this.logoutAprovechante();  // Establecer la acción que se confirmará
+            //this.showModal = true;  // Mostrar el modal
         },
 
         // Mostrar el modal para confirmar la eliminación de cuenta
         confirmDeleteAccount() {
             this.modalMessage = '¿Estás seguro que quieres eliminar tu cuenta?';
-            this.actionToConfirm = this.deletAprovechante;  // Establecer la acción que se confirmará
-            this.showModal = true;  // Mostrar el modal
+            this.actionToConfirm = this.deletAprovechante();  // Establecer la acción que se confirmará
+            //this.showModal = true;  // Mostrar el modal
         },
 
         // Ejecutar la acción confirmada (cerrar sesión o eliminar cuenta)
@@ -86,7 +86,6 @@ Vue.createApp({
                 const response = await axios.post(url);
 
                 if (response.status === 200) {
-                    alert("Inicio de sesión exitoso");
 
                     // PEQUEÑO RETRASO para asegurar que la cookie se guarda
                     setTimeout(() => {
@@ -185,6 +184,9 @@ Vue.createApp({
 
         async deletAprovechante() {
             console.log("llego al delete")
+
+            const confirmacion = window.confirm('¿Estás seguro que quieres eliminar tu cuenta?');
+            if (confirmacion) {
             // Construimos la URL para el DELETE con el correo como parámetro
             const url = `${DELETE}`;
 
@@ -204,19 +206,22 @@ Vue.createApp({
                 alert("Hubo un problema con la eliminación del aprovechante.");
                 window.location.href = "registroError.html"; // Redirigir en caso de error
             }
-        }
+        }}
         ,
         async logoutAprovechante() {
             try {
-                // Realizamos la solicitud POST al backend para cerrar sesión
-                const response = await axios.post(LOGOUT);
+                const confirmacion = window.confirm('¿Estás seguro que quieres cerrar sesión?');
+                if (confirmacion) {
+                    // Realizamos la solicitud POST al backend para cerrar sesión
+                    const response = await axios.post(LOGOUT);
 
-                // Verificamos si la respuesta fue exitosa
-                if (response.status === 200) {
-                    alert("Sesión cerrada con éxito");
-                    window.location.href = "index.html"; // Redirigir al login o a la página deseada
-                } else {
-                    throw new Error("Error al cerrar sesión");
+                    // Verificamos si la respuesta fue exitosa
+                    if (response.status === 200) {
+                        alert("Sesión cerrada con éxito");
+                        window.location.href = "index.html"; // Redirigir al login o a la página deseada
+                    } else {
+                        throw new Error("Error al cerrar sesión");
+                    }
                 }
             } catch (error) {
                 console.error("Error al cerrar sesión:", error);

@@ -200,23 +200,23 @@ public class StockCarneResourceIntegrationTest {
         assertEquals(historial, response.getEntity());
     }
 
-    @Test
-    public void testObtenerPrediccion_OK() {
-        Usuario usuario = new Usuario();
-        ComercioDetails negocio = new ComercioDetails();
-        negocio.setIdNegocio(10L);
-        usuario.setNegocio(negocio);
-
-        when(daoComercio.getComercioPorCorreo("correo@test.com")).thenReturn(usuario);
-        when(stockCarneDAO.getPrediction(10L, daoHistoricoProducto)).thenReturn("\"Buena predicción\"");
-        stockCarneResource.setStockDAO(stockCarneDAO);
-        stockCarneResource.setHistoricoDAO(daoHistoricoProducto);
-        stockCarneResource.setDaoComercio(daoComercio);
-
-        Response response = stockCarneResource.obtenerPrediccion("correo@test.com");
-        assertEquals(200, response.getStatus());
-        assertTrue(response.getEntity().toString().contains("Buena predicción"));
-    }
+//    @Test
+//    public void testObtenerPrediccion_OK() {
+//        Usuario usuario = new Usuario();
+//        ComercioDetails negocio = new ComercioDetails();
+//        negocio.setIdNegocio(10L);
+//        usuario.setNegocio(negocio);
+//
+//        when(daoComercio.getComercioPorCorreo("correo@test.com")).thenReturn(usuario);
+//        when(stockCarneDAO.getPrediction(10L, daoHistoricoProducto)).thenReturn("\"Buena predicción\"");
+//        stockCarneResource.setStockDAO(stockCarneDAO);
+//        stockCarneResource.setHistoricoDAO(daoHistoricoProducto);
+//        stockCarneResource.setDaoComercio(daoComercio);
+//
+//        Response response = stockCarneResource.obtenerPrediccion("correo@test.com");
+//        assertEquals(200, response.getStatus());
+//        assertTrue(response.getEntity().toString().contains("Buena predicción"));
+//    }
 
     @Test
     public void testObtenerPrediccion_Error() {

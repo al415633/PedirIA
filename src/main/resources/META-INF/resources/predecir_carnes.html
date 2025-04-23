@@ -26,7 +26,7 @@
     <a href="principal_mensajeria.html">
       <img src="./static/logo.png" alt="Logo Empresa" />
     </a>
-    <h1>Predicción de Stock a Futuro</h1>
+    <h1>Predicción de tu Stock de Carne en los Próximos 7 Días</h1>
   </header>
 
   <div id="app" class="container mt-4">
@@ -55,7 +55,7 @@
 
     <div class="mb-3">
       <button class="btn btn-success me-2" @click="generarInforme">Generar informe</button>
-      <button class="btn btn-info" @click="enviarAhora">Enviar informe</button>
+      <button class="btn btn-info" @click="enviarAhora">Enviar informe por correo</button>
     </div>
 
     <button class="btn btn-primary" onclick="window.history.back()">Volver</button>
@@ -91,12 +91,12 @@
       methods: {
         async cargarPredicciones() {
           try {
-            const response = await axios.get("http://localhost:8080/carnes/stock/prediccion");
-            this.predicciones = JSON.parse(response.data.message);
+              const response = await axios.get("http://localhost:8080/carnes/stock/prediccion");
+              this.predicciones = response.data.message;
           } catch (error) {
-            console.error("Error al obtener predicciones:", error);
+              console.error("Error al obtener predicciones:", error);
           }
-        },
+      },
 
         async obtenerCorreoDesdeBackend() {
           try {
@@ -128,15 +128,52 @@
         },
 
         async enviarAhora() {
-          const correo = this.correoDestino.trim();
+          const contenido = document.getElementById("contenidoPDF");
+          const fechaActual = new Date();
+          const dia = ("0" + fechaActual.getDate()).slice(-2);
+          const mes = ("0" + (fechaActual.getMonth() + 1)).slice(-2);
+          const anio = fechaActual.getFullYear();
+          const nombreArchivo = `informe_carnes_${dia}${mes}${anio}.pdf`;
 
+          const correo = this.correoDestino.trim();
           if (!correo || !correo.includes("@")) {
             alert("Por favor, ingresa un correo válido.");
             return;
           }
 
-          alert(`Se enviará el informe al correo: ${correo}`);
-        
+          const opt = {
+            margin: 1,
+            filename: nombreArchivo,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+          };
+
+          const pdf = html2pdf().set(opt).from(contenido);
+          const blob = await pdf.outputPdf('blob');
+
+          const toBase64 = blob => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+
+          const pdfBase64 = await toBase64(blob);
+
+          try {
+            const response = await axios.post('http://localhost:8080/carnes/stock/enviar-pdf', {
+              archivo: pdfBase64,
+              nombreArchivo,
+              correo
+            });
+
+            const modal = new bootstrap.Modal(document.getElementById("modalExito"));
+            modal.show();
+            
+          } catch (error) {
+            alert("Error al enviar el PDF: " + error);
+          }
         }
       }
     });

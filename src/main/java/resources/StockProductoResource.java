@@ -1,18 +1,33 @@
 package resources;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.json.simple.JSONObject;
+
 import data.HistoricoProducto;
 import data.StockProducto;
 import data.Usuario;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.mail.Multipart;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.CookieParam;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import services.ComercioDao;
 import services.HistoricoProductoDAO;
 import services.StockProductoDAO;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 public abstract class StockProductoResource<T extends StockProducto, H extends HistoricoProducto> {
 
@@ -126,13 +141,23 @@ public abstract class StockProductoResource<T extends StockProducto, H extends H
         try {
             Usuario datosUsuario = daoComercio.getComercioPorCorreo(usuario);
             Long id = datosUsuario.getNegocio().getIdNegocio();
-            String prediction = stockDAO.getPrediction(id, historicoDAO);
-            return Response.ok("{\"message\": " + prediction + "}").build();
+            JSONObject prediction = stockDAO.getPrediction(id, historicoDAO);
+            return Response.ok(prediction).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("{\"error\": \"No se pudo obtener la predicción\"}")
                     .build();
         }
+    }
+
+    @POST
+    @Path("/enviar-pdf")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response enviarInformePorCorreo(JSONObject json) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("ERROR")
+                    .build();
     }
 
     // Método abstracto para obtener el nombre de la entidad de historial (subclase específica)

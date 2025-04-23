@@ -1,18 +1,16 @@
 package services;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.json.simple.JSONObject;
+
 import data.HistoricoProducto;
 import data.StockProducto;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
-import org.json.simple.JSONObject;
 import pythonAdapter.PythonManager;
 import pythonAdapter.jsonPacker.AbstractJSONPacker;
-import pythonAdapter.jsonPacker.JSONCarnePacker;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 
 public abstract class StockProductoDAO<T extends StockProducto> {
 
@@ -33,7 +31,7 @@ public abstract class StockProductoDAO<T extends StockProducto> {
 
     // Obtener stock por idProducto
     public List<T> retrieveByProducto(Long idProducto) {
-        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.id = :idProducto", getEntityClass())
+        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.id = :idProducto AND s.cantidad > 0 ", getEntityClass())
                 .setParameter("idProducto", idProducto)
                 .getResultList();
     }
@@ -41,7 +39,7 @@ public abstract class StockProductoDAO<T extends StockProducto> {
     // Obtener stock por Negocio
     @Transactional
     public List<T> getAllByNegocio(Long idNegocio) {
-        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.idNegocio = :idNegocio", getEntityClass())
+        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.idNegocio = :AND s.cantidad > 0", getEntityClass())
                 .setParameter("idNegocio", idNegocio)
                 .getResultList();
     }
@@ -81,19 +79,13 @@ public abstract class StockProductoDAO<T extends StockProducto> {
 
         // Verificar que la cantidad vendida sea menor o igual que la cantidad disponible
         if (stock.getCantidad().compareTo(cantidadVendida) < 0) {
-            throw new IllegalArgumentException("Cantidad vendida mayor que la cantidad disponible en el stock.");
+            throw new IllegalArgumentException("No hay suficiente cantidad para vender");
         }
 
         // Reducir la cantidad del stock
         stock.setCantidad(stock.getCantidad().subtract(cantidadVendida));
 
-        // Si la cantidad llega a cero o menos, podemos eliminar el stock (opcional)
-        if (stock.getCantidad().compareTo(BigDecimal.ZERO) <= 0) {
-            getEntityManager().remove(stock);
-        } else {
-            // Si no se eliminó, actualizar el stock
-            getEntityManager().merge(stock);
-        }
+        getEntityManager().merge(stock);
     }
 
     @Transactional
@@ -127,20 +119,18 @@ public abstract class StockProductoDAO<T extends StockProducto> {
     protected abstract Class<T> getEntityClass();
     protected abstract Class<T> getHistoricoEntityClass();
 
-    public String getPrediction(Long usuario, HistoricoProductoDAO historicoProductoDAO) {
+    public JSONObject getPrediction(Long usuario, HistoricoProductoDAO historicoProductoDAO) {
         PythonManager pythonManager = new PythonManager();
         String JSONtoFiles;
 
         List<T> stockList = getAllByNegocio(usuario);
         List<HistoricoProducto> historicoList = historicoProductoDAO.obtenerHistorialPorUsuario(usuario, historicoProductoDAO.getEntityClass().getSimpleName());
-        System.out.println("Stock obtenido: " + stockList);
-        System.out.println("Historial obtenido: " + historicoList);
 
         if (stockList == null || stockList.isEmpty()) {
-            return "{\"error\": \"No hay datos en el stock\"}";
+            return null;
         }
         if (historicoList == null || historicoList.isEmpty()) {
-            return "{\"error\": \"No hay datos en el historial\"}";
+            return null;
         }
 
         try {
@@ -148,17 +138,17 @@ public abstract class StockProductoDAO<T extends StockProducto> {
             System.out.println("JSON enviado a Python: " + JSONtoFiles);
         } catch (Exception e) {
             e.printStackTrace();
-            return "{\"error\": \"Error en la serialización de datos\"}";
+            return null;
         }
 
         JSONObject prediction = pythonManager.sendPythonInfo("src/main/python/predictor.py", JSONtoFiles);
+        System.out.println(prediction);
         packer.closeFiles();
-        if (prediction == null) {
-            return "{\"error\": \"Python no devolvió respuesta\"}";
-        }
+        
+        return prediction;
+    }
 
-        String stringValue = prediction.get("message").toString();
-
-        return stringValue;
+    public boolean enviarPdfPorCorreo(String base64Archivo, String nombreArchivo, String correoDestino) {
+        return false;
     }
 }

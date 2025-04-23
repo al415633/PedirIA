@@ -252,7 +252,6 @@ Vue.createApp({
     },
     mounted() {
         // Solo ejecutar si estás en la página de modificar
-        if (window.location.pathname.includes("modificar") || window.location.pathname.includes("comercioUPDATE") || window.location.pathname.includes("comercioREAD")) {
             const correo = this.leerCookie("usuario");
 
             console.log("Correo leído de cookie (crudo):", correo);
@@ -281,8 +280,6 @@ Vue.createApp({
             } else {
                 console.warn("No se encontró la cookie");
             }
-
-        }
         this.doGet();
         this.getActiveComercio()
     },

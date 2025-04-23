@@ -8,12 +8,6 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
-        header {
-            background-color: #2848a7;
-            color: white;
-            padding: 10px 20px;
-        }
-
         .toast-container {
             position: fixed;
             top: 20px;
@@ -27,14 +21,48 @@
             width: 300px;
         }
     </style>
-    <link rel="stylesheet" href="../footer.css">
+    <link rel="stylesheet" href="footer.css">
+    <link rel="stylesheet" href="header.css">
 </head>
 <body>
-<header>
-    <h1>Ofertas Publicadas</h1>
-</header>
+
 
 <div id="app" class="container mt-4">
+
+    <header class="navbar_container2">
+        <div class="navbar-box2">
+            <img src="images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
+            <a href="aprovechanteREAD.html" class="btn">Mis datos</a>
+
+            <a href="#" class="btn">Ofertas disponibles</a>
+
+            <a href="aprovechanteUPDATE.html" class="btn">Modificar datos</a>
+
+
+            <div class="dropdown2">
+                <a href="#" class="btn" @click="toggleUserDropdown">{{ usuarioActivo }}</a>
+                <div class="dropdown-content2">
+                    <a href="#" @click="confirmLogout">Cerrar sesión</a>
+                    <a href="#" @click="confirmDeleteAccount">Eliminar cuenta</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- Modal de Confirmación -->
+    <div v-if="showModal" class="modal-overlay2">
+        <div class="modal2">
+            <h3>{{ modalMessage }}</h3>
+            <div class="modal-buttons2">
+                <button @click="closeModal" class="btn">Cancelar</button>
+                <button @click="confirmAction" class="btn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <h1>Ofertas Publicadas</h1>
     <div v-if="ofertas.length === 0" class="alert alert-info">No hay ofertas disponibles por ahora.</div>
 
     <div v-else>
@@ -112,7 +140,7 @@
     </div>
 </div>
 
-<script src="../js/oferta.js"></script>
+<script src="js/oferta.js"></script>
 
 <footer>
     <div class="footer-container">

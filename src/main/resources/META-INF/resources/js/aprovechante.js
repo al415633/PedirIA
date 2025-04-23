@@ -24,7 +24,6 @@ Vue.createApp({
             showModal: false,         // Controla la visibilidad del modal
             modalMessage: '',         // Mensaje que se mostrará en el modal
             actionToConfirm: null,    // Acción que se va a confirmar (cerrar sesión/eliminar cuenta)
-
         };
     },
     methods: {
@@ -238,7 +237,6 @@ Vue.createApp({
     },
     mounted() {
         // Solo ejecutar si estás en la página de modificar
-        if (window.location.pathname.includes("modificar") || window.location.pathname.includes("aprovechanteUPDATE") || window.location.pathname.includes("aprovechanteREAD")) {
             const correo = this.leerCookie("usuario");
 
             console.log("Correo leído de cookie (crudo):", correo);
@@ -270,11 +268,9 @@ Vue.createApp({
             } else {
                 console.warn("No se encontró la cookie");
             }
-        }
         this.doGet();
         this.getActiveAprovechante();
         console.log("Pagina cargada, showModal inicial:", this.showModal);
         this.showModal = false;
-
     }
 }).mount("#app"); //entiendo que hace que controlo lo que hay dentro del div de "app"

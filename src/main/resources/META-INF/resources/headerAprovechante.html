@@ -1,0 +1,33 @@
+<header class="navbar_container2">
+    <div class="navbar-box2">
+        <img src="images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
+        <a href="aprovechanteREAD.html" class="btn">Mis datos</a>
+
+        <a href="#" class="btn">Ofertas disponibles</a>
+
+        <a href="aprovechanteUPDATE.html" class="btn">Modificar datos</a>
+
+
+        <div class="dropdown2">
+            <a href="#" class="btn" @click="toggleUserDropdown">{{ usuarioActivo }}</a>
+            <div  class="dropdown-content2">
+                <a href="#" @click="confirmLogout">Cerrar sesión</a>
+                <a href="#" @click="confirmDeleteAccount">Eliminar cuenta</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<!--&lt;!&ndash; Modal de Confirmación &ndash;&gt;-->
+<!--<div v-if="showModal" class="modal-overlay2">-->
+<!--    <div class="modal2">-->
+<!--        <h3>{{ modalMessage }}</h3>-->
+<!--        <div class="modal-buttons2">-->
+<!--            <button @click="closeModal" class="btn">Cancelar</button>-->
+<!--            <button @click="confirmAction" class="btn">Confirmar</button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<script src="js/aprovechante.js"></script>

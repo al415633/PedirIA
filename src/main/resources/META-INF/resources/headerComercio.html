@@ -1,0 +1,49 @@
+<header class="navbar_container2">
+    <div class="navbar-box">
+        <img src="images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
+        <a href="comercioREAD.html" class="btn">Mis datos</a>
+
+        <div class="dropdown2">
+            <a href="#" class="btn">Stock</a>
+            <div class="dropdown-content2">
+                <!-- Solo mostrar la opción de informe correspondiente según el tipo de comercio -->
+                <a v-if="tipoComercio === 'carne'" href="carne/gestion_carne.html">Predecir Carnes</a>
+                <a v-if="tipoComercio === 'pescado'" href="pescado/gestion_pescado.html">Predecir Pescados</a>
+                <a v-if="tipoComercio === 'fruta'" href="hortofruticola/gestion_hortofruticola.html">Predecir Hortofrutícolas</a>
+            </div>
+        </div>
+
+        <a href="comercioUPDATE.html" class="btn">Modificar datos</a>
+
+        <div class="dropdown2">
+            <a href="#" class="btn">Generar informe</a>
+            <div class="dropdown-content2">
+                <!-- Solo mostrar la opción de informe correspondiente según el tipo de comercio -->
+                <a v-if="tipoComercio === 'carne'" href="predecir_carnes.html">Predecir Carnes</a>
+                <a v-if="tipoComercio === 'pescado'" href="predecir_pescados.html">Predecir Pescados</a>
+                <a v-if="tipoComercio === 'fruta'" href="predecir_hortofruticolas.html">Predecir Hortofrutícolas</a>
+            </div>
+        </div>
+
+        <div class="dropdown2">
+            <a href="#" class="btn" @click="toggleUserDropdown">{{ usuarioActivo }}</a>
+            <div  class="dropdown-content2">
+                <a href="#" @click="confirmLogout">Cerrar sesión</a>
+                <a href="#" @click="confirmDeleteAccount">Eliminar cuenta</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Modal de Confirmación -->
+<div v-if="showModal" class="modal-overlay">
+    <div class="modal">
+        <h3>{{ modalMessage }}</h3>
+        <div class="modal-buttons">
+            <button @click="closeModal" class="btn">Cancelar</button>
+            <button @click="confirmAction" class="btn">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/comercio.js"></script>

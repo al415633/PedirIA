@@ -1,10 +1,12 @@
 package resources;
 
+import com.google.gson.Gson;
 import data.ComercioDetails;
 import data.Usuario;
 import data.pescaderia.HistoricoPescado;
 import data.pescaderia.StockPescado;
 import jakarta.ws.rs.core.Response;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +19,9 @@ import services.HistoricoProductoDAO;
 import services.StockProductoDAO;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -201,16 +205,18 @@ public class StockPescadoResourceIntegrationTest {
         ComercioDetails negocio = new ComercioDetails();
         negocio.setIdNegocio(10L);
         usuario.setNegocio(negocio);
-
         when(daoComercio.getComercioPorCorreo("correo@test.com")).thenReturn(usuario);
-        when(stockPescadoDAO.getPrediction(10L, daoHistoricoProducto)).thenReturn("\"Buena predicción\"");
+        Gson gson = new Gson();
+        Map<String,String> respuesta =new HashMap<String,String>();
+        respuesta.put("message", "diccionario de respuesta desde python");
+        when(stockPescadoDAO.getPrediction(10L, daoHistoricoProducto)).thenReturn(gson.fromJson(JSONObject.toJSONString(respuesta), JSONObject.class));
         stockPescadoResource.setStockDAO(stockPescadoDAO);
         stockPescadoResource.setHistoricoDAO(daoHistoricoProducto);
         stockPescadoResource.setDaoComercio(daoComercio);
 
         Response response = stockPescadoResource.obtenerPrediccion("correo@test.com");
         assertEquals(200, response.getStatus());
-        assertTrue(response.getEntity().toString().contains("Buena predicción"));
+        assertTrue(response.getEntity().toString().contains("diccionario de respuesta desde python"));
     }
 
     @Test

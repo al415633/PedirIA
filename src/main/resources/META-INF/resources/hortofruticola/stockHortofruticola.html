@@ -126,7 +126,7 @@
             <!-- Navbar de selección -->
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link clickable" :class="{ active: activeTab === 'stock' }" @click="activeTab = 'stock'">Stock Actual</a>
+                    <a class="nav-link clickable" :class="{ active: activeTab === 'stock' }" @click="loadCurrentStock">Stock Actual</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link clickable" :class="{ active: activeTab === 'historico' }" @click="loadHistorico">Histórico de Ventas</a>
@@ -136,7 +136,7 @@
                        @click="loadOfertasPublicadas">Ofertas publicadas</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link clickable" :class="{ active: activeTab === 'ofertas' }" @click="">Ofertas
+                    <a class="nav-link clickable" :class="{ active: activeTab === 'ofertasAceptadas' }" @click="loadOfertasAceptadas">Ofertas
                         aceptadas</a>
                 </li>
             </ul>
@@ -175,7 +175,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="stock in sortedCurrentStock" :key="stock.id">
+                    <tr v-for="stock in sortedCurrentStockPaginated" :key="stock.id">
                         <td>{{ stock.cantidadFormateada }}</td>
                         <td>{{ formatDate(stock.fechaIngreso) }}</td>
                         <td>{{ formatDate(stock.fechaVencimiento) }}</td>
@@ -187,6 +187,21 @@
                     </tr>
                     </tbody>
                 </table>
+
+                <!-- Paginación -->
+                <nav>
+                    <ul class="pagination d-flex justify-content-center">
+                        <li class="page-item" :class="{ disabled: currentPageStock === 1 }">
+                            <button class="page-link" @click="prevPageStock" aria-label="Anterior">Anterior</button>
+                        </li>
+                        <li class="page-item" v-for="page in totalPagesStock" :key="page" :class="{ active: currentPageStock === page }">
+                            <button class="page-link" @click="goToPageStock(page)">{{ page }}</button>
+                        </li>
+                        <li class="page-item" :class="{ disabled: currentPageStock === totalPagesStock }">
+                            <button class="page-link" @click="nextPageStock" aria-label="Siguiente">Siguiente</button>
+                        </li>
+                    </ul>
+                </nav>
             </div>
 
             <!-- Contenido del Histórico -->
@@ -202,7 +217,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="venta in sortedCurrentHistorico" :key="venta.id">
+                    <tr v-for="venta in sortedCurrentHistoricoPaginated" :key="venta.id">
                         <td>{{ venta.cantidadFormateada }}</td>
                         <td>{{ formatDate(venta.fechaVenta) }}</td>
                         <td>{{ formatDate(venta.fechaIngreso) }}</td>
@@ -210,6 +225,21 @@
                     </tr>
                     </tbody>
                 </table>
+
+                <!-- Paginación -->
+                <nav>
+                    <ul class="pagination d-flex justify-content-center">
+                        <li class="page-item" :class="{ disabled: currentPageHistorico === 1 }">
+                            <button class="page-link" @click="prevPageHistorico" aria-label="Anterior">Anterior</button>
+                        </li>
+                        <li class="page-item" v-for="page in totalPagesHistorico" :key="page" :class="{ active: currentPageHistorico === page }">
+                            <button class="page-link" @click="goToPageHistorico(page)">{{ page }}</button>
+                        </li>
+                        <li class="page-item" :class="{ disabled: currentPageHistorico === totalPagesHistorico }">
+                            <button class="page-link" @click="nextPageHistorico" aria-label="Siguiente">Siguiente</button>
+                        </li>
+                    </ul>
+                </nav>
             </div>
 
             <div v-if="activeTab === 'ofertasPublicadas'">
@@ -239,6 +269,29 @@
                     </tbody>
                 </table>
             </div>
+
+            <div v-if="activeTab === 'ofertasAceptadas'">
+                <h4>Ofertas Aceptadas</h4>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Ubicación</th>
+                        <th>Cantidad</th>
+                        <th>Fecha Aceptación</th>
+                        <th>Aprovechante</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="oferta in ofertasAceptadas" :key="oferta.id">
+                        <td>{{ oferta.ubicacion }} </td>
+                        <td>{{ oferta.cantidad }}</td>
+                        <td>{{ formatDate(oferta.fechaBaja) }}</td>
+                        <td>{{ oferta.aprovechante.usuario.correo }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 

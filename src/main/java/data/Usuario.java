@@ -1,12 +1,18 @@
 package data;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usuario")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id_usuario"
+)
 public class Usuario {
 
 
@@ -37,7 +43,6 @@ public class Usuario {
     private ComercioDetails negocio;
 
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference
     private AprovechanteDetails aprovechante;
 
     @Override

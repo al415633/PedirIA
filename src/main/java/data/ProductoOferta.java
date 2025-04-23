@@ -72,7 +72,6 @@ public class ProductoOferta {
     public String toString() {
         return "ProductoOferta{" +
                 "id=" + id +
-                ", oferta=" + oferta +
                 ", stockProducto=" + getStock() +
                 '}';
     }

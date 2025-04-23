@@ -31,34 +31,48 @@ createApp({
             unidadError: '',
             isInvalid: false,
             ofertas: [],
+            ofertasAceptadas: [],
             nuevaOferta: {
                 ubicacion: '',
                 cantidad: '',
             },
             editingOferta: { ubicacion: '' },
             selectedOffer: {},
+
+            currentPageStock: 1,
+            currentPageHistorico: 1,
+            itemsPerPage: 7,
         };
     },
     computed: {
-        sortedCurrentStock() {
-            return [...this.currentStock]
-                .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
-                .map(stock => {
-                    return {
-                        ...stock,
-                        cantidadFormateada: this.formatNumber(stock.cantidad) + " " + (this.product.unidad || "")
-                    };
-                });
+        sortedCurrentStockPaginated() {
+            const start = (this.currentPageStock - 1) * this.itemsPerPage;
+            const sortedStock = [...this.currentStock].sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento));
+            return sortedStock.slice(start, start + this.itemsPerPage).map(stock => {
+                return {
+                    ...stock,
+                    cantidadFormateada: this.formatNumber(stock.cantidad) + " " + (this.product.unidad || "")
+                };
+            });
         },
-        sortedCurrentHistorico() {
-            return [...this.historicoStock]
-                .sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento))
-                .map(historico => {
-                    return {
-                        ...historico,
-                        cantidadFormateada: this.formatNumber(historico.cantidad) + " " + (this.product.unidad || "")
-                    };
-                });
+
+        sortedCurrentHistoricoPaginated() {
+            const start = (this.currentPageHistorico - 1) * this.itemsPerPage;
+            const sortedHistorico = [...this.historicoStock].sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento));
+            return sortedHistorico.slice(start, start + this.itemsPerPage).map(historico => {
+                return {
+                    ...historico,
+                    cantidadFormateada: this.formatNumber(historico.cantidad) + " " + (this.product.unidad || "")
+                };
+            });
+        },
+
+        totalPagesStock() {
+            return Math.ceil(this.currentStock.length / this.itemsPerPage);
+        },
+
+        totalPagesHistorico() {
+            return Math.ceil(this.historicoStock.length / this.itemsPerPage);
         }
     },
     methods: {
@@ -79,6 +93,7 @@ createApp({
             axios.get(STOCK_RETRIEVE_ONE + id)
                 .then(response => {
                     this.currentStock = response.data;
+                    this.activeTab = "stock";
                 })
                 .catch(error => {
                     console.error("Error al cargar stock actual:", error);
@@ -110,6 +125,28 @@ createApp({
                     });
 
                     this.activeTab = "ofertasPublicadas"
+                })
+                .catch(error => {
+                    console.error("Error al cargar ofertas:", error);
+                });
+        },
+        loadOfertasAceptadas() {
+            axios.get(API_OFERTAS + "/mis-ofertas-aceptadas/hortofruticola/" + this.product.id)
+                .then(response => {
+                    this.ofertasAceptadas = response.data;
+                    console.log(this.ofertasAceptadas)
+
+                    // Ordenar las ofertas por fechaBaja (fecha de vencimiento)
+                    this.ofertasAceptadas.sort((a, b) => {
+                        // Asegúrate de que las fechas están en formato Date (si no lo están, conviértelas)
+                        const fechaA = new Date(a.productoOferta.stock.fechaVencimiento);
+                        const fechaB = new Date(b.productoOferta.stock.fechaVencimiento);
+
+                        // Orden ascendente (de menor a mayor fecha de vencimiento)
+                        return fechaA - fechaB;
+                    });
+
+                    this.activeTab = "ofertasAceptadas"
                 })
                 .catch(error => {
                     console.error("Error al cargar ofertas:", error);
@@ -172,6 +209,34 @@ createApp({
                 })
                 .catch(error => console.error("Error al vender stock:", error));
         },
+
+        prevPageStock() {
+            if (this.currentPageStock > 1) {
+                this.currentPageStock--;
+            }
+        },
+        nextPageStock() {
+            if (this.currentPageStock < this.totalPagesStock) {
+                this.currentPageStock++;
+            }
+        },
+        goToPageStock(page) {
+            this.currentPageStock = page;
+        },
+        prevPageHistorico() {
+            if (this.currentPageHistorico > 1) {
+                this.currentPageHistorico--;
+            }
+        },
+        nextPageHistorico() {
+            if (this.currentPageHistorico < this.totalPagesHistorico) {
+                this.currentPageHistorico++;
+            }
+        },
+        goToPageHistorico(page) {
+            this.currentPageHistorico = page;
+        },
+
         formatDate(dateStr) {
             return new Date(dateStr).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
         },
@@ -226,11 +291,11 @@ createApp({
                 .then(() => {
                     this.product = { ...this.editingHortofruticola }; // Actualizar UI
                     bootstrap.Modal.getInstance(document.getElementById("editHortofruticolaModal")).hide();
-                    this.showToast("✔️ Hortofruticola actualizada correctamente.", "bg-success");
+                    this.showToast("Hortofruticola actualizada correctamente.", "bg-success");
                 })
                 .catch(error => {
                     console.error("Error al actualizar hortofruticola:", error);
-                    this.showToast("❌ Error al actualizar la hortofruticola.", "bg-danger");
+                    this.showToast("Error al actualizar la hortofruticola.", "bg-danger");
                 });
         },
 

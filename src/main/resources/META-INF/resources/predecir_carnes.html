@@ -126,7 +126,7 @@
             .from(contenido)
             .save();
         },
-        
+
         async enviarAhora() {
           const contenido = document.getElementById("contenidoPDF");
 
@@ -151,8 +151,7 @@
               console.error("Error al enviar el correo:", error);
             }
           });
-        }
-        
+          }
       }
     });
 

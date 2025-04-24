@@ -39,7 +39,7 @@ public abstract class StockProductoDAO<T extends StockProducto> {
     // Obtener stock por Negocio
     @Transactional
     public List<T> getAllByNegocio(Long idNegocio) {
-        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.idNegocio = :AND s.cantidad > 0", getEntityClass())
+        return getEntityManager().createQuery("SELECT s FROM " + getEntityClass().getSimpleName() + " s WHERE s.producto.idNegocio = :idNegocio AND s.cantidad > 0", getEntityClass())
                 .setParameter("idNegocio", idNegocio)
                 .getResultList();
     }
@@ -123,6 +123,7 @@ public abstract class StockProductoDAO<T extends StockProducto> {
         PythonManager pythonManager = new PythonManager();
         String JSONtoFiles;
 
+        System.out.println("HHHHHHHHHHH1");
         List<T> stockList = getAllByNegocio(usuario);
         List<HistoricoProducto> historicoList = historicoProductoDAO.obtenerHistorialPorUsuario(usuario, historicoProductoDAO.getEntityClass().getSimpleName());
 
@@ -132,7 +133,6 @@ public abstract class StockProductoDAO<T extends StockProducto> {
         if (historicoList == null || historicoList.isEmpty()) {
             return null;
         }
-
         try {
             JSONtoFiles = packer.packageData((List<StockProducto>) stockList, historicoList);
             System.out.println("JSON enviado a Python: " + JSONtoFiles);

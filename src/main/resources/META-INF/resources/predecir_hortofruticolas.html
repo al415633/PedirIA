@@ -1,162 +1,269 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Predicción de Stock</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <style>
-    header {
-      background-color: #28a745;
-      color: white;
-      padding: 10px 0;
-    }
-    header img {
-      height: 40px;
-      margin-right: 10px;
-    }
-  </style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Predicción de Stock</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!--  <style>-->
+    <!--    header {-->
+    <!--      background-color: #28a745;-->
+    <!--      color: white;-->
+    <!--      padding: 10px 0;-->
+    <!--    }-->
+    <!--    header img {-->
+    <!--      height: 40px;-->
+    <!--      margin-right: 10px;-->
+    <!--    }-->
+    <!--  </style>-->
+    <link rel="stylesheet" href="./header.css">
+    <link rel="stylesheet" href="./footer.css">
+
 </head>
 <body>
-  <header class="d-flex align-items-center px-4">
-    <a href="principal_mensajeria.html">
-      <img src="./static/logo.png" alt="Logo Empresa" />
-    </a>
-    <h1>Predicción de tu Stock de Hortofrutícolas en los Próximos 7 Días</h1>
-  </header>
+<!--  <header class="d-flex align-items-center px-4">-->
+<!--    <a href="principal_mensajeria.html">-->
+<!--      <img src="./static/logo.png" alt="Logo Empresa" />-->
+<!--    </a>-->
+<!--    <h1>Predicción de tu Stock de Hortofrutícolas en los Próximos 7 Días</h1>-->
+<!--  </header>-->
 
-  <div id="app" class="container mt-4">
-    <h4>Resultados de la Predicción</h4>
+
+<div id="app" class="container mt-4">
+    <header class="navbar_container2">
+        <div class="navbar-box2">
+            <img src="./images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
+            <a href="./comercioREAD.html" class="btn">Mis datos</a>
+
+            <div class="dropdown2">
+                <a href="./hortofruticola/gestion_hortofruticola.html" class="btn">Stock</a>
+
+            </div>
+
+            <a href="./comercioUPDATE.html" class="btn">Modificar datos</a>
+
+            <div class="dropdown2">
+                <a href="./predecir_hortofruticolas.html" class="btn">Generar informe</a>
+
+            </div>
+
+            <div class="dropdown2">
+                <a href="#" class="btn" @click="toggleUserDropdown">{{ correoDestino }}</a>
+                <div class="dropdown-content2">
+                    <a href="#" @click="confirmLogout">Cerrar sesión</a>
+                    <a href="#" @click="confirmDeleteAccount">Eliminar cuenta</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <h4>Predicción de tu Stock de Hortofrutícolas en los Próximos 7 Días</h4>
 
     <div id="contenidoPDF">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Stock Actual</th>
-            <th>Ventas Previstas</th>
-            <th>Restock Necesario</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="pred in predicciones" :key="pred.Producto">
-            <td>{{ pred.Producto }}</td>
-            <td>{{ pred['Stock Actual'] }}</td>
-            <td>{{ pred['Ventas previstas'] }}</td>
-            <td>{{ pred['Restock necesario'] }}</td>
-          </tr>
-        </tbody>
-      </table>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Stock Actual</th>
+                <th>Ventas Previstas</th>
+                <th>Restock Necesario</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="pred in predicciones" :key="pred.Producto">
+                <td>{{ pred.Producto }}</td>
+                <td>{{ pred['Stock Actual'] }}</td>
+                <td>{{ pred['Ventas previstas'] }}</td>
+                <td>{{ pred['Restock necesario'] }}</td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 
     <div class="mb-3">
-      <button class="btn btn-success me-2" @click="generarInforme">Generar informe</button>
-      <button class="btn btn-info" @click="enviarAhora">Enviar informe por correo</button>
+        <button class="btn btn-success me-2" @click="generarInforme">Generar informe</button>
+        <button class="btn btn-info" @click="enviarAhora">Enviar informe por correo</button>
     </div>
 
     <!-- Modal de éxito -->
     <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content text-center">
-          <div class="modal-header">
-            <h5 class="modal-title w-100" id="modalExitoLabel">¡Informe enviado!</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            <p>El informe se ha enviado con éxito a <strong>{{ correoDestino }}</strong>.</p>
-          </div>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center">
+                <div class="modal-header">
+                    <h5 class="modal-title w-100" id="modalExitoLabel">¡Informe enviado!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>El informe se ha enviado con éxito a <strong>{{ correoDestino }}</strong>.</p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <button class="btn btn-primary" onclick="window.history.back()">Volver</button>
-  </div>
+</div>
 
-  <script>
+<div id="footer"></div>
+
+<script>
+    // Cargar el contenido del footer desde footer.html
+    fetch('footer.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('footer').innerHTML = data;
+        });
+</script>
+
+<script>
     const app = Vue.createApp({
-      data() {
-        return {
-          predicciones: [],
-          correoDestino: ""
-        };
-      },
-      mounted() {
-        this.cargarPredicciones();
-        this.obtenerCorreoDesdeBackend();
-      },
-      methods: {
-        async cargarPredicciones() {
-          try {
-              const response = await axios.get("http://localhost:8080/hortofruticolas/stock/prediccion");
-              this.predicciones = response.data.message;
-          } catch (error) {
-              console.error("Error al obtener predicciones:", error);
-          }
-      },
-
-        async obtenerCorreoDesdeBackend() {
-          try {
-            const response = await axios.get("http://localhost:8080/comercio/obtener");
-            this.correoDestino = response.data;
-          } catch (error) {
-            console.error("Error al obtener el correo:", error);
-          }
+        data() {
+            return {
+                predicciones: [],
+                correoDestino: "",
+            };
         },
-
-        generarInforme() {
-          const contenido = document.getElementById("contenidoPDF");
-          const fechaActual = new Date();
-          const dia = ("0" + fechaActual.getDate()).slice(-2);
-          const mes = ("0" + (fechaActual.getMonth() + 1)).slice(-2);
-          const anio = fechaActual.getFullYear();
-          const nombreArchivo = `informe_hortofruticolas_${dia}${mes}${anio}.pdf`;
-
-          html2pdf()
-            .set({
-              margin: 1,
-              filename: nombreArchivo,
-              image: { type: 'jpeg', quality: 0.98 },
-              html2canvas: { scale: 2 },
-              jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            })
-            .from(contenido)
-            .save();
+        mounted() {
+            this.cargarPredicciones();
+            this.obtenerCorreoDesdeBackend();
         },
-        
-        async enviarAhora() {
-          const contenido = document.getElementById("contenidoPDF");
+        methods: {
+            async cargarPredicciones() {
+                try {
+                    const response = await axios.get("http://localhost:8080/hortofruticolas/stock/prediccion");
+                    this.predicciones = response.data.message;
+                } catch (error) {
+                    console.error("Error al obtener predicciones:", error);
+                }
+            },
 
-          const opt = {
-            margin: 1,
-            filename: "temp.pdf",
-            image: { type: "jpeg", quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
-          };
+            async obtenerCorreoDesdeBackend() {
+                try {
+                    const response = await axios.get("http://localhost:8080/comercio/obtener");
+                    this.correoDestino = response.data;
+                } catch (error) {
+                    console.error("Error al obtener el correo:", error);
+                }
+            },
 
-          html2pdf().set(opt).from(contenido).outputPdf('datauristring').then(async (pdfDataUri) => {
-            try {
-              await axios.post("http://localhost:3000/enviar-informe", {
-                destinatario: this.correoDestino,
-                pdfBase64: pdfDataUri
-              });
+            generarInforme() {
+                const contenido = document.getElementById("contenidoPDF");
+                const fechaActual = new Date();
+                const dia = ("0" + fechaActual.getDate()).slice(-2);
+                const mes = ("0" + (fechaActual.getMonth() + 1)).slice(-2);
+                const anio = fechaActual.getFullYear();
+                const nombreArchivo = `informe_hortofruticolas_${dia}${mes}${anio}.pdf`;
 
-              const modal = new bootstrap.Modal(document.getElementById("modalExito"));
-              modal.show();
-            } catch (error) {
-              console.error("Error al enviar el correo:", error);
+                html2pdf()
+                    .set({
+                        margin: 1,
+                        filename: nombreArchivo,
+                        image: {type: 'jpeg', quality: 0.98},
+                        html2canvas: {scale: 2},
+                        jsPDF: {unit: 'in', format: 'letter', orientation: 'portrait'}
+                    })
+                    .from(contenido)
+                    .save();
+            },
+
+            async enviarAhora() {
+                const contenido = document.getElementById("contenidoPDF");
+
+                const opt = {
+                    margin: 1,
+                    filename: "temp.pdf",
+                    image: {type: "jpeg", quality: 0.98},
+                    html2canvas: {scale: 2},
+                    jsPDF: {unit: "in", format: "letter", orientation: "portrait"}
+                };
+
+                html2pdf().set(opt).from(contenido).outputPdf('datauristring').then(async (pdfDataUri) => {
+                    try {
+                        await axios.post("http://localhost:3000/enviar-informe", {
+                            destinatario: this.correoDestino,
+                            pdfBase64: pdfDataUri
+                        });
+
+                        const modal = new bootstrap.Modal(document.getElementById("modalExito"));
+                        modal.show();
+                    } catch (error) {
+                        console.error("Error al enviar el correo:", error);
+                    }
+                });
             }
-          });
+            ,
+            confirmLogout() {
+                //console.log("confirm 1");
+                //this.modalMessage = '¿Estás seguro que quieres cerrar sesión?';
+                this.actionToConfirm = this.logoutComercio();  // Establecer la acción que se confirmará
+                //this.showModal = true;  // Mostrar el modal
+
+            },
+            async logoutComercio() {
+                try {
+                    console.log("logout 1");
+
+                    const confirmacion = window.confirm('¿Estás seguro que quieres cerrar sesión?');
+                    if (confirmacion) {
+                        // Realizamos la solicitud POST al backend para cerrar sesión
+                        const response = await axios.post(LOGOUT);
+
+                        // Verificamos si la respuesta fue exitosa
+                        if (response.status === 200) {
+                            alert("Sesión cerrada con éxito");
+                            window.location.href = "../index.html"; // Redirigir al login o a la página deseada
+                        } else {
+                            throw new Error("Error al cerrar sesión");
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error al cerrar sesión:", error);
+                    alert("Hubo un problema al cerrar sesión.");
+                    window.location.href = "registroError.html"; // Redirigir en caso de error
+                }
+            },
+            confirmDeleteAccount() {
+                this.modalMessage = '¿Estás seguro que quieres eliminar tu cuenta?';
+                this.actionToConfirm = this.deleteComercio();  // Establecer la acción que se confirmará
+                //this.showModal = true;  // Mostrar el modal
+            },
+            async deleteComercio() {
+                console.log("llego al delete")
+                // Construimos la URL para el DELETE con el correo como parámetro
+                const url = `${DELETE}`;
+
+                const confirmacion = window.confirm('¿Estás seguro que quieres eliminar tu cuenta?');
+                if (confirmacion) {
+                    try {
+                        // Realizamos la solicitud DELETE al backend
+                        const response = await axios.delete(url);
+
+                        // Verificamos si la eliminación fue exitosa
+                        if (response.status === 204) {
+                            alert("Comercio eliminado con éxito");
+                            window.location.href = "../index.html"; // Redirigir a otra página si es necesario
+                        } else {
+                            throw new Error("Error en la eliminación");
+                        }
+
+                    } catch (error) {
+                        console.error("Error al eliminar comercio:", error);
+                        alert("Hubo un problema con la eliminación del comercio.");
+                        window.location.href = "registroError.html"; // Redirigir en caso de error
+                    }
+                }
+            }
+
         }
-        
-      }
     });
 
     app.mount("#app");
-  </script>
+</script>
+<!--<script src="./js/hortofruticola.js"></script>-->
+
 </body>
 </html>

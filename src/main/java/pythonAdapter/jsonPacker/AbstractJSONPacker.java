@@ -22,10 +22,13 @@ public abstract class AbstractJSONPacker {
 //        AbstractJSONConverter<T> converter = new JSONCarneConverter();
 
         String currentStock = converter.extractCurrentStock(datosStock);
+        System.out.println("currentStock: " + currentStock);
 
         JSONObject json = new Gson().fromJson(currentStock, JSONObject.class);
 
         String csv = converter.extractHistoricStock(datosHistorico);
+//        System.out.println("csv: " + csv);
+
 
         try {
             jsonFile = File.createTempFile(
@@ -87,11 +90,11 @@ public abstract class AbstractJSONPacker {
 //    }
 
     public void closeFiles() {
-        /*if (!jsonFile.delete())
+        if (!jsonFile.delete())
             jsonFile.deleteOnExit();
         if (!csvFile.delete())
             csvFile.deleteOnExit();
-        */
+
     }
 
 }

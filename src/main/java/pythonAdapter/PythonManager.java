@@ -280,6 +280,7 @@ public class PythonManager {
             Gson gson = new Gson();
 
             process.waitFor(); // Espera a que el proceso termine
+            System.out.println("respuesta: ");
             return gson.fromJson(output.toString(), JSONObject.class);
 
         } catch (Exception e) {

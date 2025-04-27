@@ -19,16 +19,7 @@
             font-size: 0.9rem;
         }
 
-        header {
-            background-color: #2848a7;
-            color: white;
-            padding: 10px 0;
-        }
 
-        header img {
-            height: 40px;
-            margin-right: 10px;
-        }
 
         .toast-container {
             position: fixed;
@@ -53,15 +44,11 @@
         }
     </style>
     <link rel="stylesheet" href="../footer.css">
+    <link rel="stylesheet" href="../header.css">
 </head>
 <body>
 
-<header class="d-flex align-items-center px-4">
-    <a href="/">
-        <img src="/static/logo.png" alt="Logo Empresa">
-    </a>
-    <h1>Gestión de Pescado</h1>
-</header>
+
 
 <!-- Botón para volver atrás -->
 <div class="container mt-3">
@@ -69,6 +56,46 @@
 </div>
 
 <div id="app" class="container mt-4">
+
+
+    <header class="navbar_container2">
+        <div class="navbar-box2">
+            <img src="../images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
+            <a href="../comercioREAD.html" class="btn">Mis datos</a>
+
+            <div class="dropdown2">
+                <a href="gestion_pescado.html"class="btn">Stock</a>
+
+            </div>
+
+            <a href="../comercioUPDATE.html" class="btn">Modificar datos</a>
+
+            <div class="dropdown2">
+                <a href="../predecir_pescados.html" class="btn">Generar informe</a>
+
+            </div>
+
+            <div class="dropdown2">
+                <a href="#" class="btn" @click="toggleUserDropdown">{{ usuarioActivo }}</a>
+                <div  class="dropdown-content2">
+                    <a href="#" @click="confirmLogout">Cerrar sesión</a>
+                    <a href="#" @click="confirmDeleteAccount">Eliminar cuenta</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Modal de Confirmación -->
+    <div v-if="showModal" class="modal-overlay">
+        <div class="modal">
+            <h3>{{ modalMessage }}</h3>
+            <div class="modal-buttons">
+                <button @click="closeModal" class="btn">Cancelar</button>
+                <button @click="confirmAction" class="btn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
 
         <!-- Información del producto -->

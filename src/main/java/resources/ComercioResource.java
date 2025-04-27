@@ -94,7 +94,7 @@ public class ComercioResource {
 
         NewCookie cookie = new NewCookie("usuario", correo, "/", null, "Usuario en sesión", 3600, false);
 
-        return Response.created(uri).build();
+        return Response.created(uri).cookie(cookie).build();
     }
 
     @PUT

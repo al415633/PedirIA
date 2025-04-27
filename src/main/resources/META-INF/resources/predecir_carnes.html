@@ -4,33 +4,85 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Predicción de Carne</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <link rel="stylesheet" href="../footer.css">
+  <link rel="stylesheet" href="../header.css">
+
   <style>
-    header {
-      background-color: #da0909;
-      color: white;
-      padding: 10px 0;
+    /* Tarjetas clickeables, estilo de fondo y header de botones */
+    .clickable {
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    header img {
-        height: 40px;
-        margin-right: 10px;
+
+    .clickable:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    a.text-decoration-none {
+      color: inherit;
+    }
+
+    a.text-decoration-none:hover {
+      color: inherit;
+    }
+
+    body {
+      background-color: rgba(250, 218, 221, 0.65);
     }
   </style>
-  <link rel="stylesheet" href="../footer.css">
 </head>
+
 <body>
-  <header class="d-flex align-items-center px-4">
-    <a href="/carne/gestion_carne.html">
-      <img src="./static/logo.png" alt="Logo Empresa" />
-    </a>
-    <h1>Predicción de Carne para la Próxima Semana</h1>
+
+<div id="app" class="container-fluid px-0">
+
+  <!-- HEADER nuevo -->
+  <header class="navbar_container2">
+    <div class="navbar-box2">
+      <img src="../images/logo_cropped.png" alt="PEDIRIA" class="small_logo">
+      <a href="../comercioREAD.html" class="btn">Mis datos</a>
+
+      <div class="dropdown2">
+        <a href="../carne/gestion_carne.html" class="btn">Stock</a>
+      </div>
+
+      <a href="../comercioUPDATE.html" class="btn">Modificar datos</a>
+
+      <div class="dropdown2">
+        <a href="../predecir_carnes.html" class="btn">Generar informe</a>
+      </div>
+
+      <div class="dropdown2">
+        <a href="#" class="btn" @click="toggleUserDropdown">{{ usuarioActivo }}</a>
+        <div class="dropdown-content2">
+          <a href="#" @click="confirmLogout">Cerrar sesión</a>
+          <a href="#" @click="confirmDeleteAccount">Eliminar cuenta</a>
+        </div>
+      </div>
+    </div>
   </header>
 
-  <div id="app" class="container mt-4">
+  <!-- Modal de Confirmación -->
+  <div v-if="showModal" class="modal-overlay">
+    <div class="modal">
+      <h3>{{ modalMessage }}</h3>
+      <div class="modal-buttons">
+        <button @click="closeModal" class="btn">Cancelar</button>
+        <button @click="confirmAction" class="btn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div class="container mt-4">
     <h4>Resultados de la Predicción</h4>
 
     <div id="contenidoPDF">
@@ -77,111 +129,137 @@
     <button class="btn btn-primary" onclick="window.history.back()">Volver</button>
   </div>
 
-  <footer>
-    <div class="footer-container">
-        <!-- Logo PedirIA a la izquierda -->
-        <div class="footer-logo-container">
-            <img src="../images/logo.png" alt="Logo PedirIA" class="footer-logo">
-        </div>
+</div>
 
-        <!-- Texto de información a la derecha -->
-        <div class="footer-info">
-            <h3>Trabajo hecho por:</h3>
-            <ul>
-                <li>Ángela Ausina Sáncehz</li>
-                <li>Andrea Belen Cretu Toma</li>
-                <li>Alejandro Tendero Ferrandis</li>
-                <li>Alejandro Díaz Rivero</li>
-                <li>Óscar Renau Pallarés</li>
-                <li>Hugo Martí Fernández</li>
-            </ul>
-        </div>
-
-        <p class="footer-text">PedirIA &copy; 2025. Todos los derechos reservados.</p>
+<!-- FOOTER igual que antes -->
+<footer>
+  <div class="footer-container">
+    <div class="footer-logo-container">
+      <img src="../images/logo.png" alt="Logo PedirIA" class="footer-logo">
     </div>
-  </footer>
+    <div class="footer-info">
+      <h3>Trabajo hecho por:</h3>
+      <ul>
+          <li>Ángela Ausina Sánchez</li>
+          <li>Andrea Belen Cretu Toma</li>
+          <li>Alejandro Tendero Ferrandis</li>
+          <li>Alejandro Díaz Rivero</li>
+          <li>Óscar Renau Pallarés</li>
+          <li>Hugo Martí Fernández</li>
+      </ul>
+    </div>
+    <p class="footer-text">PedirIA &copy; 2025. Todos los derechos reservados.</p>
+  </div>
+</footer>
 
-  <script>
-    const app = Vue.createApp({
-      data() {
-        return {
-          predicciones: [],
-          correoDestino: ""
-        };
-      },
-      mounted() {
-        this.cargarPredicciones();
-        this.obtenerCorreoDesdeBackend();
-      },
-      methods: {
-        async cargarPredicciones() {
-          try {
-              const response = await axios.get("http://localhost:8080/carnes/stock/prediccion");
-              this.predicciones = response.data.message;
-          } catch (error) {
-              console.error("Error al obtener predicciones:", error);
-          }
-      },
-
-        async obtenerCorreoDesdeBackend() {
-          try {
-            const response = await axios.get("http://localhost:8080/comercio/obtener");
-            this.correoDestino = response.data;
-          } catch (error) {
-            console.error("Error al obtener el correo:", error);
-          }
-        },
-
-        generarInforme() {
-          const contenido = document.getElementById("contenidoPDF");
-          const fechaActual = new Date();
-          const dia = ("0" + fechaActual.getDate()).slice(-2);
-          const mes = ("0" + (fechaActual.getMonth() + 1)).slice(-2);
-          const anio = fechaActual.getFullYear();
-          const nombreArchivo = `informe_carnes_${dia}${mes}${anio}.pdf`;
-
-          html2pdf()
-            .set({
-              margin: 1,
-              filename: nombreArchivo,
-              image: { type: 'jpeg', quality: 0.98 },
-              html2canvas: { scale: 2 },
-              jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            })
-            .from(contenido)
-            .save();
-        },
-
-        async enviarAhora() {
-          const contenido = document.getElementById("contenidoPDF");
-
-          const opt = {
-            margin: 1,
-            filename: "temp.pdf",
-            image: { type: "jpeg", quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
-          };
-
-          html2pdf().set(opt).from(contenido).outputPdf('datauristring').then(async (pdfDataUri) => {
-            try {
-              await axios.post("http://localhost:3000/enviar-informe", {
-                destinatario: this.correoDestino,
-                pdfBase64: pdfDataUri
-              });
-
-              const modal = new bootstrap.Modal(document.getElementById("modalExito"));
-              modal.show();
-            } catch (error) {
-              console.error("Error al enviar el correo:", error);
-            }
-          });
-        }
-        
+<!-- SCRIPTS Vue/axios -->
+<script>
+const app = Vue.createApp({
+  data() {
+    return {
+      predicciones: [],
+      correoDestino: "",
+      usuarioActivo: "Usuario",
+      showModal: false,
+      modalMessage: ""
+    };
+  },
+  mounted() {
+    this.cargarPredicciones();
+    this.obtenerUsuarioDesdeBackend();
+    this.obtenerCorreoDesdeBackend();
+  },
+  methods: {
+    async cargarPredicciones() {
+      try {
+          const response = await axios.get("http://localhost:8080/carnes/stock/prediccion");
+          this.predicciones = response.data.message;
+      } catch (error) {
+          console.error("Error al obtener predicciones:", error);
       }
-    });
+    },
+    async obtenerUsuarioDesdeBackend() {
+      try {
+        const response = await axios.get("http://localhost:8080/comercio/obtener");
+        this.usuarioActivo = response.data;
+      } catch (error) {
+        console.error("Error al obtener el usuario activo:", error);
+      }
+    },
+    async obtenerCorreoDesdeBackend() {
+      try {
+        const response = await axios.get("http://localhost:8080/comercio/obtener");
+        this.correoDestino = response.data;
+      } catch (error) {
+        console.error("Error al obtener el correo:", error);
+      }
+    },
+    generarInforme() {
+      const contenido = document.getElementById("contenidoPDF");
+      const fechaActual = new Date();
+      const dia = ("0" + fechaActual.getDate()).slice(-2);
+      const mes = ("0" + (fechaActual.getMonth() + 1)).slice(-2);
+      const anio = fechaActual.getFullYear();
+      const nombreArchivo = `informe_carnes_${dia}${mes}${anio}.pdf`;
 
-    app.mount("#app");
-  </script>
+      html2pdf()
+        .set({
+          margin: 1,
+          filename: nombreArchivo,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        })
+        .from(contenido)
+        .save();
+    },
+    async enviarAhora() {
+      const contenido = document.getElementById("contenidoPDF");
+
+      const opt = {
+        margin: 1,
+        filename: "temp.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
+      };
+
+      html2pdf().set(opt).from(contenido).outputPdf('datauristring').then(async (pdfDataUri) => {
+        try {
+          await axios.post("http://localhost:3000/enviar-informe", {
+            destinatario: this.correoDestino,
+            pdfBase64: pdfDataUri
+          });
+
+          const modal = new bootstrap.Modal(document.getElementById("modalExito"));
+          modal.show();
+        } catch (error) {
+          console.error("Error al enviar el correo:", error);
+        }
+      });
+    },
+    toggleUserDropdown() {
+      // Función para abrir/cerrar menú de usuario
+    },
+    confirmLogout() {
+      this.modalMessage = "¿Seguro que quieres cerrar sesión?";
+      this.showModal = true;
+    },
+    confirmDeleteAccount() {
+      this.modalMessage = "¿Seguro que quieres eliminar tu cuenta?";
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
+    confirmAction() {
+      this.showModal = false;
+    }
+  }
+});
+
+app.mount("#app");
+</script>
+
 </body>
 </html>

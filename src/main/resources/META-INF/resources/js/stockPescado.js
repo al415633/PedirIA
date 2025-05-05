@@ -408,15 +408,6 @@ createApp({
                     this.showToast("Error al eliminar la oferta.", "bg-danger");
                 });
         },
-        // Mostrar notificaciones tipo Toast
-        showToast(message, colorClass) {
-            const toastBody = document.getElementById('toast-body');
-            toastBody.textContent = message;
-            const toastEl = document.getElementById('toastPescado');
-            toastEl.classList.add(colorClass);
-            const toast = new bootstrap.Toast(toastEl);
-            toast.show();
-        },
 
         toggleUserDropdown() {
             this.showUserDropdown = !this.showUserDropdown;

@@ -423,15 +423,6 @@ createApp({
 
             return daysLeft <= 4; // Si está dentro de 4 días o menos
         },
-        // Mostrar notificaciones tipo Toast
-        showToast(message, colorClass) {
-            const toastBody = document.getElementById('toast-body');
-            toastBody.textContent = message;
-            const toastEl = document.getElementById('toastCarne');
-            toastEl.classList.add(colorClass);
-            const toast = new bootstrap.Toast(toastEl);
-            toast.show();
-        },
 
         toggleUserDropdown() {
             this.showUserDropdown = !this.showUserDropdown;

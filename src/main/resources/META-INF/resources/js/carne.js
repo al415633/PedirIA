@@ -229,9 +229,8 @@ Vue.createApp({
                     alert("Hubo un problema con la eliminación del comercio.");
                     window.location.href = "registroError.html"; // Redirigir en caso de error
                 }
-            }}
-
-        ,
+            }
+        },
         async logoutComercio() {
             try {
                 console.log("logout 1");

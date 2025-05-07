@@ -61,7 +61,7 @@ createApp({
 
         sortedCurrentHistoricoPaginated() {
             const start = (this.currentPageHistorico - 1) * this.itemsPerPage;
-            const sortedHistorico = [...this.historicoStock].sort((a, b) => new Date(a.fechaVencimiento) - new Date(b.fechaVencimiento));
+            const sortedHistorico = [...this.historicoStock].sort((a, b) => new Date(b.fechaVencimiento) - new Date(a.fechaVencimiento));
             return sortedHistorico.slice(start, start + this.itemsPerPage).map(historico => {
                 return {
                     ...historico,
@@ -76,6 +76,31 @@ createApp({
 
         totalPagesHistorico() {
             return Math.ceil(this.historicoStock.length / this.itemsPerPage);
+        },
+
+        visiblePagesStock() {
+            const total = this.totalPagesStock;
+            let start = Math.max(1, this.currentPageStock - 2);
+            let end = Math.min(total, start + 4);
+
+            // Asegurar que siempre sean 5 si se puede
+            if (end - start < 4 && start > 1) {
+                start = Math.max(1, end - 4);
+            }
+
+            return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+        },
+
+        visiblePagesHistorico() {
+            const total = this.totalPagesHistorico;
+            let start = Math.max(1, this.currentPageHistorico - 2);
+            let end = Math.min(total, start + 4);
+
+            if (end - start < 4 && start > 1) {
+                start = Math.max(1, end - 4);
+            }
+
+            return Array.from({ length: end - start + 1 }, (_, i) => start + i);
         }
     },
     methods: {

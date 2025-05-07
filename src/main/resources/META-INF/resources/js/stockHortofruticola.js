@@ -398,6 +398,16 @@ createApp({
                     this.showToast("Error al eliminar la oferta.", "bg-danger");
                 });
         },
+        isNearExpiration(fechaVencimiento) {
+            const currentDate = new Date();
+            const expirationDate = new Date(fechaVencimiento);
+
+            // Calcular la diferencia en días entre la fecha actual y la fecha de vencimiento
+            const timeDiff = expirationDate - currentDate;
+            const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convertir ms a días
+
+            return daysLeft <= 4; // Si está dentro de 4 días o menos
+        },
 
         toggleUserDropdown() {
             this.showUserDropdown = !this.showUserDropdown;

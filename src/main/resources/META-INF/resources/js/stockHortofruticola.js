@@ -77,6 +77,31 @@ createApp({
 
         totalPagesHistorico() {
             return Math.ceil(this.historicoStock.length / this.itemsPerPage);
+        },
+
+        visiblePagesStock() {
+            const total = this.totalPagesStock;
+            let start = Math.max(1, this.currentPageStock - 2);
+            let end = Math.min(total, start + 4);
+
+            // Asegurar que siempre sean 5 si se puede
+            if (end - start < 4 && start > 1) {
+                start = Math.max(1, end - 4);
+            }
+
+            return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+        },
+
+        visiblePagesHistorico() {
+            const total = this.totalPagesHistorico;
+            let start = Math.max(1, this.currentPageHistorico - 2);
+            let end = Math.min(total, start + 4);
+
+            if (end - start < 4 && start > 1) {
+                start = Math.max(1, end - 4);
+            }
+
+            return Array.from({ length: end - start + 1 }, (_, i) => start + i);
         }
     },
     methods: {
@@ -398,14 +423,15 @@ createApp({
                     this.showToast("Error al eliminar la oferta.", "bg-danger");
                 });
         },
-        // Mostrar notificaciones tipo Toast
-        showToast(message, colorClass) {
-            const toastBody = document.getElementById('toast-body');
-            toastBody.textContent = message;
-            const toastEl = document.getElementById('toastHortofruticola');
-            toastEl.classList.add(colorClass);
-            const toast = new bootstrap.Toast(toastEl);
-            toast.show();
+        isNearExpiration(fechaVencimiento) {
+            const currentDate = new Date();
+            const expirationDate = new Date(fechaVencimiento);
+
+            // Calcular la diferencia en días entre la fecha actual y la fecha de vencimiento
+            const timeDiff = expirationDate - currentDate;
+            const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convertir ms a días
+
+            return daysLeft <= 4; // Si está dentro de 4 días o menos
         },
 
         toggleUserDropdown() {

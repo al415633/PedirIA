@@ -42,6 +42,10 @@
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
+
+        body {
+            background-color: rgba(250, 218, 221, 0.65); /* Rosa pastel */
+        }
     </style>
     <link rel="stylesheet" href="../footer.css">
     <link rel="stylesheet" href="../header.css">
@@ -50,12 +54,10 @@
 
 
 
-<!-- Botón para volver atrás -->
-<div class="container mt-3">
-    <button class="btn btn-secondary" onclick="window.history.back()">← Volver</button>
-</div>
+
 
 <div id="app" class="container mt-4">
+
 
 
     <header class="navbar_container2">
@@ -119,6 +121,7 @@
             <button class="btn btn-warning w-100" @click="openEditProductModal"> Editar Pescado</button>
             <!-- Botón para eliminar el pescado -->
             <button class="btn btn-danger w-100 mt-2" @click="openDeleteModal">Eliminar Pescado</button>
+            <button class="btn btn-secondary w-100 mt-2" onclick="window.history.back()">← Volver</button>
 
         </div>
 
@@ -174,7 +177,7 @@
                        @click="loadOfertasPublicadas">Ofertas publicadas</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link clickable" :class="{ active: activeTab === 'ofertas' }" @click="loadOfertasAceptadas">Ofertas
+                    <a class="nav-link clickable" :class="{ active: activeTab === 'ofertasAceptadas' }" @click="loadOfertasAceptadas">Ofertas
                         aceptadas</a>
                 </li>
             </ul>
@@ -217,10 +220,10 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="stock in sortedCurrentStockPaginated" :key="stock.id">
+                    <tr v-for="stock in sortedCurrentStockPaginated" :key="stock.id" :class="{'table-danger': isNearExpiration(stock.fechaVencimiento)}">
                         <td>{{ stock.cantidadFormateada }}</td>
                         <td>{{ formatDate(stock.fechaIngreso) }}</td>
-                        <td>{{ formatDate(stock.fechaVencimiento) }}</td>
+                        <td :class="{'text-danger': isNearExpiration(stock.fechaVencimiento)}">{{ formatDate(stock.fechaVencimiento) }}</td>
                         <td>
                             <button style="margin-right: 10px;" class="btn btn-sm btn-warning stock-actions" @click="editStock(stock)">✏️ Editar
                             </button>
@@ -237,14 +240,17 @@
                         <li class="page-item" :class="{ disabled: currentPageStock === 1 }">
                             <button class="page-link" @click="prevPageStock" aria-label="Anterior">Anterior</button>
                         </li>
-                        <li class="page-item" v-for="page in totalPagesStock" :key="page" :class="{ active: currentPageStock === page }">
+
+                        <li class="page-item" v-for="page in visiblePagesStock" :key="page" :class="{ active: currentPageStock === page }">
                             <button class="page-link" @click="goToPageStock(page)">{{ page }}</button>
                         </li>
+
                         <li class="page-item" :class="{ disabled: currentPageStock === totalPagesStock }">
                             <button class="page-link" @click="nextPageStock" aria-label="Siguiente">Siguiente</button>
                         </li>
                     </ul>
                 </nav>
+
             </div>
 
             <!-- Contenido del Histórico -->
@@ -274,7 +280,7 @@
                         <li class="page-item" :class="{ disabled: currentPageHistorico === 1 }">
                             <button class="page-link" @click="prevPageHistorico" aria-label="Anterior">Anterior</button>
                         </li>
-                        <li class="page-item" v-for="page in totalPagesHistorico" :key="page" :class="{ active: currentPageHistorico === page }">
+                        <li class="page-item" v-for="page in visiblePagesHistorico" :key="page" :class="{ active: currentPageHistorico === page }">
                             <button class="page-link" @click="goToPageHistorico(page)">{{ page }}</button>
                         </li>
                         <li class="page-item" :class="{ disabled: currentPageHistorico === totalPagesHistorico }">

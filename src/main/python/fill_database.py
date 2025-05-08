@@ -105,35 +105,17 @@ def init_negocios():
         ("Naranja", "kg", 'fresco'),
     ]
 
-    # Insertar productos
-    # cur.executemany(
-    #     """INSERT INTO Carne (nombre, unidad, tipo_conserva, id_negocio)
-    #     VALUES (%s, %s, %s, %s) RETURNING id_carne;""",
-    #     [(carnes[i][0], carnes[i][1], carnes[i][2], usuarios_ids[i]) for i in range(3)],
-    # )
-    # cur.execute("""SELECT id_carne
-    #                     FROM Carne
-    #                     ORDER BY id_carne DESC
-    #                     LIMIT 3;
-    #                     """)
-
     for i in range(3):
         cur.execute(
             """INSERT INTO Carne (nombre, unidad, tipo_conserva, id_negocio, id_img)
         VALUES (%s, %s, %s, %s, %s) RETURNING id_carne;""",
             (carnes[i][0], carnes[i][1], carnes[i][2].upper(), usuarios_ids[0], imagenes_carne_ids[i])
         )
-        # Recuperamos la ID generada y la agregamos a la lista
         carne_id = cur.fetchone()[0]
         carnes_ids.append(carne_id)
-    # carnes_ids = [row[0] for row in cur.fetchall()]
     print(carnes_ids)
 
-    # cur.execute("""SELECT id_pescado
-    #                         FROM Pescado
-    #                         ORDER BY id_pescado DESC
-    #                         LIMIT 3;
-    #                         """)
+
     for i in range(3):
         cur.execute(
             """INSERT INTO Pescado (nombre, unidad, tipo_conserva, id_negocio, id_img)
@@ -143,19 +125,7 @@ def init_negocios():
         # Recuperamos la ID generada y la agregamos a la lista
         pescado_id = cur.fetchone()[0]
         pescados_ids.append(pescado_id)
-    # pescados_ids = [row[0] for row in cur.fetchall()]
-    # print(pescados_ids)
-    #
-    # cur.executemany(
-    #     """INSERT INTO HortoFruticola (nombre, unidad, tipo_conserva, id_negocio)
-    #     VALUES (%s, %s, %s, %s) RETURNING id_hortofruticola;""",
-    #     [(frutas[i][0], frutas[i][1], frutas[i][2], usuarios_ids[1]) for i in range(3)],
-    # )
-    # cur.execute("""SELECT id_hortofruticola
-    #                         FROM Hortofruticola
-    #                         ORDER BY id_hortofruticola DESC
-    #                         LIMIT 3;
-    #                         """)
+
     for i in range(3):
         cur.execute(
             """INSERT INTO HortoFruticola (nombre, unidad, tipo_conserva, id_negocio, id_img)

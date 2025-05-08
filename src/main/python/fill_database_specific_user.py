@@ -4,6 +4,11 @@ import psycopg2
 from datetime import datetime, timedelta
 import random
 
+#######
+#Instrucciones en el "if __name__ == "__main__":"
+#######
+
+
 conn = psycopg2.connect(
     dbname="al415647_PedirIA",
     user="al415696",
@@ -28,6 +33,46 @@ carnes_ids = []
 frutas_ids = []
 pescados_ids = []
 negocio_id = 1
+
+
+def main(funcion, negocio_id , dias_anterioridad, tipo_usuario):
+
+    # Pablo: 17 /  Carne: [20, 21, 23, 24, 25, 26]
+    # Carla: 18 / Fruta: [9, 10, 11, 13, 14, 15]
+
+    match funcion:
+        case "productos":
+            add_productos(negocio_id, tipo_usuario)
+        case "historicos":
+            fill_historico(tipo_usuario, dias_anterioridad)
+
+
+if __name__ == "__main__":
+    #Cambiar esto a la id del negocio con el que quieres trabajar
+    ## Asignar a la variable "id" correspondiente las ids de los productos para los que quieras crear historicos
+    global carnes_ids
+    global frutas_ids
+    global pescados_ids
+    # carnes_ids = [24, 25, 26]
+    # carnes_ids = [20, 21, 23]
+    # frutas_ids= [13, 14, 15]
+    # frutas_ids = [9, 10, 11]
+
+    ## Cambiar a la id del negocio con el que se quiere trabajar
+    negocio_id = 18
+
+    ## Cambiar tipo_usuario al tipo de negocio del usuario
+    # carne, pescado, fruta, otro
+    tipo_usuario = 'fruta'
+
+    ##Elegir si se quiere añadir productos, o historicos (Se añadirán los productos especificados en "add_productos")
+    #productos , historicos
+    funcion_utilizada = "historicos"
+    ## Los dias hacia atrás en los que se generan historicos (30 desde hace més, 365 un año etc), 1 cada día con tendencia creciente
+    dias_anterioridad = 30
+
+    main(funcion= funcion_utilizada, negocio_id=negocio_id, dias_anterioridad=dias_anterioridad, tipo_usuario= tipo_usuario)
+    #clean()
 
 # Insertar histórico de ventas con tendencia de crecimiento
 
@@ -230,16 +275,7 @@ def fill_historico(tipo, dias_anterioridad):
 
 # Método para eliminar solo los datos insertados por este script
 
-def main(funcion, negocio_id , dias_anterioridad, tipo_usuario):
 
-    # Pablo: 17 /  Carne: [20, 21, 23, 24, 25, 26]
-    # Carla: 18 / Fruta: [9, 10, 11, 13, 14, 15]
-
-    match funcion:
-        case "productos":
-            add_productos(negocio_id, tipo_usuario)
-        case "historicos":
-            fill_historico(tipo_usuario, dias_anterioridad)
 
 
 
@@ -247,31 +283,3 @@ def clean():
     cur.execute("DELETE FROM Usuario WHERE id_usuario > 60")
 
 
-if __name__ == "__main__":
-
-
-    #Cambiar esto a la id del negocio con el que quieres trabajar
-    ## Asignar a la variable "id" correspondiente las ids de los productos para los que quieras crear historicos
-    global carnes_ids
-    global frutas_ids
-    global pescados_ids
-    # carnes_ids = [24, 25, 26]
-    # carnes_ids = [20, 21, 23]
-    # frutas_ids= [13, 14, 15]
-    # frutas_ids = [9, 10, 11]
-
-    ## Cambiar a la id del negocio con el que se quiere trabajar
-    negocio_id = 18
-
-    ## Cambiar tipo_usuario al tipo de negocio del usuario
-    # carne, pescado, fruta, otro
-    tipo_usuario = 'fruta'
-
-    ##Elegir si se quiere añadir productos, o historicos (Se añadirán los productos especificados en "add_productos")
-    #productos , historicos
-    funcion_utilizada = "historicos"
-    ## Los dias hacia atrás en los que se generan historicos (30 desde hace més, 365 un año etc), 1 cada día con tendencia creciente
-    dias_anterioridad = 30
-
-    main(funcion= funcion_utilizada, negocio_id=negocio_id, dias_anterioridad=dias_anterioridad, tipo_usuario= tipo_usuario)
-    #clean()

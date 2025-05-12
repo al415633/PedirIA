@@ -4,10 +4,11 @@ footer {
     padding: 40px 0;
     margin-top: 400px;
     text-align: center;
-    font-family: Arial, sans-serif;
+    font-family: Verdana, Geneva, sans-serif;
 }
 
 .footer-container {
+    font-family: Verdana, Geneva, sans-serif;
     max-width: 1200px;
     margin: auto;
     display: flex;
@@ -17,38 +18,45 @@ footer {
 }
 
 .footer-logo-container {
+    font-family: Verdana, Geneva, sans-serif;
     display: flex;
     align-items: center;
     justify-content: flex-start;
 }
 
 .footer-logo {
+    font-family: Verdana, Geneva, sans-serif;
     width: 300px; /* Aumentamos el tamaño del logo */
     margin-right: 20px; /* Separación entre logo y texto */
 }
 
 .footer-info {
+    font-family: Verdana, Geneva, sans-serif;
     flex-grow: 1; /* Hace que el texto se expanda y ocupe el espacio disponible */
     text-align: left; /* Alineamos el texto a la izquierda */
 }
 
 .footer-info h3 {
+    font-family: Verdana, Geneva, sans-serif;
     font-size: 1.5em;
     margin-bottom: 10px;
 }
 
 .footer-info ul {
+    font-family: Verdana, Geneva, sans-serif;
     list-style-type: disc;
     padding-left: 20px;
     text-align: left;
 }
 
 .footer-info ul li {
+    font-family: Verdana, Geneva, sans-serif;
     font-size: 1em;
     margin: 5px 0;
 }
 
 .footer-text {
+    font-family: Verdana, Geneva, sans-serif;
     font-size: 1em;
     margin-top: 20px;
     color: white;
@@ -57,13 +65,16 @@ footer {
 /* Asegurar que en móviles el footer se vea bien */
 @media (max-width: 768px) {
     .footer-container {
+        font-family: Verdana, Geneva, sans-serif;
         flex-direction: column; /* Colocamos el contenido en columna para móviles */
         text-align: center;
     }
     .footer-info {
+        font-family: Verdana, Geneva, sans-serif;
         text-align: center;
     }
     .footer-info ul {
+        font-family: Verdana, Geneva, sans-serif;
         padding-left: 0;
     }
 }

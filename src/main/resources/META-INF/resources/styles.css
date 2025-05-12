@@ -1,11 +1,12 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: Verdana, Geneva, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: rgba(250, 218, 221, 0.65); /* Rosa pastel */
+    background-color: rgba(223, 241, 223); /* Rosa pastel */
     text-align: center;
 }
 header {
+    font-family: Verdana, Geneva, sans-serif;
     color: white;
     padding: 20px;
     gap: 20px;
@@ -17,6 +18,7 @@ header {
 }
 
 .header-box {
+    font-family: Verdana, Geneva, sans-serif;
     background-color: #5a7d4b; /* Verde */
     border-radius: 15px; /* Bordes redondeados */
     padding: 20px;
@@ -26,6 +28,7 @@ header {
 }
 
 .navbar-box {
+    font-family: Verdana, Geneva, sans-serif;
     background-color: #5a7d4b;
     border-radius: 15px;
     position: absolute;
@@ -334,10 +337,11 @@ footer {
     padding: 40px 0;
     margin-top: 400px;
     text-align: center;
-    font-family: Arial, sans-serif;
+    font-family: Verdana, Geneva, sans-serif;
 }
 
 .footer-container {
+     font-family: Verdana, Geneva, sans-serif;
     max-width: 1200px;
     margin: auto;
     display: flex;
@@ -347,38 +351,45 @@ footer {
 }
 
 .footer-logo-container {
+     font-family: Verdana, Geneva, sans-serif;
     display: flex;
     align-items: center;
     justify-content: flex-start;
 }
 
 .footer-logo {
+     font-family: Verdana, Geneva, sans-serif;
     width: 300px; /* Aumentamos el tamaño del logo */
     margin-right: 20px; /* Separación entre logo y texto */
 }
 
 .footer-info {
+     font-family: Verdana, Geneva, sans-serif;
     flex-grow: 1; /* Hace que el texto se expanda y ocupe el espacio disponible */
     text-align: left; /* Alineamos el texto a la izquierda */
 }
 
 .footer-info h3 {
+     font-family: Verdana, Geneva, sans-serif;
     font-size: 1.5em;
     margin-bottom: 10px;
 }
 
 .footer-info ul {
+     font-family: Verdana, Geneva, sans-serif;
     list-style-type: disc;
     padding-left: 20px;
     text-align: left;
 }
 
 .footer-info ul li {
+     font-family: Verdana, Geneva, sans-serif;
     font-size: 1em;
     margin: 5px 0;
 }
 
 .footer-text {
+     font-family: Verdana, Geneva, sans-serif;
     font-size: 1em;
     margin-top: 20px;
     color: white;
@@ -387,19 +398,23 @@ footer {
 /* Asegurar que en móviles el footer se vea bien */
 @media (max-width: 768px) {
     .footer-container {
+         font-family: Verdana, Geneva, sans-serif;
         flex-direction: column; /* Colocamos el contenido en columna para móviles */
         text-align: center;
     }
     .footer-info {
+         font-family: Verdana, Geneva, sans-serif;
         text-align: center;
     }
     .footer-info ul {
+         font-family: Verdana, Geneva, sans-serif;
         padding-left: 0;
     }
 }
 
 /* Estilos del navbar */
 .navbar_container2 {
+     font-family: Verdana, Geneva, sans-serif;
     display: flex;
     align-items: center;
     gap: 15px;
@@ -409,10 +424,12 @@ footer {
 
 /* Estilos del dropdown */
 .dropdown2 {
+     font-family: Verdana, Geneva, sans-serif;
     position: relative;
 }
 
 .dropdown-content2 {
+     font-family: Verdana, Geneva, sans-serif;
     display: none;
     position: absolute;
     background-color: white;
@@ -426,6 +443,7 @@ footer {
 }
 
 .dropdown-content2 a {
+     font-family: Verdana, Geneva, sans-serif;
     color: black;
     padding: 10px;
     display: block;
@@ -434,16 +452,19 @@ footer {
 }
 
 .dropdown-content2 a:hover {
+     font-family: Verdana, Geneva, sans-serif;
     background-color: #f1f1f1;
 }
 
 /* Mostrar el dropdown al pasar el mouse */
 .dropdown2:hover .dropdown-content2 {
+     font-family: Verdana, Geneva, sans-serif;
     display: block;
 }
 
 /* Estilo para el overlay (fondo oscuro) */
 .modal-overlay {
+     font-family: Verdana, Geneva, sans-serif;
     position: fixed;
     top: 0;
     left: 0;
@@ -458,6 +479,7 @@ footer {
 
 /* Estilo para el modal */
 .modal {
+     font-family: Verdana, Geneva, sans-serif;
     background: white;
     padding: 20px;
     border-radius: 5px;
@@ -467,6 +489,7 @@ footer {
 }
 
 .modal button {
+    font-family: Verdana, Geneva, sans-serif;
     margin-top: 20px;
     padding: 10px 20px;
     background: #5a7d4b;
@@ -477,18 +500,22 @@ footer {
 }
 
 .modal button:hover {
+    font-family: Verdana, Geneva, sans-serif;
     background: #445a35; /* verde oscuro */
 }
 .modal-buttons {
+    font-family: Verdana, Geneva, sans-serif;
     display: flex;
     justify-content: space-between; /* Espacio entre los botones */
     margin-top: 20px; /* Separación entre el texto y los botones */
 }
 
 .modal-buttons button {
+    font-family: Verdana, Geneva, sans-serif;
     margin-right: 10px; /* Espacio entre los botones */
 }
 
 .modal-buttons button:last-child {
+    font-family: Verdana, Geneva, sans-serif;
     margin-right: 0; /* Para no dejar espacio al final */
 }

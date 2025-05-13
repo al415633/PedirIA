@@ -117,7 +117,7 @@
             <button class="btn btn-warning w-100" @click="openEditCarneModal"> Editar Carne</button>
             <!-- Botón para eliminar la carne -->
             <button class="btn btn-danger w-100 mt-2" @click="openDeleteModal">Eliminar Carne</button>
-            <button class="btn btn-secondary w-100 mt-2" onclick="window.history.back()">← Volver</button>
+            <button class="btn btn-secondary w-100 mt-2" onclick="window.history.back()">Volver</button>
 
 
         </div>
@@ -127,7 +127,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Editar Carne</h5>
+                        <h5 class="modal-title">Editar {{product.nombre}}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
@@ -176,9 +176,9 @@
 
             <!-- Contenido de Stock Actual -->
             <div v-if="activeTab === 'stock'">
-                <h4>Stock Disponible</h4>
 
                 <!-- Formulario para añadir stock -->
+                <h4 class="mt-4">Agregar nuevo stock</h4>
                 <form @submit.prevent="addStock" class="row g-2 align-items-center mb-3">
                     <div class="col-auto">
                         <label for="cantidad" class="form-label">Cantidad</label>
@@ -199,6 +199,7 @@
 
 
                 <!-- Tabla de stock -->
+                <h4 class="mt-4">Stock actual</h4>
                 <table class="table table-bordered">
                     <thead>
                     <tr>
@@ -242,7 +243,7 @@
 
             <!-- Contenido del Histórico -->
             <div v-if="activeTab === 'historico'">
-                <h4>Histórico de Ventas</h4>
+                <h4 class="mt-4">Histórico de Ventas</h4>
                 <table class="table table-bordered">
                     <thead>
                     <tr>
@@ -278,8 +279,9 @@
                 </nav>
             </div>
 
-            <div v-if="activeTab === 'ofertasPublicadas'">
-                <h4>Ofertas Publicaas</h4>
+            <div v-if="ofertas.length === 0 && activeTab === 'ofertasPublicadas'" class="alert alert-info">No hay ofertas publicadas.</div>
+            <div v-else v-if="activeTab === 'ofertasPublicadas'">
+                <h4 class="mt-4">Ofertas Publicadas</h4>
                 <table class="table table-bordered">
                     <thead>
                     <tr>
@@ -305,8 +307,9 @@
                 </table>
             </div>
 
-            <div v-if="activeTab === 'ofertasAceptadas'">
-                <h4>Ofertas Aceptadas</h4>
+            <div v-if="ofertasAceptadas.length === 0 && activeTab === 'ofertasAceptadas'" class="alert alert-info">No hay ofertas aceptadas.</div>
+            <div v-else v-if="activeTab === 'ofertasAceptadas' ">
+                <h4 class="mt-4">Ofertas Aceptadas</h4>
                 <table class="table table-bordered">
                     <thead>
                     <tr>
@@ -326,6 +329,7 @@
                     </tbody>
                 </table>
             </div>
+
 
         </div>
     </div>
@@ -430,7 +434,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Crear Oferta</h5>
+                    <h5 class="modal-title">Crear Oferta de {{ product.nombre }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

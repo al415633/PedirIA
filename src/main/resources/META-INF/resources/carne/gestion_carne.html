@@ -61,8 +61,7 @@
 <body>
 
 
-
-<div id="app" class="container mt-4"  >
+<div id="app" class="container mt-4">
 
 
     <header class="navbar_container2">
@@ -71,7 +70,7 @@
             <a href="../comercioREAD.html" class="btn">Mis datos</a>
 
             <div class="dropdown2">
-                <a href="gestion_carne.html"class="btn">Stock</a>
+                <a href="gestion_carne.html" class="btn">Stock</a>
 
             </div>
 
@@ -84,7 +83,7 @@
 
             <div class="dropdown2">
                 <a href="#" class="btn" @click="toggleUserDropdown">{{ usuarioActivo }}</a>
-                <div  class="dropdown-content2">
+                <div class="dropdown-content2">
                     <a href="#" @click="confirmLogout">Cerrar sesión</a>
                     <a href="#" @click="confirmDeleteAccount">Eliminar cuenta</a>
                 </div>
@@ -104,10 +103,9 @@
     </div>
 
 
-
     <!-- Formulario para agregar producto -->
     <div class="card p-3 mb-4">
-        <h4>Agregar Nueva Carne</h4>
+        <h4 >Agregar Nueva Carne</h4>
         <form class="row g-3" @submit.prevent="createCarne">
             <div class="col-md-4">
                 <label for="nombreCarne" class="form-label">Nombre de la Carne</label>
@@ -140,10 +138,13 @@
         </form>
     </div>
 
-    <!-- Barra de búsqueda -->
-    <div class="row mb-3">
-        <div class="col-md-6 offset-md-3">
-            <input v-model="busquedaNombre" type="text" class="form-control" placeholder="Buscar por nombre de carne">
+    <!-- Barra de búsqueda con título a la izquierda -->
+    <div class="row align-items-center mb-3">
+        <div class="col-md-3 text-md-end text-center mb-2 mb-md-0">
+            <label for="busqueda" class="form-label fw-bold">Buscar carne:</label>
+        </div>
+        <div class="col-md-6">
+            <input v-model="busquedaNombre" type="text" id="busqueda" class="form-control" placeholder="Nombre de la carne">
         </div>
     </div>
 
@@ -199,10 +200,10 @@
 </div>
 
 
-    <script src="../js/carne.js"></script>
+<script src="../js/carne.js"></script>
 
 
-    <footer>
+<footer>
     <div class="footer-container">
         <!-- Logo PedirIA a la izquierda -->
         <div class="footer-logo-container">

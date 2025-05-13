@@ -23,18 +23,19 @@
 
 <main>
     <div id="app">
-    <div class="login-container">
-        <form @submit.prevent="verificarComercio">
-            <label for="correo">Email</label>
-            <input type="email" id="correo" v-model="correo" name="email" required>
+        <div class="login-container">
+            <h2>Inicio de sesión</h2>
+            <form @submit.prevent="verificarComercio">
+                <label for="correo">Email</label>
+                <input type="email" id="correo" v-model="correo" name="email" required>
 
-            <label for="password">Contraseña</label>
-            <input type="password" id="password" v-model="password" name="password" required>
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" v-model="password" name="password" required>
 
-            <button type="submit" class="btn register">Iniciar Sesión</button>
-        </form>
-        <p>¿No tienes cuenta? <a href="comercioREGISTRO.html" class="btn register">Registrarse</a></p>
-    </div>
+                <button type="submit" class="btn register">Iniciar Sesión</button>
+            </form>
+            <p>¿No tienes cuenta? <a href="comercioREGISTRO.html" class="btn register">Registrarse</a></p>
+        </div>
     </div>
 </main>
 <script src="js/comercio.js"></script>

@@ -136,10 +136,13 @@
         </form>
     </div>
 
-    <!-- Barra de búsqueda -->
-    <div class="row mb-3">
-        <div class="col-md-6 offset-md-3">
-            <input v-model="busquedaNombre" type="text" class="form-control" placeholder="Buscar por nombre de fruta">
+    <!-- Barra de búsqueda con título a la izquierda -->
+    <div class="row align-items-center mb-3">
+        <div class="col-md-3 text-md-end text-center mb-2 mb-md-0">
+            <label for="busqueda" class="form-label fw-bold">Buscar hortofrutícola:</label>
+        </div>
+        <div class="col-md-6">
+            <input v-model="busquedaNombre" type="text" id="busqueda" class="form-control" placeholder="Nombre del hortofrutícola">
         </div>
     </div>
 

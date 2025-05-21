@@ -103,10 +103,10 @@
 
     <!-- Formulario para agregar producto -->
     <div class="card p-3 mb-4">
-        <h4>Agregar Nueva Hortofrutícola</h4>
+        <h4>Agregar Nueva Fruta o Verdura</h4>
         <form class="row g-3" @submit.prevent="createHortofruticola">
             <div class="col-md-4">
-                <label for="nombreHortofruticola" class="form-label">Nombre de la Hortofrutícola</label>
+                <label for="nombreHortofruticola" class="form-label">Nombre de la Fruta o Verdura</label>
                 <input v-model="nombreHortofruticola" type="text" id="nombreHortofruticola" class="form-control"
                        placeholder="Nombre" @input="validateHortofruticola">
                 <small v-if="errores.nombre" class="text-danger">{{ errores.nombre }}</small>
@@ -125,12 +125,12 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label for="imagenHortofruticola" class="form-label">Imagen de la Hortofrutícola</label>
+                <label for="imagenHortofruticola" class="form-label">Imagen de la Fruta o Verdura</label>
                 <input type="file" id="imagenHortofruticola" class="form-control" @change="onFileChange">
             </div>
             <div class="col-12 text-end">
                 <button type="submit" class="btn btn-primary" :disabled="botonDeshabilitado">
-                    Agregar Hortofrutícola
+                    Agregar Fruta o Verdura
                 </button>
             </div>
         </form>
@@ -139,10 +139,10 @@
     <!-- Barra de búsqueda con título a la izquierda -->
     <div class="row align-items-center mb-3">
         <div class="col-md-3 text-md-end text-center mb-2 mb-md-0">
-            <label for="busqueda" class="form-label fw-bold">Buscar hortofrutícola:</label>
+            <label for="busqueda" class="form-label fw-bold">Buscar fruta o verdura:</label>
         </div>
         <div class="col-md-6">
-            <input v-model="busquedaNombre" type="text" id="busqueda" class="form-control" placeholder="Nombre del hortofrutícola">
+            <input v-model="busquedaNombre" type="text" id="busqueda" class="form-control" placeholder="Nombre de la fruta o verdura">
         </div>
     </div>
 

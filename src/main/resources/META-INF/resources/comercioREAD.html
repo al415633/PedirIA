@@ -21,9 +21,9 @@
                 <a href="#" class="btn">Stock</a>
                 <div class="dropdown-content2">
                     <!-- Solo mostrar la opción de informe correspondiente según el tipo de comercio -->
-                    <a v-if="tipoComercio === 'carne'" href="carne/gestion_carne.html">Predecir Carnes</a>
-                    <a v-if="tipoComercio === 'pescado'" href="pescado/gestion_pescado.html">Predecir Pescados</a>
-                    <a v-if="tipoComercio === 'fruta'" href="hortofruticola/gestion_hortofruticola.html">Predecir Hortofrutícolas</a>
+                    <a v-if="tipoComercio === 'carne'" href="carne/gestion_carne.html">Gestionar Carnes</a>
+                    <a v-if="tipoComercio === 'pescado'" href="pescado/gestion_pescado.html">Gestionar Pescados</a>
+                    <a v-if="tipoComercio === 'fruta'" href="hortofruticola/gestion_hortofruticola.html">Gestionar Frutas y Verduras</a>
                 </div>
             </div>
 
@@ -35,7 +35,7 @@
                     <!-- Solo mostrar la opción de informe correspondiente según el tipo de comercio -->
                     <a v-if="tipoComercio === 'carne'" href="predecir_carnes.html">Predecir Carnes</a>
                     <a v-if="tipoComercio === 'pescado'" href="predecir_pescados.html">Predecir Pescados</a>
-                    <a v-if="tipoComercio === 'fruta'" href="predecir_hortofruticolas.html">Predecir Hortofrutícolas</a>
+                    <a v-if="tipoComercio === 'fruta'" href="predecir_hortofruticolas.html">Predecir Frutas y Verduras</a>
                 </div>
             </div>
 
@@ -85,15 +85,17 @@
                 <div>
                     <div class="form-group">
                         <label for="dia">Horario de compra de stock</label>
-                        <select readonly id="dia" v-model="dia" required>
-                            <option value="lunes">Lunes</option>
-                            <option value="martes">Martes</option>
-                            <option value="miercoles">Miércoles</option>
-                            <option value="jueves">Jueves</option>
-                            <option value="viernes">Viernes</option>
-                            <option value="sabado">Sábado</option>
-                            <option value="domingo">Domingo</option>
-                        </select>
+                        <input readonly type="text" id="dia" v-model="dia" required>
+
+<!--                        <select readonly id="dia" v-model="dia" required>-->
+<!--                            <option value="lunes">Lunes</option>-->
+<!--                            <option value="martes">Martes</option>-->
+<!--                            <option value="miercoles">Miércoles</option>-->
+<!--                            <option value="jueves">Jueves</option>-->
+<!--                            <option value="viernes">Viernes</option>-->
+<!--                            <option value="sabado">Sábado</option>-->
+<!--                            <option value="domingo">Domingo</option>-->
+<!--                        </select>-->
                     </div>
                 </div>
             </div>

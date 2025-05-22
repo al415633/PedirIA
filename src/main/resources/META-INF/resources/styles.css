@@ -20,7 +20,7 @@ header {
 .header-box {
     font-family: Verdana, Geneva, sans-serif;
     background-color: #5a7d4b; /* Verde */
-    border-radius: 15px; /* Bordes redondeados */
+    border-radius: 0px;
     padding: 20px;
     max-width: 100%; /* Ajusta el ancho */
     margin: 20px auto; /* Centrarlo horizontalmente */
@@ -30,12 +30,12 @@ header {
 .navbar-box {
     font-family: Verdana, Geneva, sans-serif;
     background-color: #5a7d4b;
-    border-radius: 15px;
+    border-radius: 0px;
     position: absolute;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 90%;
+    width: 100%;
     /*max-width: 1200px;*/
     padding: 10px 20px;
     text-align: center;
